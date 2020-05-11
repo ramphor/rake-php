@@ -1,0 +1,14 @@
+{
+    "name": "ramphor/spider-framework",
+    "description": "The spider framework for WordPress",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Ramphor Premium",
+            "email": "puleeno@gmail.com"
+        }
+    ],
+    "require": {}
+}
