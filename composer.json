@@ -1,5 +1,5 @@
 {
-    "name": "ramphor/spider-framework",
+    "name": "ramphor/scrapy",
     "description": "The spider framework for WordPress",
     "type": "library",
     "license": "MIT",
