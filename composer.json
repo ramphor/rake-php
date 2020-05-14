@@ -1,6 +1,6 @@
 {
     "name": "ramphor/scrapy",
-    "description": "The spider framework for WordPress",
+    "description": "The spiders framework for PHP/WordPress",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
