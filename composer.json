@@ -1,5 +1,5 @@
 {
-    "name": "ramphor/scrapy",
+    "name": "ramphor/rake",
     "description": "The spiders framework for PHP/WordPress",
     "type": "library",
     "license": "MIT",
@@ -13,7 +13,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Ramphor\\Scrapy\\": "src/"
+            "Ramphor\\Rake\\": "src/"
         }
     }
 }
