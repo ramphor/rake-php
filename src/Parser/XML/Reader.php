@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Scrapy\Parser\XML;
+namespace Ramphor\Rake\Parser\XML;
 
 class Reader
 {

@@ -1,10 +1,11 @@
 <?php
-namespace Ramphor\Scrapy;
+namespace Ramphor\Rake;
 
-use Ramphor\Scrapy\Constracts\Adapter as AdapterConstract;
+use Ramphor\Rake\Constracts\Adapter as AdapterConstract;
 
 abstract class Adapter implements AdapterConstract
 {
-    public function generateHashFromURL($url) {
+    public function generateHashFromURL($url)
+    {
     }
 }

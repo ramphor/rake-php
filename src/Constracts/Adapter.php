@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Scrapy\Constracts;
+namespace Ramphor\Rake\Constracts;
 
 interface Adapter
 {

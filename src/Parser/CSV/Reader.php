@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Scrapy\Parser\CSV;
+namespace Ramphor\Rake\Parser\CSV;
 
 class Reader
 {

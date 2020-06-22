@@ -1,7 +1,7 @@
 <?php
-namespace Ramphor\Scrapy;
+namespace Ramphor\Rake;
 
-class Scrapy
+class Rake
 {
     public function __construct(Adapter $adapter)
     {

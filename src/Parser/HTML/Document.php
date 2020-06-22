@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Scrapy\Parser\HTML;
+namespace Ramphor\Rake\Parser\HTML;
 
 class Document
 {
