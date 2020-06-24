@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-use Ramphor\Rake\Data\FeedIterator;
+use Ramphor\Rake\DataSource\FeedIterator;
 
 interface Feed
 {

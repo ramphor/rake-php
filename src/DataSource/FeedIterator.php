@@ -11,14 +11,17 @@ class FeedIterator implements Iterator
 
     public function current():FeedItem
     {
+        return new FeedItem();
     }
 
     public function next():bool
     {
+        return true;
     }
 
     public function valid():bool
     {
+        return true;
     }
 
     public function rewind():void
