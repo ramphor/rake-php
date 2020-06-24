@@ -1,7 +1,10 @@
 <?php
 namespace Ramphor\Rake;
 
-use Ramphor\Rake\Processor;
+use Ramphor\Rake\Abstracts\AbstractProcessor;
+use Ramphor\Rake\Abstracts\AbstractFeed;
+use Ramphor\Rake\Abstracts\AbstractAdapter;
+
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
 
@@ -11,7 +14,7 @@ class Rake
     protected $feed;
     protected $processorClassName;
 
-    public function __construct(Adapter $adapter = null, Feed $feed = null, string $processorClassName = '')
+    public function __construct(AbstractAdapter $adapter = null, AbstractFeed $feed = null, string $processorClassName = '')
     {
         if (!is_null($adapter)) {
             $this->setAdapter($adapter);
@@ -24,12 +27,12 @@ class Rake
         }
     }
 
-    public function setAdapter(Adapter $adapter)
+    public function setAdapter(AbstractAdapter $adapter)
     {
         $this->adapter = $adapter;
     }
 
-    public function setFeed(Feed $feed)
+    public function setFeed(AbstractFeed $feed)
     {
         $this->feed = $feed;
     }
@@ -55,16 +58,18 @@ class Rake
         if (empty($this->feed) || empty($this->adapter) || empty($this->processorClassName)) {
             throw new ResourceException();
         }
+        // Convert data before get feed items
+        $this->feed->convert();
 
-        $feedItems = $this->feed->getItems();
+        $feedItems          = $this->feed->getItems();
         $processorClassName = $this->processorClassName;
         foreach ($feedItems as $feedItem) {
             $processor = new $processorClassName($feedItem);
-            if (!($processor instanceof Processor)) {
+            if (!($processor instanceof AbstractProcessor)) {
                 throw new ProcessorException();
             }
             if ($processor->validateFeedItem()) {
-                $result = $processor->excute();
+                $result = $processor->execute();
             } else {
                 $processor->writeLog("Feed item is not valid", $feedItem, $processor::LOG_WARNING);
             }

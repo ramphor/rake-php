@@ -1,9 +1,7 @@
 <?php
 namespace Ramphor\Rake;
 
-use Ramphor\Rake\Constracts\Resource as ResourceConstract;
-
-abstract class Resource implements ResourceConstract
+class Resource
 {
     public $id;
     public $guid;

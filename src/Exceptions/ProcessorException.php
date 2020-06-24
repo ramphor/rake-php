@@ -1,6 +1,6 @@
 <?php
 namespace Ramphor\Rake\Exceptions;
 
-class ProcessorException extends \Exception
+class ProcessorException extends \Exceptions
 {
 }

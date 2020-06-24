@@ -1,10 +1,10 @@
 <?php
-namespace Ramphor\Rake;
+namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
+use Ramphor\Rake\Constracts\Processor;
 use Ramphor\Rake\DataSource\FeedItem;
 
-abstract class Processor implements ProcessorConstract
+abstract class AbstractProcessor implements Processor
 {
     public const LOG_DEBUG     = 100;
     public const LOG_INFO      = 200;

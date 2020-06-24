@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-use Ramphor\Rake\Processor as ProcessorAbstract;
+use Ramphor\Rake\Abstracts\AbstractProcessor as ProcessorAbstract;
 use Ramphor\Rake\ProcessResult;
 
 interface Processor
