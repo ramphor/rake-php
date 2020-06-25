@@ -61,6 +61,7 @@ class Rake
 
         $feedItems          = $this->feed->getItems();
         $processorClassName = $this->processorClassName;
+
         foreach ($feedItems as $feedItem) {
             $processor = new $processorClassName($feedItem);
             if (!($processor instanceof AbstractProcessor)) {
@@ -72,5 +73,8 @@ class Rake
                 $processor->writeLog("Feed item is not valid", $feedItem, $processor::LOG_WARNING);
             }
         }
+
+        // Close the feed stream
+        $this->feed->closeStream();
     }
 }

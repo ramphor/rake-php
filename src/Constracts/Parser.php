@@ -1,9 +1,8 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-use Ramphor\Rake\DataSource\FeedIterator;
+use Iterator;
 
-interface Parser
+interface Parser extends Iterator
 {
-    public function parse(): FeedIterator;
 }

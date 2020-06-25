@@ -1,9 +1,9 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
+use Iterator;
 use TypeError;
 use Ramphor\Rake\Constracts\Feed;
-use Ramphor\Rake\DataSource\FeedIterator;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
@@ -56,22 +56,20 @@ abstract class AbstractFeed implements Feed
         return $stream;
     }
 
-    public function convert($stream): FeedIterator
+    public function getItems(): Iterator
     {
         if (empty($this->feedFormat)) {
             throw new FeedFormatException();
         }
 
-        $parser = $this->createParser($stream);
-
-        return $parser->parse();
-    }
-
-    public function getItems(): FeedIterator
-    {
         $response = $this->fetch();
         $stream   = $this->createStreamFronString($response);
 
-        return $this->convert($stream);
+        return $this->createParser($stream);
+    }
+
+    public function closeStream()
+    {
+        @fclose($this->stream);
     }
 }
