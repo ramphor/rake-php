@@ -16,7 +16,7 @@ class FeedIterator implements Iterator
 
     public function next():bool
     {
-        return true;
+        return false;
     }
 
     public function valid():bool

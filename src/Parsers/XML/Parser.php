@@ -1,6 +1,12 @@
 <?php
 namespace Ramphor\Rake\Parsers\XML;
 
-class Parser
+use Ramphor\Rake\Abstracts\AbstractParser;
+use Ramphor\Rake\DataSource\FeedIterator;
+
+class Parser extends AbstractParser
 {
+    public function parse():FeedIterator
+    {
+    }
 }

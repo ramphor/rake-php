@@ -58,8 +58,6 @@ class Rake
         if (empty($this->feed) || empty($this->adapter) || empty($this->processorClassName)) {
             throw new ResourceException();
         }
-        // Convert data before get feed items
-        $this->feed->convert();
 
         $feedItems          = $this->feed->getItems();
         $processorClassName = $this->processorClassName;
