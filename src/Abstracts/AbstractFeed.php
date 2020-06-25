@@ -51,6 +51,7 @@ abstract class AbstractFeed implements Feed
     {
         $stream = fopen('php://temp', 'r+');
         fwrite($stream, $response);
+        rewind($stream);
 
         return $stream;
     }
