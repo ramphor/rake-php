@@ -16,6 +16,11 @@ class FeedItem
     public $coverImage;
     public $status;
 
+    public function __construct($originalData)
+    {
+        $this->originalData = $originalData;
+    }
+
     public function getOriginalData()
     {
         return $this->originalData;

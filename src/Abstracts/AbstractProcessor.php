@@ -17,7 +17,7 @@ abstract class AbstractProcessor implements Processor
 
     protected $feedItem;
 
-    public function __construct(FeedItem $feedItem)
+    public function __construct($feedItem)
     {
         $this->feedItem = $feedItem;
     }

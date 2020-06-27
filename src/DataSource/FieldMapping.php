@@ -5,16 +5,16 @@ class FieldMapping
 {
     protected $sourceField;
     protected $destField;
-    protected $isRequired = false;
+    protected $isRequired   = false;
     protected $defaultValue = null;
 
     public function __construct($sourceField = null, $destField = null, $isRequired = false, $defaultValue = null)
     {
-        if (!is_null($sourceField)) {
+        if (! is_null($sourceField)) {
             $this->setSource($sourceField);
         }
 
-        if (!is_null($destField)) {
+        if (! is_null($destField)) {
             $this->setDestination($destField);
         }
         $this->setRequired($isRequired);

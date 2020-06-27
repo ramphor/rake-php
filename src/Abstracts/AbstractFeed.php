@@ -27,6 +27,7 @@ abstract class AbstractFeed implements Feed
     ];
 
     protected $feedFormat;
+    protected $parser;
 
     public function setFeedFormat($format)
     {
@@ -36,7 +37,7 @@ abstract class AbstractFeed implements Feed
         $this->feedFormat = $format;
     }
 
-    public function createParser($resource):AbstractParser
+    public function createParser($resource, $parserOptions = null):AbstractParser
     {
         $parsers = [
             self::FORMAT_CSV => CsvParser::class,
@@ -44,7 +45,8 @@ abstract class AbstractFeed implements Feed
             self::FORMAT_JSON => JsonParser::class,
             self::FORMAT_HTML => HtmlParser::class,
         ];
-        return new $parsers[$this->feedFormat]($resource);
+
+        return new $parsers[$this->feedFormat]($resource, $parserOptions);
     }
 
     protected function createStreamFronString($response)
@@ -61,11 +63,10 @@ abstract class AbstractFeed implements Feed
         if (empty($this->feedFormat)) {
             throw new FeedFormatException();
         }
-
         $response = $this->fetch();
         $stream   = $this->createStreamFronString($response);
 
-        return $this->createParser($stream);
+        return $this->createParser($stream, $this->parserOptions());
     }
 
     public function closeStream()
