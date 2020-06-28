@@ -1,6 +1,6 @@
 {
     "name": "ramphor/rake",
-    "description": "The spiders framework for PHP/WordPress",
+    "description": "The spider/crawler framework written in PHP",
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
