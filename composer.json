@@ -10,7 +10,9 @@
             "email": "puleeno@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "ramphor/scheduler": "*"
+    },
     "autoload": {
         "psr-4": {
             "Ramphor\\Rake\\": "src/"
