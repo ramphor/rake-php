@@ -4,41 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1ccbfc8e3a9615f2cbf415608b807097",
+    "content-hash": "0c7a9dfc568d63c16a3888b2d14ec591",
     "packages": [
-        {
-            "name": "ramphor/scheduler",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/ramphor/scheduler.git",
-                "reference": "819e6e7d927f995eb7d5d97dfed32c27af04b429"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/ramphor/scheduler/zipball/819e6e7d927f995eb7d5d97dfed32c27af04b429",
-                "reference": "819e6e7d927f995eb7d5d97dfed32c27af04b429",
-                "shasum": ""
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Ramphor\\Scheduler\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Puleeno Nguyen",
-                    "email": "puleeno@gmail.com"
-                }
-            ],
-            "description": "A robust scheduling library for use in WordPress",
-            "time": "2020-06-28T04:35:16+00:00"
-        },
         {
             "name": "sunra/php-simple-html-dom-parser",
             "version": "v1.5.2",
