@@ -11,7 +11,8 @@
         }
     ],
     "require": {
-        "ramphor/scheduler": "*"
+        "ramphor/scheduler": "*",
+        "sunra/php-simple-html-dom-parser": "1.5.2"
     },
     "autoload": {
         "psr-4": {
