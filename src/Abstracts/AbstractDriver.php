@@ -1,9 +1,9 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Constracts\Adapter;
+use Ramphor\Rake\Constracts\Driver;
 
-abstract class AbstractAdapter implements Adapter
+abstract class AbstractDriver implements Driver
 {
     public function generateHashFromURL($url)
     {

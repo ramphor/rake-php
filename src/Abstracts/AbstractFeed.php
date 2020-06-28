@@ -4,6 +4,7 @@ namespace Ramphor\Rake\Abstracts;
 use Iterator;
 use TypeError;
 use Ramphor\Rake\Constracts\Feed;
+use Ramphor\Rake\Abstracts\AbstractPreprocessor;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
@@ -25,6 +26,7 @@ abstract class AbstractFeed implements Feed
         self::FORMAT_JSON,
         self::FORMAT_HTML
     ];
+    protected $preprocessors = [];
 
     protected $feedFormat;
     protected $parser;
@@ -35,6 +37,20 @@ abstract class AbstractFeed implements Feed
             throw new FeedFormatException();
         }
         $this->feedFormat = $format;
+    }
+
+    public function addPreprocessor(AbstractPreprocessor $preprocessor)
+    {
+        if (!isset($this->preprocessors[$preprocessor->getId()])) {
+            $this->preprocessors[$preprocessor->getId()] = $preprocessor;
+        } else {
+            throw new \Exception("Preprocessor [%s] is existings", $preprocessor->getId());
+        }
+    }
+
+    public function getPreprocessors()
+    {
+        return $this->preprocessors;
     }
 
     public function createParser($resource, $parserOptions = null):AbstractParser

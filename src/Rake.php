@@ -3,33 +3,33 @@ namespace Ramphor\Rake;
 
 use Ramphor\Rake\Abstracts\AbstractProcessor;
 use Ramphor\Rake\Abstracts\AbstractFeed;
-use Ramphor\Rake\Abstracts\AbstractAdapter;
+use Ramphor\Rake\Abstracts\AbstractDriver;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
 
 class Rake
 {
-    protected $adapter;
+    protected $driver;
     protected $feed;
     protected $processorClassName;
 
-    public function __construct(AbstractAdapter $adapter = null, AbstractFeed $feed = null, string $processorClassName = '')
+    public function __construct(AbstractDriver $driver = null, AbstractFeed $feed = null, string $processorClassName = '')
     {
-        if (!is_null($adapter)) {
-            $this->setAdapter($adapter);
+        if (!is_null($driver)) {
+            $this->setDriver($driver);
         }
         if (!is_null($feed)) {
-            $this->setFeed($adapter);
+            $this->setFeed($driver);
         }
         if (!empty($processorClassName)) {
             $this->setProcessorClass($processorClassName);
         }
     }
 
-    public function setAdapter(AbstractAdapter $adapter)
+    public function setDriver(AbstractDriver $driver)
     {
-        $this->adapter = $adapter;
+        $this->driver = $driver;
     }
 
     public function setFeed(AbstractFeed $feed)
@@ -55,7 +55,7 @@ class Rake
 
     public function execute()
     {
-        if (empty($this->feed) || empty($this->adapter) || empty($this->processorClassName)) {
+        if (empty($this->feed) || empty($this->driver) || empty($this->processorClassName)) {
             throw new ResourceException();
         }
 
