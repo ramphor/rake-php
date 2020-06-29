@@ -1,20 +1,22 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Contracts\Preprocessor;
-use Ramphor\Rake\Abstracts\AbstractProcessor;
+use Ramphor\Rake\Constracts\Preprocessor;
 
 abstract class AbstractPreprocessor implements Preprocessor
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 
     protected $lifeCycle;
+    protected $allowedLifeCycles = [
+        self::LIFE_CYCLE_ONE_TIME,
+    ];
 
-    public function setLifeCycle()
+    public function setLifeCycle($lifeCycle)
     {
-    }
-
-    public function writeLog($logMessage, $data = [], $logLevel = AbstractProcessor::LOG_WARNING)
-    {
+        if (in_array($lifeCycle, $this->allowedLifeCycles)) {
+            throw new \Exception(sprintf("Invalid life cycle %d", $lifeCycle));
+        }
+        $this->lifeCycle = $lifeCycle;
     }
 }

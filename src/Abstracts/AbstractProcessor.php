@@ -7,8 +7,6 @@ use Ramphor\Rake\DataSource\FeedItem;
 
 abstract class AbstractProcessor implements Processor
 {
-    protected $crawlURLs = false;
-
     protected $feedItem;
 
     public function __construct($feedItem)
@@ -19,10 +17,6 @@ abstract class AbstractProcessor implements Processor
     public function validateFeedItem(): bool
     {
         return true;
-    }
-
-    public function crawlURLs()
-    {
     }
 
     public function writeLog($logMessage, $data = [], $logLevel = Logger::WARNING)
