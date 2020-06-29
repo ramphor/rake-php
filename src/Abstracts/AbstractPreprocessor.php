@@ -11,6 +11,7 @@ abstract class AbstractPreprocessor implements Preprocessor
     protected $allowedLifeCycles = [
         self::LIFE_CYCLE_ONE_TIME,
     ];
+    protected $httpClient;
 
     public function setLifeCycle($lifeCycle)
     {
@@ -18,5 +19,10 @@ abstract class AbstractPreprocessor implements Preprocessor
             throw new \Exception(sprintf("Invalid life cycle %d", $lifeCycle));
         }
         $this->lifeCycle = $lifeCycle;
+    }
+
+    public function setHttpClient(AbstractHttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
     }
 }

@@ -5,6 +5,7 @@ use Iterator;
 use TypeError;
 use Ramphor\Rake\Constracts\Feed;
 use Ramphor\Rake\Abstracts\AbstractPreprocessor;
+use Ramphor\Rake\Abstracts\AbstractHttpClient;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
@@ -31,6 +32,7 @@ abstract class AbstractFeed implements Feed
     protected $feedId;
     protected $feedFormat;
     protected $parser;
+    protected $httpClient;
 
     public function __construct(string $feedId = null)
     {
@@ -67,6 +69,11 @@ abstract class AbstractFeed implements Feed
     public function getPreprocessors()
     {
         return $this->preprocessors;
+    }
+
+    public function setHttpClient(AbstractHttpClient $httpClient)
+    {
+        $this->httpClient = $httpClient;
     }
 
     public function createParser($resource, $parserOptions = null):AbstractParser
