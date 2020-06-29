@@ -28,8 +28,24 @@ abstract class AbstractFeed implements Feed
     ];
     protected $preprocessors = [];
 
+    protected $feedId;
     protected $feedFormat;
     protected $parser;
+
+    public function __construct(string $feedId = null)
+    {
+        $this->setId($feedId);
+    }
+
+    public function setId(string $feedId)
+    {
+        $this->feedId = $feedId;
+    }
+
+    public function getId()
+    {
+        return $this->feedId;
+    }
 
     public function setFeedFormat($format)
     {

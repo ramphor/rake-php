@@ -11,7 +11,7 @@ use Ramphor\Rake\Exceptions\ProcessorException;
 class Rake
 {
     protected $driver;
-    protected $feed;
+    protected $feeds;
     protected $processorClassName;
 
     public function __construct(AbstractDriver $driver = null, AbstractFeed $feed = null, string $processorClassName = '')
@@ -32,9 +32,12 @@ class Rake
         $this->driver = $driver;
     }
 
-    public function setFeed(AbstractFeed $feed)
+    public function addFeed(AbstractFeed $feed)
     {
-        $this->feed = $feed;
+        if (isset($this->feeds[$feed->getId()])) {
+            throw new \Exception(sprintf('Feed "%s" is already exists', $feed->getId()));
+        }
+        $this->feeds[$feed->getId()] = $feed;
     }
 
     public function setProcessorClass(string $processorClassName)
@@ -55,26 +58,28 @@ class Rake
 
     public function execute()
     {
-        if (empty($this->feed) || empty($this->driver) || empty($this->processorClassName)) {
+        if (empty($this->feeds) || empty($this->driver) || empty($this->processorClassName)) {
             throw new ResourceException();
         }
 
-        $feedItems          = $this->feed->getItems();
-        $processorClassName = $this->processorClassName;
+        foreach ($this->feeds as $feed) {
+            $feedItems          = $feed->getItems();
+            $processorClassName = $this->processorClassName;
 
-        foreach ($feedItems as $feedItem) {
-            $processor = new $processorClassName($feedItem);
-            if (!($processor instanceof AbstractProcessor)) {
-                throw new ProcessorException();
+            foreach ($feedItems as $feedItem) {
+                $processor = new $processorClassName($feedItem);
+                if (!($processor instanceof AbstractProcessor)) {
+                    throw new ProcessorException();
+                }
+                if ($processor->validateFeedItem()) {
+                    $result = $processor->execute();
+                } else {
+                    $processor->writeLog("Feed item is not valid", $feedItem, $processor::LOG_WARNING);
+                }
             }
-            if ($processor->validateFeedItem()) {
-                $result = $processor->execute();
-            } else {
-                $processor->writeLog("Feed item is not valid", $feedItem, $processor::LOG_WARNING);
-            }
+
+            // Close the feed stream
+            $feed->closeStream();
         }
-
-        // Close the feed stream
-        $this->feed->closeStream();
     }
 }
