@@ -3,7 +3,7 @@ namespace Ramphor\Rake\Preprocessors\Sitemap;
 
 use Ramphor\Rake\Abstracts\AbstractPreprocessor;
 
-class Base extends AbstractPreprocessor
+abstract class Base extends AbstractPreprocessor
 {
     protected $namespaces = [];
     protected $url;

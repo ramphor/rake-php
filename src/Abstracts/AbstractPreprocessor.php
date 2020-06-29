@@ -7,7 +7,7 @@ abstract class AbstractPreprocessor implements Preprocessor
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 
-    protected $lifeCycle;
+    protected $lifeCycle = self::LIFE_CYCLE_ONE_TIME;
     protected $allowedLifeCycles = [
         self::LIFE_CYCLE_ONE_TIME,
     ];

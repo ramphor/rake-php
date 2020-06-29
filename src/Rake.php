@@ -63,6 +63,14 @@ class Rake
         }
 
         foreach ($this->feeds as $feed) {
+            // Run preprocessors before get feed items
+            $preprocessors = $feed->getPreprocessors();
+            if (count($preprocessors) > 0) {
+                foreach ($preprocessors as $preprocessor) {
+                    $preprocessor->execute();
+                }
+            }
+
             $feedItems          = $feed->getItems();
             $processorClassName = $this->processorClassName;
 

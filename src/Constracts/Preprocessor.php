@@ -6,4 +6,6 @@ interface Preprocessor
     public function getId();
 
     public function setLifeCycle(int $lifeCycle);
+
+    public function execute();
 }
