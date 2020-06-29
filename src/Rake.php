@@ -14,8 +14,12 @@ class Rake
     protected $feeds;
     protected $processorClassName;
 
-    public function __construct(AbstractDriver $driver = null, AbstractFeed $feed = null, string $processorClassName = '')
-    {
+    public function __construct(
+        string $teeth_id,
+        AbstractDriver $driver = null,
+        AbstractFeed $feed = null,
+        string $processorClassName = ''
+    ) {
         if (!is_null($driver)) {
             $this->setDriver($driver);
         }
