@@ -10,16 +10,19 @@ use Ramphor\Rake\Exceptions\ProcessorException;
 
 class Rake
 {
+    protected $teethId;
     protected $driver;
     protected $feeds;
     protected $processorClassName;
 
     public function __construct(
-        string $teeth_id,
+        string $teethId,
         AbstractDriver $driver = null,
         AbstractFeed $feed = null,
         string $processorClassName = ''
     ) {
+        $this->teethId = $teethId;
+
         if (!is_null($driver)) {
             $this->setDriver($driver);
         }
@@ -29,6 +32,11 @@ class Rake
         if (!empty($processorClassName)) {
             $this->setProcessorClass($processorClassName);
         }
+    }
+
+    public function getTeethId()
+    {
+        return $this->teethId;
     }
 
     public function setDriver(AbstractDriver $driver)

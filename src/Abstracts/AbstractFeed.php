@@ -29,13 +29,16 @@ abstract class AbstractFeed implements Feed
     ];
     protected $preprocessors = [];
 
+    protected $teetchId;
     protected $feedId;
     protected $feedFormat;
     protected $parser;
     protected $httpClient;
 
-    public function __construct(string $feedId = null)
+    public function __construct(string $teethID, string $feedId = null)
     {
+        $this->teethId = $teetchId;
+
         $this->setId($feedId);
     }
 

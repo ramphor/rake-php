@@ -1,6 +1,7 @@
 <?php
 namespace Ramphor\Rake\Drivers;
 
+use Ramphor\Rake\Link;
 use Ramphor\Rake\Abstracts\AbstractDriver;
 
 class WordPress extends AbstractDriver
@@ -29,5 +30,32 @@ class WordPress extends AbstractDriver
 
         // Execute SQL query to create DB table
         $this->dbQuery($sql);
+    }
+
+    public function crawlUrlIsExists(Link $url, string $teethId = null)
+    {
+        return $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT ID {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND teeth_id=%s",
+                (string)$url,
+                $teethId
+            )
+        ) != null;
+    }
+
+    public function insertCrawlUrl(Link $url, string $teethId = null)
+    {
+        return $this->wpdb->insert(
+            $this->wpdb->prefix . 'rake_crawled_urls',
+            [
+                'url'        => (string)$url,
+                'teeth_id'   => $teethId,
+                'crawled'    => false,
+                'retry'      => 0,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ],
+            ['%s', '%s', '%d', '%d', '%s', '%s']
+        );
     }
 }

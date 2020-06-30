@@ -1,7 +1,9 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
+use Ramphor\Rake\Link;
 use Ramphor\Rake\Constracts\Preprocessor;
+use Ramphor\Rake\Abstracts\AbstractDriver;
 
 abstract class AbstractPreprocessor implements Preprocessor
 {
@@ -11,6 +13,7 @@ abstract class AbstractPreprocessor implements Preprocessor
     protected $allowedLifeCycles = [
         self::LIFE_CYCLE_ONE_TIME,
     ];
+    protected $driver;
     protected $httpClient;
 
     public function setLifeCycle($lifeCycle)
@@ -24,5 +27,21 @@ abstract class AbstractPreprocessor implements Preprocessor
     public function setHttpClient(AbstractHttpClient $httpClient)
     {
         $this->httpClient = $httpClient;
+    }
+
+    public function setDriver(AbstractDriver $driver)
+    {
+        $this->driver = $driver;
+    }
+
+    public function insertCrawlUrl(Link $url)
+    {
+        if (empty($this->driver)) {
+            throw new \Exception("Rake driver is not exists");
+        }
+
+        if (!$this->driver->crawlUrlIsExists($url, $this->teethId)) {
+            $this->driver->insertCrawlUrl($url, $this->teethId);
+        }
     }
 }
