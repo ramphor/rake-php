@@ -29,9 +29,6 @@ class Rake
         if (!is_null($tooth)) {
             $this->setTooth($driver);
         }
-        if (!empty($processorClassName)) {
-            $this->setProcessorClass($processorClassName);
-        }
     }
 
     public function getRakeId()
@@ -50,17 +47,6 @@ class Rake
             throw new \Exception(sprintf('Tooth "%s" is already exists', $tooth->getId()));
         }
         $this->teeth[$tooth->getId()] = $tooth;
-    }
-
-    public function setProcessorClass(string $processorClassName)
-    {
-        if (empty($processorClassName)) {
-            throw new ResourceException("Processor must be have value");
-        }
-        if (!class_exists($processorClassName)) {
-            throw new ResourceException("Processor must be a class name");
-        }
-        $this->processorClassName = $processorClassName;
     }
 
     public function getProcessorClass()

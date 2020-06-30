@@ -1,9 +1,9 @@
 <?php
 namespace Ramphor\Rake\Feeds\Sitemap;
 
-use Ramphor\Rake\Abstracts\AbstractPreprocessor;
+use Ramphor\Rake\Abstracts\AbstractFeed;
 
-abstract class Base extends AbstractPreprocessor
+abstract class Base extends AbstractFeed
 {
     protected $url;
 

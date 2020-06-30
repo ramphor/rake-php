@@ -2,10 +2,10 @@
 namespace Ramphor\Rake\Abstracts;
 
 use Ramphor\Rake\Link;
-use Ramphor\Rake\Constracts\Preprocessor;
+use Ramphor\Rake\Constracts\Feed;
 use Ramphor\Rake\Abstracts\AbstractDriver;
 
-abstract class AbstractPreprocessor implements Preprocessor
+abstract class AbstractFeed implements Feed
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 

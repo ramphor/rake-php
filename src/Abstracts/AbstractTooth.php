@@ -4,7 +4,7 @@ namespace Ramphor\Rake\Abstracts;
 use Iterator;
 use TypeError;
 use Ramphor\Rake\Constracts\Tooth;
-use Ramphor\Rake\Abstracts\AbstractPreprocessor;
+use Ramphor\Rake\Abstracts\AbstractFeed;
 use Ramphor\Rake\Abstracts\AbstractHttpClient;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
@@ -49,7 +49,18 @@ abstract class AbstractTooth implements Tooth
         return $this->feedId;
     }
 
-    public function setToothFormat($format)
+    public function registerProcessor(string $processorClassName)
+    {
+        if (empty($processorClassName)) {
+            throw new ResourceException("Processor must be have value");
+        }
+        if (!class_exists($processorClassName)) {
+            throw new ResourceException("Processor must be a class name");
+        }
+        $this->processorClassName = $processorClassName;
+    }
+
+    public function setFormat($format)
     {
         if (!in_array($format, $this->acceptToothFormats)) {
             throw new ToothFormatException();
@@ -57,12 +68,12 @@ abstract class AbstractTooth implements Tooth
         $this->feedFormat = $format;
     }
 
-    public function addPreprocessor(AbstractPreprocessor $feed)
+    public function addFeed(AbstractFeed $feed)
     {
         if (!isset($this->feeds[$feed->getId()])) {
             $this->feeds[$feed->getId()] = $feed;
         } else {
-            throw new \Exception("Preprocessor [%s] is existings", $feed->getId());
+            throw new \Exception("Feed [%s] is existings", $feed->getId());
         }
     }
 

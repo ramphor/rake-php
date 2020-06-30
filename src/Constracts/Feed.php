@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-interface Preprocessor
+interface Feed
 {
     public function getId();
 
