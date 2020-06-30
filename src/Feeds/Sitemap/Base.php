@@ -1,16 +1,14 @@
 <?php
-namespace Ramphor\Rake\Preprocessors\Sitemap;
+namespace Ramphor\Rake\Feeds\Sitemap;
 
 use Ramphor\Rake\Abstracts\AbstractPreprocessor;
 
 abstract class Base extends AbstractPreprocessor
 {
-    protected $rakeId;
     protected $url;
 
-    public function __construct($rakeId, $sitemapURL)
+    public function __construct($sitemapURL)
     {
-        $this->rakeId = $rakeId;
         $this->url = $sitemapURL;
     }
 

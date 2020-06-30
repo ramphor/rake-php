@@ -27,24 +27,21 @@ abstract class AbstractTooth implements Tooth
         self::FORMAT_JSON,
         self::FORMAT_HTML
     ];
-    protected $preprocessors = [];
+    protected $feeds = [];
 
-    protected $teetchId;
     protected $toothId;
     protected $toothFormat;
     protected $parser;
     protected $httpClient;
 
-    public function __construct(string $rakeID, string $toothId = null)
+    public function __construct(string $toothId = null)
     {
-        $this->rakeId = $teetchId;
-
         $this->setId($toothId);
     }
 
     public function setId(string $toothId)
     {
-        $this->feedId = $toothId;
+        $this->toothId = $toothId;
     }
 
     public function getId()
@@ -60,18 +57,18 @@ abstract class AbstractTooth implements Tooth
         $this->feedFormat = $format;
     }
 
-    public function addPreprocessor(AbstractPreprocessor $preprocessor)
+    public function addPreprocessor(AbstractPreprocessor $feed)
     {
-        if (!isset($this->preprocessors[$preprocessor->getId()])) {
-            $this->preprocessors[$preprocessor->getId()] = $preprocessor;
+        if (!isset($this->feeds[$feed->getId()])) {
+            $this->feeds[$feed->getId()] = $feed;
         } else {
-            throw new \Exception("Preprocessor [%s] is existings", $preprocessor->getId());
+            throw new \Exception("Preprocessor [%s] is existings", $feed->getId());
         }
     }
 
-    public function getPreprocessors()
+    public function getFeeds()
     {
-        return $this->preprocessors;
+        return $this->feeds;
     }
 
     public function setHttpClient(AbstractHttpClient $httpClient)

@@ -75,11 +75,11 @@ class Rake
         }
 
         foreach ($this->teeth as $tooth) {
-            // Run preprocessors before get feed items
-            $preprocessors = $tooth->getPreprocessors();
-            if (count($preprocessors) > 0) {
-                foreach ($preprocessors as $preprocessor) {
-                    $preprocessor->execute();
+            // Run feeds before get feed items
+            $feeds = $tooth->getFeeds();
+            if (count($feeds) > 0) {
+                foreach ($feeds as $feed) {
+                    $feed->execute();
                 }
             }
 

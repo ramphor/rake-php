@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Rake\Preprocessors\Sitemap;
+namespace Ramphor\Rake\Feeds\Sitemap;
 
 use SimpleXMLElement;
 use Ramphor\Rake\Link;
