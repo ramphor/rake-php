@@ -3,7 +3,7 @@ namespace Ramphor\Rake\Abstracts;
 
 use Iterator;
 use TypeError;
-use Ramphor\Rake\Constracts\Feed;
+use Ramphor\Rake\Constracts\Tooth;
 use Ramphor\Rake\Abstracts\AbstractPreprocessor;
 use Ramphor\Rake\Abstracts\AbstractHttpClient;
 
@@ -12,16 +12,16 @@ use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
 use Ramphor\Rake\Parsers\XML\Parser as XmlParser;
 use Ramphor\Rake\Parsers\JSON\Parser as JsonParser;
 
-use Ramphor\Rake\Exceptions\FeedFormatException;
+use Ramphor\Rake\Exceptions\ToothFormatException;
 
-abstract class AbstractFeed implements Feed
+abstract class AbstractTooth implements Tooth
 {
     public const FORMAT_CSV      = 'csv';
     public const FORMAT_XML      = 'xml';
     public const FORMAT_JSON     = 'json';
     public const FORMAT_HTML     = 'html';
 
-    protected $acceptFeedFormats = [
+    protected $acceptToothFormats = [
         self::FORMAT_CSV,
         self::FORMAT_XML,
         self::FORMAT_JSON,
@@ -35,9 +35,9 @@ abstract class AbstractFeed implements Feed
     protected $parser;
     protected $httpClient;
 
-    public function __construct(string $teethID, string $feedId = null)
+    public function __construct(string $rakeID, string $feedId = null)
     {
-        $this->teethId = $teetchId;
+        $this->rakeId = $teetchId;
 
         $this->setId($feedId);
     }
@@ -52,10 +52,10 @@ abstract class AbstractFeed implements Feed
         return $this->feedId;
     }
 
-    public function setFeedFormat($format)
+    public function setToothFormat($format)
     {
-        if (!in_array($format, $this->acceptFeedFormats)) {
-            throw new FeedFormatException();
+        if (!in_array($format, $this->acceptToothFormats)) {
+            throw new ToothFormatException();
         }
         $this->feedFormat = $format;
     }
@@ -102,7 +102,7 @@ abstract class AbstractFeed implements Feed
     public function getItems(): Iterator
     {
         if (empty($this->feedFormat)) {
-            throw new FeedFormatException();
+            throw new ToothFormatException();
         }
         $response = $this->fetch();
         $stream   = $this->createStreamFronString($response);

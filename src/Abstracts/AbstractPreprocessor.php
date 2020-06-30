@@ -40,8 +40,8 @@ abstract class AbstractPreprocessor implements Preprocessor
             throw new \Exception("Rake driver is not exists");
         }
 
-        if (!$this->driver->crawlUrlIsExists($url, $this->teethId)) {
-            $this->driver->insertCrawlUrl($url, $this->teethId);
+        if (!$this->driver->crawlUrlIsExists($url, $this->rakeId)) {
+            $this->driver->insertCrawlUrl($url, $this->rakeId);
         }
     }
 }

@@ -9,7 +9,7 @@ interface Driver
 
     public function createDbTable(string $tableName, string $syntaxContent);
 
-    public function crawlUrlIsExists(Link $url, string $teethId = null);
+    public function crawlUrlIsExists(Link $url, string $rakeId = null);
 
-    public function insertCrawlUrl(Link $url, string $teethId = null);
+    public function insertCrawlUrl(Link $url, string $rakeId = null);
 }

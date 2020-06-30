@@ -32,24 +32,24 @@ class WordPress extends AbstractDriver
         $this->dbQuery($sql);
     }
 
-    public function crawlUrlIsExists(Link $url, string $teethId = null)
+    public function crawlUrlIsExists(Link $url, string $rakeId = null)
     {
         return $this->wpdb->get_var(
             $this->wpdb->prepare(
-                "SELECT ID FROM {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND teeth_id=%s",
+                "SELECT ID FROM {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND rake_id=%s",
                 (string)$url,
-                $teethId
+                $rakeId
             )
         ) != null;
     }
 
-    public function insertCrawlUrl(Link $url, string $teethId = null)
+    public function insertCrawlUrl(Link $url, string $rakeId = null)
     {
         return $this->wpdb->insert(
             $this->wpdb->prefix . 'rake_crawled_urls',
             [
                 'url'        => (string)$url,
-                'teeth_id'   => $teethId,
+                'rake_id'   => $rakeId,
                 'crawled'    => false,
                 'retry'      => 0,
                 'created_at' => current_time('mysql'),

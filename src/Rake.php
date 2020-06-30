@@ -2,7 +2,7 @@
 namespace Ramphor\Rake;
 
 use Ramphor\Rake\Abstracts\AbstractProcessor;
-use Ramphor\Rake\Abstracts\AbstractFeed;
+use Ramphor\Rake\Abstracts\AbstractTooth;
 use Ramphor\Rake\Abstracts\AbstractDriver;
 
 use Ramphor\Rake\Exceptions\ResourceException;
@@ -10,33 +10,33 @@ use Ramphor\Rake\Exceptions\ProcessorException;
 
 class Rake
 {
-    protected $teethId;
+    protected $rakeId;
     protected $driver;
     protected $feeds;
     protected $processorClassName;
 
     public function __construct(
-        string $teethId,
+        string $rakeId,
         AbstractDriver $driver = null,
-        AbstractFeed $feed = null,
+        AbstractTooth $feed = null,
         string $processorClassName = ''
     ) {
-        $this->teethId = $teethId;
+        $this->rakeId = $rakeId;
 
         if (!is_null($driver)) {
             $this->setDriver($driver);
         }
         if (!is_null($feed)) {
-            $this->setFeed($driver);
+            $this->setTooth($driver);
         }
         if (!empty($processorClassName)) {
             $this->setProcessorClass($processorClassName);
         }
     }
 
-    public function getTeethId()
+    public function getRakeId()
     {
-        return $this->teethId;
+        return $this->rakeId;
     }
 
     public function setDriver(AbstractDriver $driver)
@@ -44,10 +44,10 @@ class Rake
         $this->driver = $driver;
     }
 
-    public function addFeed(AbstractFeed $feed)
+    public function addTooth(AbstractTooth $feed)
     {
         if (isset($this->feeds[$feed->getId()])) {
-            throw new \Exception(sprintf('Feed "%s" is already exists', $feed->getId()));
+            throw new \Exception(sprintf('Tooth "%s" is already exists', $feed->getId()));
         }
         $this->feeds[$feed->getId()] = $feed;
     }
@@ -94,7 +94,7 @@ class Rake
                 if ($processor->validateFeedItem()) {
                     $result = $processor->execute();
                 } else {
-                    $processor->writeLog("Feed item is not valid", $feedItem, $processor::LOG_WARNING);
+                    $processor->writeLog("Tooth item is not valid", $feedItem, $processor::LOG_WARNING);
                 }
             }
 

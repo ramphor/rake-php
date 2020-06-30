@@ -4,7 +4,7 @@ namespace Ramphor\Rake\Constracts;
 use Iterator;
 use Resource;
 
-interface Feed
+interface Tooth
 {
     public function setId(string $feedId);
 

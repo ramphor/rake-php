@@ -5,12 +5,12 @@ use Ramphor\Rake\Abstracts\AbstractPreprocessor;
 
 abstract class Base extends AbstractPreprocessor
 {
-    protected $teethId;
+    protected $rakeId;
     protected $url;
 
-    public function __construct($teethId, $sitemapURL)
+    public function __construct($rakeId, $sitemapURL)
     {
-        $this->teethId = $teethId;
+        $this->rakeId = $rakeId;
         $this->url = $sitemapURL;
     }
 
