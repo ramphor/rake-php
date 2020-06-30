@@ -8,22 +8,9 @@ abstract class Base extends AbstractPreprocessor
     protected $namespaces = [];
     protected $url;
 
-    public function __construct($sitemapURL, $namespaces = null)
+    public function __construct($sitemapURL)
     {
         $this->url = $sitemapURL;
-
-        if (!is_null($namespaces)) {
-            $this->addNamespaces($namespaces);
-        }
-    }
-
-    public function addNamespaces($namespaces)
-    {
-        foreach ($namespaces as $namespace => $url) {
-            if (!isset($this->namespaces[$namespace])) {
-                $this->namespaces[$namespace] = $url;
-            }
-        }
     }
 
     public function getId()
