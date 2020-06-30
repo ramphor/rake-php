@@ -36,7 +36,7 @@ class WordPress extends AbstractDriver
     {
         return $this->wpdb->get_var(
             $this->wpdb->prepare(
-                "SELECT ID {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND teeth_id=%s",
+                "SELECT ID FROM {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND teeth_id=%s",
                 (string)$url,
                 $teethId
             )
