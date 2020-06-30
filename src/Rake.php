@@ -37,11 +37,6 @@ class Rake extends TemplateMethod
         $this->teeth[$tooth->getId()] = $tooth;
     }
 
-    public function getProcessorClass()
-    {
-        return $this->processorClassName;
-    }
-
     public function execute()
     {
         if (empty($this->teeth) || empty($this->driver)) {
