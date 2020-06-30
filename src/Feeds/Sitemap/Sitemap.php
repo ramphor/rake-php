@@ -18,8 +18,8 @@ class Sitemap extends AbstractFeed
             if (empty($url->loc) || !($url->loc instanceof SimpleXMLElement)) {
                 continue;
             }
-            $link = new Link($url->loc->__toString());
 
+            $link = new Link((string)$url->loc);
             $this->insertCrawlUrl($link);
         }
     }
