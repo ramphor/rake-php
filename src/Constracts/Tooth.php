@@ -6,7 +6,7 @@ use Resource;
 
 interface Tooth
 {
-    public function setId(string $feedId);
+    public function setId(string $toothId);
 
     public function getId();
 

@@ -12,13 +12,13 @@ class Rake
 {
     protected $rakeId;
     protected $driver;
-    protected $feeds;
+    protected $teeth;
     protected $processorClassName;
 
     public function __construct(
         string $rakeId,
         AbstractDriver $driver = null,
-        AbstractTooth $feed = null,
+        AbstractTooth $tooth = null,
         string $processorClassName = ''
     ) {
         $this->rakeId = $rakeId;
@@ -26,7 +26,7 @@ class Rake
         if (!is_null($driver)) {
             $this->setDriver($driver);
         }
-        if (!is_null($feed)) {
+        if (!is_null($tooth)) {
             $this->setTooth($driver);
         }
         if (!empty($processorClassName)) {
@@ -44,12 +44,12 @@ class Rake
         $this->driver = $driver;
     }
 
-    public function addTooth(AbstractTooth $feed)
+    public function addTooth(AbstractTooth $tooth)
     {
-        if (isset($this->feeds[$feed->getId()])) {
-            throw new \Exception(sprintf('Tooth "%s" is already exists', $feed->getId()));
+        if (isset($this->teeth[$tooth->getId()])) {
+            throw new \Exception(sprintf('Tooth "%s" is already exists', $tooth->getId()));
         }
-        $this->feeds[$feed->getId()] = $feed;
+        $this->teeth[$tooth->getId()] = $tooth;
     }
 
     public function setProcessorClass(string $processorClassName)
@@ -70,36 +70,36 @@ class Rake
 
     public function execute()
     {
-        if (empty($this->feeds) || empty($this->driver) || empty($this->processorClassName)) {
+        if (empty($this->teeth) || empty($this->driver) || empty($this->processorClassName)) {
             throw new ResourceException();
         }
 
-        foreach ($this->feeds as $feed) {
+        foreach ($this->teeth as $tooth) {
             // Run preprocessors before get feed items
-            $preprocessors = $feed->getPreprocessors();
+            $preprocessors = $tooth->getPreprocessors();
             if (count($preprocessors) > 0) {
                 foreach ($preprocessors as $preprocessor) {
                     $preprocessor->execute();
                 }
             }
 
-            $feedItems          = $feed->getItems();
+            $toothItems          = $tooth->getItems();
             $processorClassName = $this->processorClassName;
 
-            foreach ($feedItems as $feedItem) {
-                $processor = new $processorClassName($feedItem);
+            foreach ($toothItems as $toothItem) {
+                $processor = new $processorClassName($toothItem);
                 if (!($processor instanceof AbstractProcessor)) {
                     throw new ProcessorException();
                 }
                 if ($processor->validateFeedItem()) {
                     $result = $processor->execute();
                 } else {
-                    $processor->writeLog("Tooth item is not valid", $feedItem, $processor::LOG_WARNING);
+                    $processor->writeLog("Tooth item is not valid", $toothItem, $processor::LOG_WARNING);
                 }
             }
 
             // Close the feed stream
-            $feed->closeStream();
+            $tooth->closeStream();
         }
     }
 }

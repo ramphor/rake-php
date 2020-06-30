@@ -30,21 +30,21 @@ abstract class AbstractTooth implements Tooth
     protected $preprocessors = [];
 
     protected $teetchId;
-    protected $feedId;
-    protected $feedFormat;
+    protected $toothId;
+    protected $toothFormat;
     protected $parser;
     protected $httpClient;
 
-    public function __construct(string $rakeID, string $feedId = null)
+    public function __construct(string $rakeID, string $toothId = null)
     {
         $this->rakeId = $teetchId;
 
-        $this->setId($feedId);
+        $this->setId($toothId);
     }
 
-    public function setId(string $feedId)
+    public function setId(string $toothId)
     {
-        $this->feedId = $feedId;
+        $this->feedId = $toothId;
     }
 
     public function getId()

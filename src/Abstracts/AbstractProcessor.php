@@ -7,11 +7,11 @@ use Ramphor\Rake\DataSource\FeedItem;
 
 abstract class AbstractProcessor implements Processor
 {
-    protected $feedItem;
+    protected $toothItem;
 
-    public function __construct($feedItem)
+    public function __construct($toothItem)
     {
-        $this->feedItem = $feedItem;
+        $this->feedItem = $toothItem;
     }
 
     public function validateFeedItem(): bool
