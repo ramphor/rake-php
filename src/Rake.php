@@ -52,7 +52,7 @@ class Rake extends TemplateMethod
                 }
             }
 
-            $feedItems          = $tooth->getItems();
+            $feedItems = $tooth->getItems();
             foreach ($feedItems as $feedItem) {
                 $processor = $tooth->createProcessor($feedItem);
 
