@@ -3,9 +3,9 @@ namespace Ramphor\Rake\Feeds\Sitemap;
 
 use SimpleXMLElement;
 use Ramphor\Rake\Link;
-use Ramphor\Rake\Abstracts\AbstractFeed;
+use Ramphor\Rake\Abstracts\Feed;
 
-class Sitemap extends AbstractFeed
+class Sitemap extends Feed
 {
     protected $httpClient;
 

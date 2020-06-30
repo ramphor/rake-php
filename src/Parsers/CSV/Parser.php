@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Parsers\CSV;
 
-use Ramphor\Rake\Abstracts\AbstractParser;
+use Ramphor\Rake\Abstracts\Parser as AbstractParser;
 use Ramphor\Rake\DataSource\FeedItem;
 
 class Parser extends AbstractParser

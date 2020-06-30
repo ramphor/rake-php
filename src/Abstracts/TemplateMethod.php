@@ -17,22 +17,22 @@ abstract class TemplateMethod
         return $this->id;
     }
 
-    public function setHttpClient(AbstractHttpClient &$httpClient)
+    public function setHttpClient(HttpClient &$httpClient)
     {
         $this->httpClient = $httpClient;
     }
 
-    public function setDriver(AbstractDriver &$driver)
+    public function setDriver(Driver &$driver)
     {
         $this->driver = $driver;
     }
 
-    public function getDriver(): AbstractDriver
+    public function getDriver(): Driver
     {
         return $this->driver;
     }
 
-    public function getHttpClient(): AbstractHttpClient
+    public function getHttpClient(): HttpClient
     {
         return $this->httpClient;
     }

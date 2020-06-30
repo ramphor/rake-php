@@ -2,10 +2,10 @@
 namespace Ramphor\Rake\Abstracts;
 
 use Monolog\Logger;
-use Ramphor\Rake\Constracts\Processor;
+use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\DataSource\FeedItem;
 
-abstract class AbstractProcessor extends TemplateMethod implements Processor
+abstract class Processor extends TemplateMethod implements ProcessorConstract
 {
     protected $toothItem;
 

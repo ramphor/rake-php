@@ -2,9 +2,9 @@
 namespace Ramphor\Rake\Http;
 
 use Requests;
-use Ramphor\Rake\Abstracts\AbstractHttpClient;
+use Ramphor\Rake\Abstracts\HttpClient;
 
-class WordPress extends AbstractHttpClient
+class WordPress extends HttpClient
 {
     public function request($method, $uri = '', $options = [])
     {

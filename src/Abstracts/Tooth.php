@@ -4,10 +4,10 @@ namespace Ramphor\Rake\Abstracts;
 use Iterator;
 use TypeError;
 use Ramphor\Rake\Rake;
-use Ramphor\Rake\Constracts\Tooth;
+use Ramphor\Rake\Constracts\Tooth as ToothConstract;
 use Ramphor\Rake\DataSource\FeedItem;
-use Ramphor\Rake\Abstracts\AbstractFeed;
-use Ramphor\Rake\Abstracts\AbstractProcessor;
+use Ramphor\Rake\Abstracts\Feed;
+use Ramphor\Rake\Abstracts\Processor;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
@@ -16,7 +16,7 @@ use Ramphor\Rake\Parsers\JSON\Parser as JsonParser;
 
 use Ramphor\Rake\Exceptions\ToothFormatException;
 
-abstract class AbstractTooth extends TemplateMethod implements Tooth
+abstract class Tooth extends TemplateMethod implements ToothConstract
 {
     public const FORMAT_CSV      = 'csv';
     public const FORMAT_XML      = 'xml';
@@ -62,7 +62,7 @@ abstract class AbstractTooth extends TemplateMethod implements Tooth
         $this->processorClassName = $processorClassName;
     }
 
-    public function createProcessor(FeedItem $feedItem): AbstractProcessor
+    public function createProcessor(FeedItem $feedItem): Processor
     {
         $processorClassName = $this->processorClassName;
         if (empty($processorClassName)) {
@@ -84,7 +84,7 @@ abstract class AbstractTooth extends TemplateMethod implements Tooth
         $this->feedFormat = $format;
     }
 
-    public function addFeed(AbstractFeed $feed)
+    public function addFeed(Feed $feed)
     {
         if (!isset($this->feeds[$feed->getId()])) {
             $this->feeds[$feed->getId()] = $feed;
@@ -98,7 +98,7 @@ abstract class AbstractTooth extends TemplateMethod implements Tooth
         return $this->feeds;
     }
 
-    public function createParser($resource, $parserOptions = null):AbstractParser
+    public function createParser($resource, $parserOptions = null):Parser
     {
         $parsers = [
             self::FORMAT_CSV => CsvParser::class,

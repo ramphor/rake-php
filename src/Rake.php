@@ -2,10 +2,10 @@
 namespace Ramphor\Rake;
 
 use Ramphor\Rake\Abstracts\TemplateMethod;
-use Ramphor\Rake\Abstracts\AbstractProcessor;
-use Ramphor\Rake\Abstracts\AbstractTooth;
-use Ramphor\Rake\Abstracts\AbstractDriver;
-use Ramphor\Rake\Abstracts\AbstractHttpClient;
+use Ramphor\Rake\Abstracts\Processor;
+use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Abstracts\Driver;
+use Ramphor\Rake\Abstracts\HttpClient;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
@@ -17,8 +17,8 @@ class Rake extends TemplateMethod
 
     public function __construct(
         string $rakeId,
-        AbstractDriver $driver = null,
-        AbstractHttpClient $httpClient = null
+        Driver $driver = null,
+        HttpClient $httpClient = null
     ) {
         $this->setId($rakeId);
         if (!is_null($driver)) {
@@ -29,7 +29,7 @@ class Rake extends TemplateMethod
         }
     }
 
-    public function addTooth(AbstractTooth $tooth)
+    public function addTooth(Tooth $tooth)
     {
         if (isset($this->teeth[$tooth->getId()])) {
             throw new \Exception(sprintf('Tooth "%s" is already exists', $tooth->getId()));

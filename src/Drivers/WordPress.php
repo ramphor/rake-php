@@ -2,9 +2,9 @@
 namespace Ramphor\Rake\Drivers;
 
 use Ramphor\Rake\Link;
-use Ramphor\Rake\Abstracts\AbstractDriver;
+use Ramphor\Rake\Abstracts\Driver;
 
-class WordPress extends AbstractDriver
+class WordPress extends Driver
 {
     protected $wpdb;
 

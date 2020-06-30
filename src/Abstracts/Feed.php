@@ -2,11 +2,11 @@
 namespace Ramphor\Rake\Abstracts;
 
 use Ramphor\Rake\Link;
-use Ramphor\Rake\Constracts\Feed;
-use Ramphor\Rake\Abstracts\AbstractDriver;
-use Ramphor\Rake\Abstracts\AbstractTooth;
+use Ramphor\Rake\Constracts\Feed as FeedConstract;
+use Ramphor\Rake\Abstracts\Driver;
+use Ramphor\Rake\Abstracts\Tooth;
 
-abstract class AbstractFeed extends TemplateMethod implements Feed
+abstract class Feed extends TemplateMethod implements FeedConstract
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 
@@ -18,7 +18,7 @@ abstract class AbstractFeed extends TemplateMethod implements Feed
     protected $id;
     protected $tooth;
 
-    public function __construct(AbstractTooth $tooth, string $feedId)
+    public function __construct(Tooth $tooth, string $feedId)
     {
         $this->setId($feedId);
         $this->setDriver($tooth->getDriver());
@@ -26,12 +26,12 @@ abstract class AbstractFeed extends TemplateMethod implements Feed
         $this->setTooth($tooth);
     }
 
-    public function setTooth(AbstractTooth $tooth)
+    public function setTooth(Tooth $tooth)
     {
         $this->tooth = $tooth;
     }
 
-    public function getTooth(): AbstractTooth
+    public function getTooth(): Tooth
     {
         return $this->tooth;
     }

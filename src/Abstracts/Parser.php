@@ -2,9 +2,9 @@
 namespace Ramphor\Rake\Abstracts;
 
 use TypeError;
-use Ramphor\Rake\Constracts\Parser;
+use Ramphor\Rake\Constracts\Parser as ParserConstract;
 
-abstract class AbstractParser implements Parser
+abstract class Parser implements ParserConstract
 {
     protected $stream;
 

@@ -1,20 +1,20 @@
 <?php
 namespace Ramphor\Rake;
 
-use Ramphor\Rake\Abstracts\AbstractDriver;
+use Ramphor\Rake\Abstracts\Driver;
 
 class Initialize
 {
     protected $driver;
 
-    public function __construct(AbstractDriver $driver = null)
+    public function __construct(Driver $driver = null)
     {
         if (!is_null($driver)) {
             $this->setDriver($driver);
         }
     }
 
-    public function setDriver(AbstractDriver $driver)
+    public function setDriver(Driver $driver)
     {
         $this->driver = $driver;
     }
