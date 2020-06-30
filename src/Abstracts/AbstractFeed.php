@@ -4,8 +4,9 @@ namespace Ramphor\Rake\Abstracts;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Constracts\Feed;
 use Ramphor\Rake\Abstracts\AbstractDriver;
+use Ramphor\Rake\Abstracts\AbstractTooth;
 
-abstract class AbstractFeed implements Feed
+abstract class AbstractFeed extends TemplateMethod implements Feed
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 
@@ -13,8 +14,27 @@ abstract class AbstractFeed implements Feed
     protected $allowedLifeCycles = [
         self::LIFE_CYCLE_ONE_TIME,
     ];
-    protected $driver;
-    protected $httpClient;
+
+    protected $id;
+    protected $tooth;
+
+    public function __construct(AbstractTooth $tooth, string $feedId)
+    {
+        $this->setId($feedId);
+        $this->setDriver($tooth->getDriver());
+        $this->setHttpClient($tooth->getHttpClient());
+        $this->setTooth($tooth);
+    }
+
+    public function setTooth(AbstractTooth $tooth)
+    {
+        $this->tooth = $tooth;
+    }
+
+    public function getTooth(): AbstractTooth
+    {
+        return $this->tooth;
+    }
 
     public function setLifeCycle($lifeCycle)
     {
@@ -24,24 +44,16 @@ abstract class AbstractFeed implements Feed
         $this->lifeCycle = $lifeCycle;
     }
 
-    public function setHttpClient(AbstractHttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
-
-    public function setDriver(AbstractDriver $driver)
-    {
-        $this->driver = $driver;
-    }
-
     public function insertCrawlUrl(Link $url)
     {
         if (empty($this->driver)) {
             throw new \Exception("Rake driver is not exists");
         }
 
-        if (!$this->driver->crawlUrlIsExists($url, $this->rakeId)) {
-            $this->driver->insertCrawlUrl($url, $this->rakeId);
+        $rakeId = $this->getTooth()->getRake()->getId();
+
+        if (!$this->driver->crawlUrlIsExists($url, $rakeId)) {
+            $this->driver->insertCrawlUrl($url, $rakeId);
         }
     }
 }

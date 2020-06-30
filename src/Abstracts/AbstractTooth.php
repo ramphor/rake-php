@@ -3,9 +3,11 @@ namespace Ramphor\Rake\Abstracts;
 
 use Iterator;
 use TypeError;
+use Ramphor\Rake\Rake;
 use Ramphor\Rake\Constracts\Tooth;
+use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\AbstractFeed;
-use Ramphor\Rake\Abstracts\AbstractHttpClient;
+use Ramphor\Rake\Abstracts\AbstractProcessor;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
@@ -14,7 +16,7 @@ use Ramphor\Rake\Parsers\JSON\Parser as JsonParser;
 
 use Ramphor\Rake\Exceptions\ToothFormatException;
 
-abstract class AbstractTooth implements Tooth
+abstract class AbstractTooth extends TemplateMethod implements Tooth
 {
     public const FORMAT_CSV      = 'csv';
     public const FORMAT_XML      = 'xml';
@@ -29,35 +31,49 @@ abstract class AbstractTooth implements Tooth
     ];
     protected $feeds = [];
 
-    protected $toothId;
+    protected $id;
+    protected $rake;
     protected $toothFormat;
     protected $parser;
-    protected $httpClient;
 
-    public function __construct(string $toothId = null)
+    public function __construct(Rake $rake, string $toothId)
     {
         $this->setId($toothId);
+        $this->setDriver($rake->getDriver());
+        $this->setHttpClient($rake->getHttpClient());
+        $this->setRake($rake);
     }
 
-    public function setId(string $toothId)
+    public function setRake(Rake $rake)
     {
-        $this->toothId = $toothId;
+        $this->rake = $rake;
     }
 
-    public function getId()
+    public function getRake():Rake
     {
-        return $this->feedId;
+        return $this->rake;
     }
 
     public function registerProcessor(string $processorClassName)
     {
-        if (empty($processorClassName)) {
-            throw new ResourceException("Processor must be have value");
-        }
         if (!class_exists($processorClassName)) {
             throw new ResourceException("Processor must be a class name");
         }
         $this->processorClassName = $processorClassName;
+    }
+
+    public function createProcessor(FeedItem $feedItem): AbstractProcessor
+    {
+        $processorClassName = $this->processorClassName;
+        if (empty($processorClassName)) {
+            throw new ResourceException("Processor must be have value");
+        }
+
+        $processor = new $processorClassName($feedItem);
+        $processor->setDriver($this->driver);
+        $processor->setHttpClient($this->httpClient);
+
+        return $processor;
     }
 
     public function setFormat($format)
@@ -80,11 +96,6 @@ abstract class AbstractTooth implements Tooth
     public function getFeeds()
     {
         return $this->feeds;
-    }
-
-    public function setHttpClient(AbstractHttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
     }
 
     public function createParser($resource, $parserOptions = null):AbstractParser

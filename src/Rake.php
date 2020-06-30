@@ -1,44 +1,32 @@
 <?php
 namespace Ramphor\Rake;
 
+use Ramphor\Rake\Abstracts\TemplateMethod;
 use Ramphor\Rake\Abstracts\AbstractProcessor;
 use Ramphor\Rake\Abstracts\AbstractTooth;
 use Ramphor\Rake\Abstracts\AbstractDriver;
+use Ramphor\Rake\Abstracts\AbstractHttpClient;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
 
-class Rake
+class Rake extends TemplateMethod
 {
-    protected $rakeId;
-    protected $driver;
+    protected $id;
     protected $teeth;
-    protected $processorClassName;
 
     public function __construct(
         string $rakeId,
         AbstractDriver $driver = null,
-        AbstractTooth $tooth = null,
-        string $processorClassName = ''
+        AbstractHttpClient $httpClient = null
     ) {
-        $this->rakeId = $rakeId;
-
+        $this->setId($rakeId);
         if (!is_null($driver)) {
             $this->setDriver($driver);
         }
-        if (!is_null($tooth)) {
-            $this->setTooth($driver);
+        if (!is_null($httpClient)) {
+            $this->setHttpClient($httpClient);
         }
-    }
-
-    public function getRakeId()
-    {
-        return $this->rakeId;
-    }
-
-    public function setDriver(AbstractDriver $driver)
-    {
-        $this->driver = $driver;
     }
 
     public function addTooth(AbstractTooth $tooth)
@@ -56,7 +44,7 @@ class Rake
 
     public function execute()
     {
-        if (empty($this->teeth) || empty($this->driver) || empty($this->processorClassName)) {
+        if (empty($this->teeth) || empty($this->driver)) {
             throw new ResourceException();
         }
 
@@ -69,18 +57,14 @@ class Rake
                 }
             }
 
-            $toothItems          = $tooth->getItems();
-            $processorClassName = $this->processorClassName;
+            $feedItems          = $tooth->getItems();
+            foreach ($feedItems as $feedItem) {
+                $processor = $tooth->createProcessor($feedItem);
 
-            foreach ($toothItems as $toothItem) {
-                $processor = new $processorClassName($toothItem);
-                if (!($processor instanceof AbstractProcessor)) {
-                    throw new ProcessorException();
-                }
                 if ($processor->validateFeedItem()) {
                     $result = $processor->execute();
                 } else {
-                    $processor->writeLog("Tooth item is not valid", $toothItem, $processor::LOG_WARNING);
+                    $processor->writeLog("Tooth item is not valid", $feedItem, $processor::LOG_WARNING);
                 }
             }
 

@@ -1,6 +1,8 @@
 <?php
 namespace Ramphor\Rake\Feeds\Sitemap;
 
-class Sitemap extends Base
+use Ramphor\Rake\Abstracts\AbstractFeed;
+
+class SitemapIndex extends AbstractFeed
 {
 }

@@ -5,13 +5,13 @@ use Monolog\Logger;
 use Ramphor\Rake\Constracts\Processor;
 use Ramphor\Rake\DataSource\FeedItem;
 
-abstract class AbstractProcessor implements Processor
+abstract class AbstractProcessor extends TemplateMethod implements Processor
 {
     protected $toothItem;
 
     public function __construct($toothItem)
     {
-        $this->feedItem = $toothItem;
+        $this->toothItem = $toothItem;
     }
 
     public function validateFeedItem(): bool
