@@ -6,9 +6,6 @@ abstract class CrawlerTooth extends Tooth
     protected $skipCheckTooth = false;
     protected $validateResponse = false;
 
-    abstract protected function validateURL($url): bool;
-    abstract protected function validateRequestResponse($response): bool;
-
     public function skipCheckToothWhenCrawl($skip = false)
     {
         $this->skipCheckTooth = (bool)$skip;
@@ -25,6 +22,12 @@ abstract class CrawlerTooth extends Tooth
     public function crawlRequestOptions()
     {
         return [];
+    }
+
+    abstract protected function validateURL($url): bool;
+
+    protected function validateRequestResponse($response): bool {
+        return !empty($response);
     }
 
     public function fetch()
