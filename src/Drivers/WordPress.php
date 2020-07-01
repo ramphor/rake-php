@@ -102,8 +102,8 @@ class WordPress extends Driver
             "SELECT options
             FROM {$this->wpdb->prefix}rake_feeds
             WHERE rake_id=%s
-                feed_id=%s
-                tooth_id=%s",
+                AND feed_id=%s
+                AND tooth_id=%s",
             $rake->getId(),
             $feed->getId(),
             $tooth->getId()

@@ -78,11 +78,11 @@ abstract class Feed extends TemplateMethod implements FeedConstract
         if (is_null($this->options)) {
             $this->options = $this->getOptions();
         }
-        if (!isset($this->options[$option])) {
+
+        if (!isset($this->options[$optionName])) {
             return $defaultValue;
         }
-
-        return $this->options[$option];
+        return $this->options[$optionName];
     }
 
     public function getOptions()
