@@ -44,19 +44,8 @@ class Rake extends TemplateMethod
         }
 
         foreach ($this->teeth as $tooth) {
-            // Run feeds before get feed items
-            $feeds = $tooth->getFeeds();
-            if (count($feeds) > 0) {
-                foreach ($feeds as $feed) {
-                    $excutedTimes = $feed->getOption('excuted_times', 0);
-                    if ($feed->getLifeCycle() <= $excutedTimes) {
-                        continue;
-                    }
-
-                    $feed->execute();
-                    $feed->updateOption('excuted_times', $excutedTimes + 1);
-                }
-            }
+            // Crawl data from the feeds of tooth
+            $tooth->excute();
 
             $feedItems = $tooth->getItems();
             foreach ($feedItems as $feedItem) {

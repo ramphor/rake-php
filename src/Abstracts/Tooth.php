@@ -118,6 +118,23 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         return $stream;
     }
 
+    public function execute()
+    {
+        // Run feeds before get feed items
+        $feeds = $this->getFeeds();
+        if (count($feeds) > 0) {
+            foreach ($feeds as $feed) {
+                $excutedTimes = $feed->getOption('excuted_times', 0);
+                if ($feed->getLifeCycle() <= $excutedTimes) {
+                    continue;
+                }
+
+                $feed->execute();
+                $feed->updateOption('excuted_times', $excutedTimes + 1);
+            }
+        }
+    }
+
     public function getItems(): Iterator
     {
         if (empty($this->feedFormat)) {
