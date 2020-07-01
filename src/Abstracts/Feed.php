@@ -50,16 +50,21 @@ abstract class Feed extends TemplateMethod implements FeedConstract
         return $this->lifeCycle;
     }
 
-    public function insertCrawlUrl(Link $url)
+    public function insertCrawlUrl(Link $url, $checkingTooth = true)
     {
         if (empty($this->driver)) {
             throw new \Exception("Rake driver is not exists");
         }
 
-        $rakeId = $this->getTooth()->getRake()->getId();
+        $tooth = $this->getTooth();
+        $rake = $tooth->getRake();
 
-        if (!$this->driver->crawlUrlIsExists($url, $rakeId)) {
-            $this->driver->insertCrawlUrl($url, $rakeId);
+        if (!$checkingTooth) {
+            $tooth = null;
+        }
+
+        if (!$this->driver->crawlUrlIsExists($url, $rake, $tooth)) {
+            $this->driver->insertCrawlUrl($url, $rake, $tooth);
         }
     }
 

@@ -1,9 +1,11 @@
 <?php
 namespace Ramphor\Rake\Drivers;
 
+use Ramphor\Rake\Rake;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Feed;
+use Ramphor\Rake\Abstracts\Tooth;
 
 class WordPress extends Driver
 {
@@ -31,33 +33,6 @@ class WordPress extends Driver
 
         // Execute SQL query to create DB table
         $this->dbQuery($sql);
-    }
-
-    public function crawlUrlIsExists(Link $url, string $rakeId = null)
-    {
-        return $this->wpdb->get_var(
-            $this->wpdb->prepare(
-                "SELECT ID FROM {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND rake_id=%s",
-                (string)$url,
-                $rakeId
-            )
-        ) != null;
-    }
-
-    public function insertCrawlUrl(Link $url, string $rakeId = null)
-    {
-        return $this->wpdb->insert(
-            $this->wpdb->prefix . 'rake_crawled_urls',
-            [
-                'url'        => (string)$url,
-                'rake_id'   => $rakeId,
-                'crawled'    => false,
-                'retry'      => 0,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ],
-            ['%s', '%s', '%d', '%d', '%s', '%s']
-        );
     }
 
     public function updateFeedOptions(Feed $feed, $options = null)
@@ -114,5 +89,85 @@ class WordPress extends Driver
             return [];
         }
         return unserialize($options);
+    }
+
+
+    public function crawlUrlIsExists(Link $url, Rake $rake, Tooth $tooth = null)
+    {
+        if (is_null($tooth)) {
+            $sql = $this->wpdb->prepare(
+                "SELECT ID FROM {$this->wpdb->prefix}rake_crawled_urls WHERE url=%s AND rake_id=%s",
+                (string)$url,
+                $rake->getId()
+            );
+        } else {
+            $sql = $this->wpdb->prepare(
+                "SELECT ID
+                FROM {$this->wpdb->prefix}rake_crawled_urls
+                WHERE url=%s
+                    AND rake_id=%s
+                    AND tooth_id=%s",
+                (string)$url,
+                $rake->getId(),
+                $tooth->getId()
+            );
+        }
+
+        return $this->wpdb->get_var($sql) != null;
+    }
+
+    public function insertCrawlUrl(Link $url, Rake $rake, Tooth $tooth = null)
+    {
+        $data = [
+            'url'        => (string)$url,
+            'rake_id'   => $rake->getId(),
+            'crawled'    => false,
+            'retry'      => 0,
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql'),
+        ];
+        $formats = ['%s', '%s', '%d', '%d', '%s', '%s'];
+
+        if (!is_null($tooth)) {
+            $data['tooth_id'] = $tooth->getId();
+            array_push($formats, '%s');
+        }
+
+        return $this->wpdb->insert($this->wpdb->prefix . 'rake_crawled_urls', $data, $formats);
+    }
+
+    public function getCrawlUrls(Rake $rake, Tooth $tooth = null, $options = [])
+    {
+        list($crawled, $retry, $limit) = $this->parseCrawlURLOptions($options);
+
+        if (is_null($tooth)) {
+            $sql = $this->wpdb->prepare(
+                "SELECT *
+                FROM {$this->wpdb->prefix}rake_crawled_urls
+                WHERE rake_id=%s
+                    AND crawled=%d
+                ORDER BY retry {$retry}, updated_at ASC, ID ASC
+                LIMIT %d",
+                $rake->getId(),
+                $crawled,
+                $limit
+            );
+        } else {
+            $sql = $this->wpdb->prepare(
+                "SELECT *
+                FROM {$this->wpdb->prefix}rake_crawled_urls
+                WHERE rake_id=%s
+                    AND tooth_id=%s
+                    AND crawled=%d
+                ORDER BY retry {$retry}, updated_at ASC, ID ASC
+                LIMIT %d",
+                $rake->getId(),
+                $tooth->getId(),
+                $crawled,
+                $limit
+            );
+        }
+
+        return $this->wpdb->get_results($sql);
     }
 }

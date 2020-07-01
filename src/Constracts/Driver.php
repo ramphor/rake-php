@@ -1,8 +1,10 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
+use Ramphor\Rake\Rake;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Abstracts\Feed;
+use Ramphor\Rake\Abstracts\Tooth;
 
 interface Driver
 {
@@ -10,9 +12,9 @@ interface Driver
 
     public function createDbTable(string $tableName, string $syntaxContent);
 
-    public function crawlUrlIsExists(Link $url, string $rakeId = null);
+    public function crawlUrlIsExists(Link $url, Rake $rake, Tooth $tooth = null);
 
-    public function insertCrawlUrl(Link $url, string $rakeId = null);
+    public function insertCrawlUrl(Link $url, Rake $rake, Tooth $tooth = null);
 
     public function updateFeedOptions(Feed $feed, $options = null);
 }
