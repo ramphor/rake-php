@@ -110,14 +110,6 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         return new $parsers[$this->feedFormat]($resource, $parserOptions);
     }
 
-    protected function createStreamFronString($response)
-    {
-        $stream = fopen('php://temp', 'r+');
-        fwrite($stream, $response);
-
-        return $stream;
-    }
-
     public function execute()
     {
         // Run feeds before get feed items
@@ -141,9 +133,8 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
             throw new ToothFormatException();
         }
         $response = $this->fetch();
-        $stream   = $this->createStreamFronString($response);
 
-        return $this->createParser($stream, $this->parserOptions());
+        return $this->createParser($response, $this->parserOptions());
     }
 
     public function closeStream()

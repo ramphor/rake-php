@@ -6,14 +6,15 @@ use Ramphor\Rake\Constracts\Parser as ParserConstract;
 
 abstract class Parser implements ParserConstract
 {
-    protected $stream;
+    protected $data;
 
-    public function __construct($stream, $parserOptions = null)
+    public function __construct($data, $parserOptions = null)
     {
-        if (!is_resource($stream)) {
-            throw new TypeError(sprintf('Argument passed must be a stream resource, %s given', gettype($stream)));
+        if (is_string($data)) {
+            $this->data = new $this->createStreamFronString($data);
+        } else {
+            $this->data = $data;
         }
-        $this->stream = $stream;
 
         if (is_array($parserOptions) && count($parserOptions) > 0) {
             foreach ($parserOptions as $option => $value) {
@@ -27,5 +28,13 @@ abstract class Parser implements ParserConstract
                 call_user_func($callback, $value);
             }
         }
+    }
+
+    protected function createStreamFronString($response)
+    {
+        $stream = fopen('php://temp', 'r+');
+        fwrite($stream, $response);
+
+        return $stream;
     }
 }

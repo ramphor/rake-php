@@ -49,7 +49,7 @@ class Parser extends AbstractParser
     public function current(): FeedItem
     {
         $row = fgetcsv(
-            $this->stream,
+            $this->data,
             $this->contentSize,
             $this->delimeter,
             $this->enclosure,
@@ -66,28 +66,28 @@ class Parser extends AbstractParser
 
     public function next()
     {
-        if (is_resource($this->stream)) {
-            return !feof($this->stream);
+        if (is_resource($this->data)) {
+            return !feof($this->data);
         }
         return false;
     }
 
     public function rewind()
     {
-        rewind($this->stream);
+        rewind($this->data);
 
-        $header = fgets($this->stream);
+        $header = fgets($this->data);
 
         if ((bool) $this->header) {
             $this->header = str_getcsv($header, $this->delimeter, $this->enclosure, $this->escape);
         }
 
         $this->rowCounter  = 0;
-        $this->contentSize = fstat($this->stream)['size'];
+        $this->contentSize = fstat($this->data)['size'];
     }
 
     public function valid()
     {
-        return !feof($this->stream);
+        return !feof($this->data);
     }
 }
