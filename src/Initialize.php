@@ -49,6 +49,7 @@ class Initialize
 
         $this->driver->createDbTable('rake_feeds', "`ID` int(11) NOT NULL,
             `rake_id` varchar(255) NOT NULL,
+            `tooth_id` varchar(255) NOT NULL,
             `feed_id` varchar(255) NOT NULL,
             `options` longtext NOT NULL,
             `last_execute` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

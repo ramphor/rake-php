@@ -48,8 +48,13 @@ class Rake extends TemplateMethod
             $feeds = $tooth->getFeeds();
             if (count($feeds) > 0) {
                 foreach ($feeds as $feed) {
+                    $excutedTimes = $feed->getOption('excuted_times', 0);
+                    if ($feed->getLifeCycle() <= $excutedTimes) {
+                        continue;
+                    }
+
                     $feed->execute();
-                    $feed->updateOptions();
+                    $feed->updateOption('excuted_times', $excutedTimes +1);
                 }
             }
 

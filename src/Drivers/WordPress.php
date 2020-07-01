@@ -3,6 +3,7 @@ namespace Ramphor\Rake\Drivers;
 
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Abstracts\Driver;
+use Ramphor\Rake\Abstracts\Feed;
 
 class WordPress extends Driver
 {
@@ -61,16 +62,57 @@ class WordPress extends Driver
 
     public function updateFeedOptions(Feed $feed, $options = null)
     {
-        $tooth = $this->feed->getTooth();
+        $tooth = $feed->getTooth();
         $rake  = $tooth->getRake();
 
         $exists = $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT ID FROM ". $this->wpdb->prefix . " WHERE rake_id=% AND feed_id=%s",
+            "SELECT ID FROM ". $this->wpdb->prefix . "rake_feeds
+                WHERE rake_id=%s
+                    AND tooth_id=%s
+                    AND feed_id=%s",
             $rake->getId(),
+            $tooth->getId(),
             $feed->getId()
         ));
 
-        var_dump($exists);
-        die;
+        $data = [
+            'rake_id' => $rake->getId(),
+            'tooth_id' => $tooth->getId(),
+            'feed_id' => $feed->getId(),
+            'options' => serialize($options),
+            'last_execute' => current_time('mysql')
+        ];
+        $db_table = $this->wpdb->prefix . 'rake_feeds';
+
+        if (is_null($exists)) {
+            $this->wpdb->insert($db_table, $data);
+        } else {
+            $this->wpdb->update($db_table, $data, [
+                'ID' => $exists
+            ]);
+        }
+    }
+
+    public function getFeedOptions(Feed $feed)
+    {
+        $tooth = $feed->getTooth();
+        $rake  = $tooth->getRake();
+
+        $sql = $this->wpdb->prepare(
+            "SELECT options
+            FROM {$this->wpdb->prefix}rake_feeds
+            WHERE rake_id=%s
+                feed_id=%s
+                tooth_id=%s",
+            $rake->getId(),
+            $feed->getId(),
+            $tooth->getId()
+        );
+        $options = $this->wpdb->get_var($sql);
+
+        if (empty($options)) {
+            return [];
+        }
+        return unserialize($options);
     }
 }

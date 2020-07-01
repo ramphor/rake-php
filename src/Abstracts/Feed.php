@@ -17,6 +17,7 @@ abstract class Feed extends TemplateMethod implements FeedConstract
 
     protected $id;
     protected $tooth;
+    protected $options;
 
     public function __construct(Tooth $tooth, string $feedId)
     {
@@ -44,6 +45,11 @@ abstract class Feed extends TemplateMethod implements FeedConstract
         $this->lifeCycle = $lifeCycle;
     }
 
+    public function getLifeCycle()
+    {
+        return $this->lifeCycle;
+    }
+
     public function insertCrawlUrl(Link $url)
     {
         if (empty($this->driver)) {
@@ -57,8 +63,30 @@ abstract class Feed extends TemplateMethod implements FeedConstract
         }
     }
 
-    public function updateOptions($options = null)
+    public function updateOption($option, $value)
     {
-        $this->driver->updateFeedOptions($this, $options);
+        if (is_null($this->options)) {
+            $this->options = $this->getOptions();
+        }
+        $this->options[$option] = $value;
+
+        $this->driver->updateFeedOptions($this, $this->options);
+    }
+
+    public function getOption($optionName, $defaultValue = false)
+    {
+        if (is_null($this->options)) {
+            $this->options = $this->getOptions();
+        }
+        if (!isset($this->options[$option])) {
+            return $defaultValue;
+        }
+
+        return $this->options[$option];
+    }
+
+    public function getOptions()
+    {
+        return $this->driver->getFeedOptions($this);
     }
 }

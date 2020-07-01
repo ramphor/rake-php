@@ -2,6 +2,7 @@
 namespace Ramphor\Rake\Constracts;
 
 use Ramphor\Rake\Link;
+use Ramphor\Rake\Abstracts\Feed;
 
 interface Driver
 {
