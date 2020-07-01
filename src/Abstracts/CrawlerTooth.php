@@ -4,7 +4,10 @@ namespace Ramphor\Rake\Abstracts;
 abstract class CrawlerTooth extends Tooth
 {
     protected $skipCheckTooth = false;
+    protected $validateResponse = false;
 
+    abstract protected function validateURL($url): bool;
+    abstract protected function validateRequestResponse($response): bool;
 
     public function skipCheckToothWhenCrawl($skip = false)
     {
@@ -19,13 +22,13 @@ abstract class CrawlerTooth extends Tooth
         ];
     }
 
-    public function crawlRequestOptions() {
+    public function crawlRequestOptions()
+    {
         return [];
     }
 
     public function fetch()
     {
-
         $rake = $this->getRake();
         if ($this->skipCheckTooth) {
             $tooth = null;
@@ -36,16 +39,22 @@ abstract class CrawlerTooth extends Tooth
         $crawlUrls = $this->driver->getCrawlUrls($rake, $tooth, $this->crawlUrlOptions());
         $responses = [];
 
-        foreach($crawlUrls as $crawlUrl) {
+        foreach ($crawlUrls as $crawlUrl) {
+            if (!$this->validateURL($crawlUrl)) {
+                continue;
+            }
+
             $response = $this->httpClient->request(
                 'GET',
                 $crawlUrl->url,
                 $this->crawlRequestOptions()
             );
-            $responses[$crawlUrl->url] = [
-                'raw' => $crawlUrl,
-                'response' => $response,
-            ];
+            if ($this->validateResponse && $this->validateRequestResponse($response)) {
+                $responses[$crawlUrl->url] = [
+                    'raw' => $crawlUrl,
+                    'response' => $response,
+                ];
+            }
         }
 
         return $responses;
