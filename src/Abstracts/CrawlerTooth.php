@@ -14,9 +14,13 @@ abstract class CrawlerTooth extends Tooth
     public function crawlUrlOptions()
     {
         return [
-            'limit' => 10,
+            'limit' => 2,
             'crawled' => 0
         ];
+    }
+
+    public function crawlRequestOptions() {
+        return [];
     }
 
     public function fetch()
@@ -30,7 +34,20 @@ abstract class CrawlerTooth extends Tooth
         }
 
         $crawlUrls = $this->driver->getCrawlUrls($rake, $tooth, $this->crawlUrlOptions());
+        $responses = [];
 
-        var_dump($crawlUrls);
+        foreach($crawlUrls as $crawlUrl) {
+            $response = $this->httpClient->request(
+                'GET',
+                $crawlUrl->url,
+                $this->crawlRequestOptions()
+            );
+            $responses[$crawlUrl->url] = [
+                'raw' => $crawlUrl,
+                'response' => $response,
+            ];
+        }
+
+        return $responses;
     }
 }
