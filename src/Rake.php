@@ -45,7 +45,7 @@ class Rake extends TemplateMethod
 
         foreach ($this->teeth as $tooth) {
             // Crawl data from the feeds of tooth
-            $tooth->excute();
+            $tooth->execute();
 
             $feedItems = $tooth->getItems();
             foreach ($feedItems as $feedItem) {

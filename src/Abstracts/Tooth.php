@@ -124,13 +124,13 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         $feeds = $this->getFeeds();
         if (count($feeds) > 0) {
             foreach ($feeds as $feed) {
-                $excutedTimes = $feed->getOption('excuted_times', 0);
-                if ($feed->getLifeCycle() <= $excutedTimes) {
+                $executedTimes = $feed->getOption('executed_times', 0);
+                if ($feed->getLifeCycle() <= $executedTimes) {
                     continue;
                 }
 
                 $feed->execute();
-                $feed->updateOption('excuted_times', $excutedTimes + 1);
+                $feed->updateOption('executed_times', $executedTimes + 1);
             }
         }
     }
