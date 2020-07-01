@@ -12,4 +12,6 @@ interface Driver
     public function crawlUrlIsExists(Link $url, string $rakeId = null);
 
     public function insertCrawlUrl(Link $url, string $rakeId = null);
+
+    public function updateFeedOptions(Feed $feed, $options = null);
 }

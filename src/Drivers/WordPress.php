@@ -58,4 +58,19 @@ class WordPress extends Driver
             ['%s', '%s', '%d', '%d', '%s', '%s']
         );
     }
+
+    public function updateFeedOptions(Feed $feed, $options = null)
+    {
+        $tooth = $this->feed->getTooth();
+        $rake  = $tooth->getRake();
+
+        $exists = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT ID FROM ". $this->wpdb->prefix . " WHERE rake_id=% AND feed_id=%s",
+            $rake->getId(),
+            $feed->getId()
+        ));
+
+        var_dump($exists);
+        die;
+    }
 }

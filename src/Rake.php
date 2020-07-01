@@ -49,6 +49,7 @@ class Rake extends TemplateMethod
             if (count($feeds) > 0) {
                 foreach ($feeds as $feed) {
                     $feed->execute();
+                    $feed->updateOptions();
                 }
             }
 

@@ -56,4 +56,9 @@ abstract class Feed extends TemplateMethod implements FeedConstract
             $this->driver->insertCrawlUrl($url, $rakeId);
         }
     }
+
+    public function updateOptions($options = null)
+    {
+        $this->driver->updateFeedOptions($this, $options);
+    }
 }
