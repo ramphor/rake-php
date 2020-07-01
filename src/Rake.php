@@ -54,7 +54,7 @@ class Rake extends TemplateMethod
                     }
 
                     $feed->execute();
-                    $feed->updateOption('excuted_times', $excutedTimes +1);
+                    $feed->updateOption('excuted_times', $excutedTimes + 1);
                 }
             }
 
