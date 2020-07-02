@@ -18,7 +18,7 @@ class Rake extends TemplateMethod
     public function __construct(
         string $rakeId,
         Driver $driver = null,
-        HttpClient $httpClient = null
+        Client $httpClient = null
     ) {
         $this->setId($rakeId);
         if (!is_null($driver)) {
