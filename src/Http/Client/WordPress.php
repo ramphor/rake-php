@@ -1,8 +1,8 @@
 <?php
-namespace Ramphor\Rake\Http;
+namespace Ramphor\Rake\Http\Client;
 
 use Requests;
-use Ramphor\Rake\Abstracts\HttpClient;
+use Ramphor\Rake\Abstracts\Http\Client;
 
 class WordPress extends HttpClient
 {

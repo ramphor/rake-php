@@ -1,6 +1,8 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
+use Ramphor\Rake\Http\Response;
+
 abstract class CrawlerTooth extends Tooth
 {
     protected $skipCheckTooth = false;
@@ -31,9 +33,11 @@ abstract class CrawlerTooth extends Tooth
         return !empty($response);
     }
 
-    public function fetch()
+    public function fetch(): Response
     {
-        $rake = $this->getRake();
+        $response = new Response(Response::TYPE_ARRAY);
+        $rake     = $this->getRake();
+
         if ($this->skipCheckTooth) {
             $tooth = null;
         } else {
@@ -41,27 +45,21 @@ abstract class CrawlerTooth extends Tooth
         }
 
         $crawlDatas = $this->driver->getCrawlURLs($rake, $tooth, $this->crawlOptions());
-        $responses = [];
 
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
                 continue;
             }
-
-            $response = $this->httpClient->request(
+            $html = $this->httpClient->request(
                 'GET',
                 $crawlData->url,
                 $this->crawlRequestOptions()
             );
-
             if (!$this->validateResponse || $this->validateRequestResponse($response)) {
-                array_push($responses, [
-                    'raw' => $crawlData,
-                    'response' => $response,
-                ]);
+                $response->append($crawlData->ID, $html, $crawlData->url);
             }
         }
 
-        return $responses;
+        return $response;
     }
 }

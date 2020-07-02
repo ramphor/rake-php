@@ -7,11 +7,11 @@ use Ramphor\Rake\DataSource\FeedItem;
 
 abstract class Processor extends TemplateMethod implements ProcessorConstract
 {
-    protected $toothItem;
+    protected $feedItem;
 
-    public function __construct($toothItem)
+    public function setFeedItem(FeedItem &$feedItem)
     {
-        $this->toothItem = $toothItem;
+        $this->feedItem =$feedItem;
     }
 
     public function validateFeedItem(): bool

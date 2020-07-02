@@ -1,7 +1,7 @@
 <?php
-namespace Ramphor\Rake\Constracts;
+namespace Ramphor\Rake\Constracts\Http;
 
-interface HttpClient
+interface Client
 {
     public function request($method, $uri = '', $options = []);
 }

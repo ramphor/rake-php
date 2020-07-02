@@ -35,6 +35,7 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
     protected $rake;
     protected $toothFormat;
     protected $parser;
+    protected $processor;
 
     public function __construct(Rake $rake, string $toothId)
     {
@@ -54,26 +55,16 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         return $this->rake;
     }
 
-    public function registerProcessor(string $processorClassName)
+    public function registerProcessor(Processor $processor)
     {
-        if (!class_exists($processorClassName)) {
-            throw new ResourceException("Processor must be a class name");
-        }
-        $this->processorClassName = $processorClassName;
-    }
-
-    public function createProcessor(FeedItem $feedItem): Processor
-    {
-        $processorClassName = $this->processorClassName;
-        if (empty($processorClassName)) {
-            throw new ResourceException("Processor must be have value");
-        }
-
-        $processor = new $processorClassName($feedItem);
         $processor->setDriver($this->driver);
         $processor->setHttpClient($this->httpClient);
+        $this->processor = $processor;
+    }
 
-        return $processor;
+    public function getProcessor(): Processor
+    {
+        return $this->processor;
     }
 
     public function setFormat($format)
@@ -132,13 +123,11 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         if (empty($this->feedFormat)) {
             throw new ToothFormatException();
         }
+
         $response = $this->fetch();
-
-        return $this->createParser($response, $this->parserOptions());
-    }
-
-    public function closeStream()
-    {
-        @fclose($this->stream);
+        return $this->createParser(
+            $response,
+            $this->parserOptions()
+        );
     }
 }

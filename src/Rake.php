@@ -5,7 +5,7 @@ use Ramphor\Rake\Abstracts\TemplateMethod;
 use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Abstracts\Driver;
-use Ramphor\Rake\Abstracts\HttpClient;
+use Ramphor\Rake\Abstracts\Http\Client;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
@@ -48,8 +48,10 @@ class Rake extends TemplateMethod
             $tooth->execute();
 
             $feedItems = $tooth->getItems();
+            $processor = $tooth->getProcessor();
+
             foreach ($feedItems as $feedItem) {
-                $processor = $tooth->createProcessor($feedItem);
+                $processor->setFeedItem($feedItem);
 
                 if ($processor->validateFeedItem()) {
                     $result = $processor->execute();
@@ -57,9 +59,6 @@ class Rake extends TemplateMethod
                     $processor->writeLog("Tooth item is not valid", $feedItem, $processor::LOG_WARNING);
                 }
             }
-
-            // Close the feed stream
-            $tooth->closeStream();
         }
     }
 }

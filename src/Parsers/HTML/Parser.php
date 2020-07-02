@@ -15,7 +15,10 @@ class Parser extends AbstractParser
 
     public function current(): FeedItem
     {
-        return new FeedItem($this->data[$this->currentIndex]);
+        var_dump($this->data);
+
+        $dataItem = $this->data[$this->currentIndex];
+        return new FeedItem($dataItem);
     }
 
     public function rewind()
