@@ -17,4 +17,6 @@ interface Driver
     public function insertCrawlUrl(Link $url, Rake $rake, Tooth $tooth = null);
 
     public function updateFeedOptions(Feed $feed, $options = null);
+
+    public function getCrawlUrls(Rake $rake, Tooth $tooth = null, $options = []);
 }

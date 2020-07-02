@@ -11,7 +11,7 @@ abstract class CrawlerTooth extends Tooth
         $this->skipCheckTooth = (bool)$skip;
     }
 
-    public function crawlUrlOptions()
+    public function crawlOptions()
     {
         return [
             'limit' => 2,
@@ -24,9 +24,10 @@ abstract class CrawlerTooth extends Tooth
         return [];
     }
 
-    abstract protected function validateURL($url): bool;
+    abstract protected function validateURL($url);
 
-    protected function validateRequestResponse($response): bool {
+    protected function validateRequestResponse($response): bool
+    {
         return !empty($response);
     }
 
@@ -39,24 +40,25 @@ abstract class CrawlerTooth extends Tooth
             $tooth = $this;
         }
 
-        $crawlUrls = $this->driver->getCrawlUrls($rake, $tooth, $this->crawlUrlOptions());
+        $crawlDatas = $this->driver->getCrawlURLs($rake, $tooth, $this->crawlOptions());
         $responses = [];
 
-        foreach ($crawlUrls as $crawlUrl) {
-            if (!$this->validateURL($crawlUrl)) {
+        foreach ($crawlDatas as $crawlData) {
+            if (!$this->validateURL($crawlData->url)) {
                 continue;
             }
 
             $response = $this->httpClient->request(
                 'GET',
-                $crawlUrl->url,
+                $crawlData->url,
                 $this->crawlRequestOptions()
             );
-            if ($this->validateResponse && $this->validateRequestResponse($response)) {
-                $responses[$crawlUrl->url] = [
-                    'raw' => $crawlUrl,
+
+            if (!$this->validateResponse || $this->validateRequestResponse($response)) {
+                array_push($responses, [
+                    'raw' => $crawlData,
                     'response' => $response,
-                ];
+                ]);
             }
         }
 
