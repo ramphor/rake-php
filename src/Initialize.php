@@ -38,6 +38,7 @@ class Initialize
             `rake_id` VARCHAR(255) NOT NULL,
             `tooth_id` VARCHAR(255) NULL,
             `guid` text NOT NULL,
+            `resource_type` VARCHAR(255) NOT NULL,
             `sha256_hash` char(64) NOT NULL,
             `new_guid` text,
             `new_type` varchar(255) DEFAULT NULL,
