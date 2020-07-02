@@ -15,9 +15,7 @@ class Parser extends AbstractParser
 
     public function current(): FeedItem
     {
-        var_dump($this->data);
-
-        $dataItem = $this->data[$this->currentIndex];
+        $dataItem = $this->data[ $this->currentIndex ];
         return new FeedItem($dataItem);
     }
 
@@ -33,6 +31,6 @@ class Parser extends AbstractParser
 
     public function valid()
     {
-        return is_array($this->data) && isset($this->data[$this->currentIndex]);
+        return is_array($this->data) && isset($this->data[ $this->currentIndex ]);
     }
 }

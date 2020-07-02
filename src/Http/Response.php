@@ -23,6 +23,11 @@ final class Response implements ResponseConstract
         $this->type = $responeType;
     }
 
+    public function getType()
+    {
+        return $this->type;
+    }
+
     public function append($guid, $body, $url = null)
     {
         $this->body[] = [
@@ -37,7 +42,7 @@ final class Response implements ResponseConstract
         $this->body = $body;
     }
 
-    public function body()
+    public function getBody()
     {
         return $this->body;
     }

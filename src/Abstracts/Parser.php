@@ -8,12 +8,12 @@ abstract class Parser implements ParserConstract
 {
     protected $data;
 
-    public function __construct($data, $parserOptions = null)
+    public function __construct($response, $parserOptions = null)
     {
-        if (is_string($data)) {
-            $this->data = new $this->createStreamFronString($data);
+        if ($response->getType() === $response::TYPE_STREAM) {
+            $this->data = new $this->createStreamFronString($response->getBody());
         } else {
-            $this->data = $data;
+            $this->data = $response->getBody();
         }
 
         if (is_array($parserOptions) && count($parserOptions) > 0) {
