@@ -11,22 +11,16 @@ use Ramphor\Rake\Abstracts\Processor;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
-use Ramphor\Rake\Parsers\XML\Parser as XmlParser;
-use Ramphor\Rake\Parsers\JSON\Parser as JsonParser;
 
 use Ramphor\Rake\Exceptions\ToothFormatException;
 
 abstract class Tooth extends TemplateMethod implements ToothConstract
 {
     public const FORMAT_CSV      = 'csv';
-    public const FORMAT_XML      = 'xml';
-    public const FORMAT_JSON     = 'json';
     public const FORMAT_HTML     = 'html';
 
     protected $acceptToothFormats = [
         self::FORMAT_CSV,
-        self::FORMAT_XML,
-        self::FORMAT_JSON,
         self::FORMAT_HTML
     ];
     protected $feeds = [];
@@ -93,8 +87,6 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
     {
         $parsers = [
             self::FORMAT_CSV => CsvParser::class,
-            self::FORMAT_XML => XmlParser::class,
-            self::FORMAT_JSON => JsonParser::class,
             self::FORMAT_HTML => HtmlParser::class,
         ];
 
