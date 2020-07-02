@@ -122,4 +122,8 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
             $this->parserOptions()
         );
     }
+
+    public function setMappingFields($mappingFields)
+    {
+    }
 }

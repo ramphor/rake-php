@@ -1,6 +1,8 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
+use Ramphor\Rake\Abstracts\Http\Client;
+
 abstract class TemplateMethod
 {
     protected $id;
@@ -17,7 +19,7 @@ abstract class TemplateMethod
         return $this->id;
     }
 
-    public function setHttpClient(HttpClient &$httpClient)
+    public function setHttpClient(Client &$httpClient)
     {
         $this->httpClient = $httpClient;
     }
@@ -32,7 +34,7 @@ abstract class TemplateMethod
         return $this->driver;
     }
 
-    public function getHttpClient(): HttpClient
+    public function getHttpClient(): Client
     {
         return $this->httpClient;
     }
