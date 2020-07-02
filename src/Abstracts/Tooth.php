@@ -16,14 +16,12 @@ use Ramphor\Rake\Exceptions\ToothFormatException;
 
 abstract class Tooth extends TemplateMethod implements ToothConstract
 {
-    public const FORMAT_CSV      = 'csv';
-    public const FORMAT_HTML     = 'html';
+    public const FORMAT_CSV  = 'csv';
+    public const FORMAT_HTML = 'html';
 
-    protected $acceptToothFormats = [
-        self::FORMAT_CSV,
-        self::FORMAT_HTML
-    ];
-    protected $feeds = [];
+    protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
+    protected $feeds              = [];
+    protected $mappingFields      = [];
 
     protected $id;
     protected $rake;
@@ -93,21 +91,9 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         return new $parsers[$this->feedFormat]($resource, $parserOptions);
     }
 
-    public function execute()
+    public function setMappingFields(array $mappingFields)
     {
-        // Run feeds before get feed items
-        $feeds = $this->getFeeds();
-        if (count($feeds) > 0) {
-            foreach ($feeds as $feed) {
-                $executedTimes = $feed->getOption('executed_times', 0);
-                if ($feed->getLifeCycle() <= $executedTimes) {
-                    continue;
-                }
-
-                $feed->execute();
-                $feed->updateOption('executed_times', $executedTimes + 1);
-            }
-        }
+        $this->mappingFields = $mappingFields;
     }
 
     public function getItems(): Iterator
@@ -123,7 +109,20 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         );
     }
 
-    public function setMappingFields($mappingFields)
+    public function execute()
     {
+        // Run feeds before get feed items
+        $feeds = $this->getFeeds();
+        if (count($feeds) > 0) {
+            foreach ($feeds as $feed) {
+                $executedTimes = $feed->getOption('executed_times', 0);
+                if ($feed->getLifeCycle() <= $executedTimes) {
+                    continue;
+                }
+
+                $feed->execute();
+                $feed->updateOption('executed_times', $executedTimes + 1);
+            }
+        }
     }
 }
