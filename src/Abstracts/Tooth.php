@@ -89,12 +89,12 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
             self::FORMAT_HTML => HtmlParser::class,
         ];
 
-        return new $parsers[$this->feedFormat]($resource, $parserOptions);
+        return new $parsers[$this->toothFormat]($resource, $parserOptions);
     }
 
     public function getItems(): Iterator
     {
-        if (empty($this->feedFormat)) {
+        if (empty($this->toothFormat)) {
             throw new ToothFormatException();
         }
 
