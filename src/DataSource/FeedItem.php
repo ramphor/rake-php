@@ -3,8 +3,6 @@ namespace Ramphor\Rake\DataSource;
 
 class FeedItem
 {
-    protected $originalData;
-
     public $key;
     public $title;
     public $content;
@@ -18,14 +16,4 @@ class FeedItem
     public $imageGallery;
     public $status;
     public $metas;
-
-    public function __construct($originalData)
-    {
-        $this->originalData = $originalData;
-    }
-
-    public function getOriginalData()
-    {
-        return $this->originalData;
-    }
 }

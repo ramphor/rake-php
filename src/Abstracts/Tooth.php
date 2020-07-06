@@ -63,9 +63,9 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
     public function setFormat($format)
     {
         if (!in_array($format, $this->acceptToothFormats)) {
-            throw new ToothFormatException();
+            throw new ToothFormatException("The tooth format is invalid");
         }
-        $this->feedFormat = $format;
+        $this->toothFormat = $format;
     }
 
     public function addFeed(Feed $feed)
@@ -108,7 +108,10 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
             return $parser;
         }
 
-        $feedItemBuilder = new FeedItemBuilder($this->mappingFields);
+        $feedItemBuilder = new FeedItemBuilder(
+            $this->mappingFields,
+            $this->toothFormat
+        );
         return $parser->setFeedItemBuilder($feedItemBuilder);
     }
 
