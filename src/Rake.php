@@ -51,6 +51,8 @@ class Rake extends TemplateMethod
             $processor = $tooth->getProcessor();
 
             foreach ($feedItems as $feedItem) {
+                var_dump($feedItem);
+
                 $processor->setFeedItem($feedItem);
 
                 if ($processor->validateFeedItem()) {

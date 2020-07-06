@@ -11,6 +11,4 @@ interface Tooth
     public function fetch(): Response;
 
     public function getItems(): Iterator;
-
-    public function setMappingFields(array $mappingFields);
 }

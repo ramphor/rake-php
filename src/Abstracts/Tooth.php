@@ -6,6 +6,7 @@ use TypeError;
 use Ramphor\Rake\Rake;
 use Ramphor\Rake\Constracts\Tooth as ToothConstract;
 use Ramphor\Rake\DataSource\FeedItem;
+use Ramphor\Rake\DataSource\FeedItemBuilder;
 use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Abstracts\Processor;
 
@@ -91,11 +92,6 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         return new $parsers[$this->feedFormat]($resource, $parserOptions);
     }
 
-    public function setMappingFields(array $mappingFields)
-    {
-        $this->mappingFields = $mappingFields;
-    }
-
     public function getItems(): Iterator
     {
         if (empty($this->feedFormat)) {
@@ -103,10 +99,17 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
         }
 
         $response = $this->fetch();
-        return $this->createParser(
+        $parser   = $this->createParser(
             $response,
             $this->parserOptions()
         );
+
+        if (empty($this->mappingFields)) {
+            return $parser;
+        }
+
+        $feedItemBuilder = new FeedItemBuilder($this->mappingFields);
+        return $parser->setFeedItemBuilder($feedItemBuilder);
     }
 
     public function execute()

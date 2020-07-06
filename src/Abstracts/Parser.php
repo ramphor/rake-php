@@ -3,10 +3,12 @@ namespace Ramphor\Rake\Abstracts;
 
 use TypeError;
 use Ramphor\Rake\Constracts\Parser as ParserConstract;
+use Ramphor\Rake\DataSource\FeedItemBuilder;
 
 abstract class Parser implements ParserConstract
 {
     protected $data;
+    protected $feedBuilder;
 
     public function __construct($response, $parserOptions = null)
     {
@@ -28,6 +30,12 @@ abstract class Parser implements ParserConstract
                 call_user_func($callback, $value);
             }
         }
+    }
+
+    public function setFeedItemBuilder(FeedItemBuilder $feedBuilder): self
+    {
+        $this->feedBuilder = $feedBuilder;
+        return $this;
     }
 
     protected function createStreamFronString($response)
