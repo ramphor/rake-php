@@ -141,6 +141,18 @@ class FieldMapping
         }
     }
 
+    protected function buildCallbackArguments($args, $currentValue)
+    {
+        $argument_index = array_search("%%argument%%", $args);
+        if ($argument_index !== false) {
+            $args[$argument_index] = $currentValue;
+        } else {
+            array_unshift($args, $currentValue);
+        }
+
+        return $args;
+    }
+
     public function callCallbacks($value)
     {
         if (empty($this->callbacks)) {
@@ -148,10 +160,10 @@ class FieldMapping
         }
 
         foreach ($this->callbacks as $callback) {
-            $args = $callback['args'];
-            array_unshift($args, $value);
-
-            $value = call_user_func_array($callback['func'], $args);
+            $value = call_user_func_array(
+                $callback['func'],
+                $this->buildCallbackArguments($callback['args'], $value)
+            );
         }
         return $value;
     }
