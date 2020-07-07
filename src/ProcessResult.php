@@ -10,7 +10,8 @@ class ProcessResult
     protected $newGuid;
     protected $newType;
 
-    public function __construct($guid) {
+    public function __construct($guid)
+    {
         $this->guid = $guid;
     }
 
