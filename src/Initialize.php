@@ -26,6 +26,7 @@ class Initialize
             `rake_id` VARCHAR(255) NOT NULL,
             `tooth_id` VARCHAR(255) NULL,
             `crawled` tinyint(4) NOT NULL,
+            `skipped` tinyint(4) NOT NULL,
             `retry` tinyint(4) NOT NULL DEFAULT '0',
             `created_at` timestamp NULL DEFAULT NULL,
             `updated_at` timestamp NULL DEFAULT NULL,
