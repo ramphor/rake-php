@@ -33,7 +33,8 @@ class Initialize
             PRIMARY KEY (`ID`)");
 
         $this->driver->createDbTable('rake_mapping', "`resource_id` bigint(20) NOT NULL,
-            `source_id` bigint(20) NOT NULL COMMENT 'The resource #ID contain resource_id'");
+            `source_id` bigint(20) NOT NULL COMMENT 'The resource #ID contain resource_id',
+            `map_type` char(64) NOT NULL DEFAULT 'parent',");
 
         $this->driver->createDbTable('rake_resources', "`ID` bigint(20) NOT NULL AUTO_INCREMENT,
             `rake_id` VARCHAR(255) NOT NULL,
