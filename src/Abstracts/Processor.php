@@ -18,8 +18,4 @@ abstract class Processor extends TemplateMethod implements ProcessorConstract
     {
         return true;
     }
-
-    public function writeLog($logMessage, $data = [], $logLevel = Logger::WARNING)
-    {
-    }
 }

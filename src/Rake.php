@@ -52,16 +52,13 @@ class Rake extends TemplateMethod
 
             foreach ($feedItems as $feedItem) {
                 if (!$feedItem->isValid()) {
-                    // Logging warning message later
                     continue;
                 }
 
                 $processor->setFeedItem($feedItem);
 
-                if ($processor->validateFeedItem()) {
+                if ($processor->isSuccess()) {
                     $result = $processor->execute();
-                } else {
-                    $processor->writeLog("Tooth item is not valid", $feedItem, $processor::LOG_WARNING);
                 }
             }
         }

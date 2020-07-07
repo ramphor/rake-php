@@ -7,6 +7,4 @@ use Ramphor\Rake\ProcessResult;
 interface Processor
 {
     public function execute(): ProcessResult;
-
-    public function writeLog($logMessage, $data = [], $logLevel = Logger::WARNING);
 }
