@@ -44,7 +44,7 @@ abstract class CrawlerTooth extends Tooth
             $tooth = $this;
         }
 
-        $crawlDatas = $this->driver->getCrawlURLs($rake, $tooth, $this->crawlOptions());
+        $crawlDatas = $this->driver->getCrawlUrls($rake, $tooth, $this->crawlOptions());
 
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
