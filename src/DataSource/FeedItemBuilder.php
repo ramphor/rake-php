@@ -46,7 +46,18 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                 $mapArgs['required'],
                 $mapArgs['default_value']
             );
-            unset($mapArgs['pattern'], $mapArgs['type'], $mapArgs['required'], $mapArgs['default_value']);
+
+            if (isset($mapArgs['callbacks'])) {
+                $fieldMapping->createCallbacksFromArray($mapArgs['callbacks']);
+            }
+
+            unset(
+                $mapArgs['pattern'],
+                $mapArgs['type'],
+                $mapArgs['required'],
+                $mapArgs['default_value'],
+                $mapArgs['callbacks']
+            );
 
             if (!empty($mapArgs)) {
                 foreach ($mapArgs as $meta => $value) {
@@ -94,7 +105,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
             $this->feedItem->setProperty(
                 $mappingField->getDestination(),
-                $value
+                $mappingField->callCallbacks($value)
             );
         }
     }

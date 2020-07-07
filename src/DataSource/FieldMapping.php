@@ -12,6 +12,7 @@ class FieldMapping
     protected $metas        = [];
 
     protected $supportedSourceTypes = ["xpath", "dom", "regex", "attribute"];
+    protected $callbacks = [];
 
     public function __construct($sourceField, $destField, $sourceType, $isRequired = false, $defaultValue = null)
     {
@@ -91,5 +92,67 @@ class FieldMapping
             return $this->metas[$metaKey];
         }
         return $defaultValue;
+    }
+
+    public function createCallbacksFromArray($callbacks)
+    {
+        if (!is_array($callbacks)) {
+            return;
+        }
+        foreach ($callbacks as $index_or_func => $args_or_func) {
+            if (is_string($args_or_func)) {
+                if (is_callable($index_or_func)) {
+                    $this->addCallback($index_or_func, [$args_or_func]);
+                    continue;
+                }
+                $this->addCallback($args_or_func);
+            } elseif (is_array($args_or_func)) {
+                if (is_string($index_or_func)) {
+                    $this->addCallback($index_or_func, $args_or_func);
+                    continue;
+                } elseif (is_callable($args_or_func)) {
+                    $this->addCallback($args_or_func);
+                    continue;
+                } elseif (isset($args_or_func['func'])) {
+                    if (isset($args_or_func['args'])) {
+                        $this->addCallback($args_or_func['func'], $args_or_func['args']);
+                        continue;
+                    }
+
+                    $callback = $args_or_func['func'];
+                    unset($args_or_func['func']);
+                    if (empty($args_or_func)) {
+                        $this->addCallback($callback);
+                    } else {
+                        $this->addCallback($callback, $args_or_func);
+                    }
+                }
+            }
+        }
+    }
+
+    public function addCallback($callback, $args = [])
+    {
+        if (is_callable($callback)) {
+            array_push($this->callbacks, [
+                'func' => $callback,
+                'args' => $args
+            ]);
+        }
+    }
+
+    public function callCallbacks($value)
+    {
+        if (empty($this->callbacks)) {
+            return $value;
+        }
+
+        foreach ($this->callbacks as $callback) {
+            $args = $callback['args'];
+            array_unshift($args, $value);
+
+            $value = call_user_func_array($callback['func'], $args);
+        }
+        return $value;
     }
 }
