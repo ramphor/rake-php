@@ -4,7 +4,7 @@ namespace Ramphor\Rake;
 class ProcessResult
 {
     protected $guid;
-    protected $isSuccess;
+    protected $resultType;
     protected $errors;
 
     protected $newGuid;
@@ -40,7 +40,7 @@ class ProcessResult
 
     public function isSucess()
     {
-        return $this->isSuccess;
+        return $this->resultType;
     }
 
     public function setNewGuid($newGuid)
