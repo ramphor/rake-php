@@ -5,18 +5,19 @@ class FieldMapping
 {
     protected $sourceField;
     protected $destField;
+    protected $sourceType;
+
     protected $isRequired   = false;
     protected $defaultValue = null;
+    protected $metas        = [];
 
-    public function __construct($sourceField = null, $destField = null, $isRequired = false, $defaultValue = null)
+    protected $supportedSourceTypes = ["xpath", "dom", "regex", "attribute"];
+
+    public function __construct($sourceField, $destField, $sourceType, $isRequired = false, $defaultValue = null)
     {
-        if (! is_null($sourceField)) {
-            $this->setSource($sourceField);
-        }
-
-        if (! is_null($destField)) {
-            $this->setDestination($destField);
-        }
+        $this->setSource($sourceField);
+        $this->setDestination($destField);
+        $this->setSourceType($sourceType);
         $this->setRequired($isRequired);
         $this->setDefaultValue($defaultValue);
     }
@@ -31,6 +32,15 @@ class FieldMapping
         $this->destField = $destField;
     }
 
+    public function setSourceType($souceType)
+    {
+        if (!in_array($souceType, $this->supportedSourceTypes)) {
+            var_dump($souceType);
+            throw new \Exception("Invalid resource type");
+        }
+        $this->sourceType = $souceType;
+    }
+
     public function setRequired($isRequired)
     {
         $this->isRequired = (bool) $isRequired;
@@ -39,5 +49,21 @@ class FieldMapping
     public function setDefaultValue($defaultValue)
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    public function addMeta($metaKey, $metaValue)
+    {
+        if (isset($this->metas[$metaKey])) {
+            return;
+        }
+        $this->metas[$metaKey] = $metaValue;
+    }
+
+    public function getMeta($metaKey, $defaultValue)
+    {
+        if (isset($this->metas[$metaKey])) {
+            return $this->metas[$metaKey];
+        }
+        return $defaultValue;
     }
 }

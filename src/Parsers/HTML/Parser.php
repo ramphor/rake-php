@@ -34,6 +34,6 @@ class Parser extends AbstractParser
 
     public function valid()
     {
-        return is_array($this->data) && isset($this->data[ $this->currentIndex ]);
+        return is_array($this->data) && isset($this->data[$this->currentIndex]);
     }
 }

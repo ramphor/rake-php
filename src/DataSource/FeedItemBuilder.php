@@ -6,8 +6,9 @@ use Sunra\PhpSimple\HtmlDomParser;
 
 class FeedItemBuilder implements FeedItemBuilderConstract
 {
+    protected $mappingFields = [];
+
     protected $originalData;
-    protected $mappingFields;
     protected $feedItem;
     protected $dataType;
     protected $document;
@@ -29,22 +30,26 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
     public function setMappingFields($mappingFields)
     {
-        $this->mappingFields = $mappingFields;
+        foreach ($mappingFields as $mapKey => $mapArgs) {
+            if (empty($mapArgs)) {
+                continue;
+            }
+            $fieldMapping = new FieldMapping($mapArgs['pattern'], trim($mapKey), $mapArgs["type"]);
+            if (isset($mapArgs['group'])) {
+                $fieldMapping->addMeta('group', $mapArgs['group']);
+            }
+            array_push($this->mappingFields, $fieldMapping);
+        }
     }
 
     public function newItem($data)
     {
-        $this->originalData = $data;
-        var_dump($this->dataType);
-        die;
+        $this->originalData = $data["body"];
         if ($this->dataType === 'html') {
-            $this->document = HtmlDomParser::str_get_html($data["body"]);
+            $this->document = @HtmlDomParser::str_get_html($data["body"]);
         }
 
-        var_dump($this->document);
-        die;
-
-        $this->feedItem = new FeedItem();
+        $this->feedItem = new FeedItem($data["guid"]);
     }
 
     public function build()
@@ -54,5 +59,17 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     public function getFeedItem(): FeedItem
     {
         return $this->feedItem;
+    }
+
+    public function getXPathValue($xpath)
+    {
+    }
+
+    public function getRegexValue($pattern)
+    {
+    }
+
+    public function getAttributeValue($attribue)
+    {
     }
 }
