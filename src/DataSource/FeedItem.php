@@ -29,7 +29,7 @@ class FeedItem
         }
     }
 
-    public function deleteGUID()
+    public function deleteGuid()
     {
         unset($this->guid);
     }

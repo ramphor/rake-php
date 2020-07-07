@@ -99,7 +99,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
             }
 
             if ($mappingField->isRequired() && is_null($value)) {
-                $this->feedItem->deleteGUID();
+                $this->feedItem->deleteGuid();
                 break;
             }
 

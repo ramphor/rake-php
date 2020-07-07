@@ -3,16 +3,21 @@ namespace Ramphor\Rake;
 
 class ProcessResult
 {
+    protected $guid;
     protected $isSuccess;
     protected $errors;
 
-    protected $newGUID;
+    protected $newGuid;
     protected $newType;
 
-    public static function createSuccessResult($newGUID, $newType): self
+    public function __construct($guid) {
+        $this->guid = $guid;
+    }
+
+    public static function createSuccessResult($guid, $newGuid, $newType): self
     {
-        $result = new static();
-        $result->setNewGUID($newGUID);
+        $result = new static($guid);
+        $result->setNewGuid($newGuid);
         $result->setNewType($newType);
 
         return $result->setResultType(true);
@@ -20,7 +25,7 @@ class ProcessResult
 
     public static function createErrorResult($errorMessage): self
     {
-        $result = new static();
+        $result = new static($guid);
         $result->addErrorMessage($errorMessage);
 
         return $result->setResultType(false);
@@ -37,9 +42,9 @@ class ProcessResult
         return $this->isSuccess;
     }
 
-    public function setNewGUID($newGUID)
+    public function setNewGuid($newGuid)
     {
-        $this->newGUID = $newGUID;
+        $this->newGuid = $newGuid;
     }
 
     public function setNewType($newType)

@@ -28,12 +28,12 @@ final class Response implements ResponseConstract
         return $this->type;
     }
 
-    public function append($guid, $body, $url = null)
+    public function append($guid, $body, $urlID = null)
     {
         $this->body[] = [
             'guid' => $guid,
             'body' => $body,
-            'url' => $url,
+            'urlID' => $urlID,
         ];
     }
 
