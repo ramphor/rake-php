@@ -24,21 +24,36 @@ class FieldMapping
 
     public function setSource($sourceField)
     {
-        $this->sourceField = $sourceField;
+        $this->sourceField = trim($sourceField);
+    }
+
+    public function getSource()
+    {
+        return $this->sourceField;
     }
 
     public function setDestination($destField)
     {
-        $this->destField = $destField;
+        $this->destField = trim($destField);
+    }
+
+    public function getDestination()
+    {
+        return $this->destField;
     }
 
     public function setSourceType($souceType)
     {
+        $souceType = strtolower(trim($souceType));
         if (!in_array($souceType, $this->supportedSourceTypes)) {
-            var_dump($souceType);
             throw new \Exception("Invalid resource type");
         }
         $this->sourceType = $souceType;
+    }
+
+    public function getSourceType()
+    {
+        return $this->sourceType;
     }
 
     public function setRequired($isRequired)
@@ -46,13 +61,24 @@ class FieldMapping
         $this->isRequired = (bool) $isRequired;
     }
 
+    public function isRequired()
+    {
+        return $this->isRequired;
+    }
+
     public function setDefaultValue($defaultValue)
     {
         $this->defaultValue = $defaultValue;
     }
 
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
+    }
+
     public function addMeta($metaKey, $metaValue)
     {
+        $metaKey = trim($metaKey);
         if (isset($this->metas[$metaKey])) {
             return;
         }

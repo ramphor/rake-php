@@ -21,4 +21,14 @@ class FeedItem
     {
         $this->guid = $guid;
     }
+
+    public function deleteGUID()
+    {
+        unset($this->guid);
+    }
+
+    public function isValid()
+    {
+        return !empty($this->guid);
+    }
 }
