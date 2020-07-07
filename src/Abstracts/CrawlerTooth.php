@@ -5,7 +5,7 @@ use Ramphor\Rake\Http\Response;
 
 abstract class CrawlerTooth extends Tooth
 {
-    protected $skipCheckTooth = false;
+    protected $skipCheckTooth   = false;
     protected $validateResponse = false;
 
     public function skipCheckToothWhenCrawl($skip = false)
