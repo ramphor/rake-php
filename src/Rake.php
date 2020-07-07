@@ -51,6 +51,11 @@ class Rake extends TemplateMethod
             $processor = $tooth->getProcessor();
 
             foreach ($feedItems as $feedItem) {
+                if (!$feedItem->isValid()) {
+                    // Logging warning message later
+                    continue;
+                }
+
                 $processor->setFeedItem($feedItem);
 
                 if ($processor->validateFeedItem()) {
