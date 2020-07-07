@@ -78,13 +78,11 @@ class FeedItemBuilder implements FeedItemBuilderConstract
             if (in_array($mappingField->getSourceType(), ['xpath', 'dom'])) {
                 $value = $this->getXPathValue(
                     $mappingField->getSource(),
-                    $mappingField->getDefaultValue(),
                     $mappingField
                 );
             } elseif ($mappingField->getSourceType() == 'regex') {
                 $value = $this->getRegexValue(
                     $mappingField->getSource(),
-                    $mappingField->getDefaultValue(),
                     $mappingField
                 );
             }
@@ -93,6 +91,11 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                 $this->feedItem->deleteGUID();
                 break;
             }
+
+            $this->feedItem->setProperty(
+                $mappingField->getDestination(),
+                $value
+            );
         }
     }
 
@@ -101,17 +104,55 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         return $this->feedItem;
     }
 
-    public function getXPathValue($xpath, $defaultValue, $mappingField)
+    public function getXPathValue($xpath, $mappingField)
     {
         if (is_null($this->document)) {
-            return $defaultValue;
+            return $mappingField->getDefaultValue();
         }
-        foreach ($this->document->find($xpath) as $value) {
-            return $value;
+        $elements = $this->document->find($xpath);
+        if (count($elements) <= 0) {
+            return $mappingField->getDefaultValue();
         }
+        $get = $mappingField->getMeta('get', 'text');
+        if (!in_array($get, ['text', 'attribute', 'innerHtml', 'outerHtml'])) {
+            // Will show warning later
+
+            // Override get type value
+            $get = 'text';
+        }
+
+        $return = $mappingField->getMeta('return', 'field');
+        if (!in_array($return, ['field', 'fields', 'array'])) {
+            // Will show warning later
+
+            // Override return type value
+            $return = 'field';
+        }
+
+        if ($return == 'field') {
+            return $this->getValueFromDomElement($elements[0], $get, $mappingField);
+        }
+
+        $values = [];
+        foreach ($elements as $element) {
+            array_push($values, $this->getValueFromDomElement($element, $get, $mappingField));
+        }
+        return $values;
     }
 
-    public function getRegexValue($pattern, $defaultValue, $mappingField)
+    public function getValueFromDomElement($element, $content_type, $mappingField)
+    {
+        if ($content_type !== 'attribute') {
+            return $element->$content_type;
+        }
+        $attribue = $mappingField->getMeta('attribute', null);
+        if (empty($attribue)) {
+            return $attribue->getDefaultValue();
+        }
+        return $element->getAttribute($attribue);
+    }
+
+    public function getRegexValue($pattern, $mappingField)
     {
         if (preg_match($pattern, $this->originalData, $matches)) {
             $group = $mappingField->getMeta('group', 0);
@@ -119,7 +160,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                 return $matches[$group];
             }
         }
-        return $defaultValue;
+        return $mappingField->getDefaultValue();
     }
 
     public function getAttributeValue($attribue)
