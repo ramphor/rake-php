@@ -56,10 +56,7 @@ class Rake extends TemplateMethod
                 }
 
                 $processor->setFeedItem($feedItem);
-
-                if ($processor->isSuccess()) {
-                    $result = $processor->execute();
-                }
+                $result = $processor->execute();
             }
         }
     }

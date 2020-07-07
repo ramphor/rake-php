@@ -13,9 +13,4 @@ abstract class Processor extends TemplateMethod implements ProcessorConstract
     {
         $this->feedItem =$feedItem;
     }
-
-    public function validateFeedItem(): bool
-    {
-        return true;
-    }
 }
