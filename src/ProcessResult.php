@@ -32,6 +32,11 @@ class ProcessResult
         return $result->setResultType(false);
     }
 
+    public function getGuid()
+    {
+        return $this->guid;
+    }
+
     public function setResultType(bool $isSuccess): self
     {
         $this->resultType = $isSuccess;
@@ -48,9 +53,19 @@ class ProcessResult
         $this->newGuid = $newGuid;
     }
 
+    public function getNewGuid()
+    {
+        return $this->newGuid;
+    }
+
     public function setNewType($newType)
     {
         $this->newType = $newType;
+    }
+
+    public function getNewType()
+    {
+        return $this->newType;
     }
 
     public function addErrorMessage($errorMessage)
