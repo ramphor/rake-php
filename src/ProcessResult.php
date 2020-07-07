@@ -6,6 +6,7 @@ class ProcessResult
     protected $guid;
     protected $resultType;
     protected $errors;
+    protected $urlDbId;
 
     protected $newGuid;
     protected $newType;
@@ -66,6 +67,16 @@ class ProcessResult
     public function getNewType()
     {
         return $this->newType;
+    }
+
+    public function setUrlDbId($urlId)
+    {
+        $this->urlDbId = $urlId;
+    }
+
+    public function getUrlDbId()
+    {
+        return $this->urlDbId;
     }
 
     public function addErrorMessage($errorMessage)

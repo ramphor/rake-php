@@ -56,7 +56,11 @@ class Rake extends TemplateMethod
                 }
 
                 $processor->setFeedItem($feedItem);
+
                 $result = $processor->execute();
+                if ($feedItem->urlDbId) {
+                    $result->setUrlDbId($feedItem->urlDbId);
+                }
             }
         }
     }

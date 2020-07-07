@@ -4,6 +4,7 @@ namespace Ramphor\Rake\DataSource;
 class FeedItem
 {
     protected $guid;
+    protected $urlDbId;
 
     protected $title;
     protected $content;
@@ -17,9 +18,10 @@ class FeedItem
     protected $status;
     protected $metas;
 
-    public function __construct($guid = null)
+    public function __construct($guid = null, $urlDbId = null)
     {
         $this->guid = $guid;
+        $this->urlDbId = $urlDbId;
     }
 
     public function __get($name)

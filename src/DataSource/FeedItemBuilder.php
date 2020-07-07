@@ -75,7 +75,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         if ($this->dataType === 'html') {
             $this->document->load($data['body']);
         }
-        $this->feedItem = new FeedItem($data['guid']);
+        $this->feedItem = new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
     }
 
     public function build()
