@@ -44,7 +44,7 @@ class ProcessResult
         return $this;
     }
 
-    public function isSucess()
+    public function isSuccess()
     {
         return $this->resultType;
     }
