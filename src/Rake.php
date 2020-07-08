@@ -60,6 +60,8 @@ class Rake extends TemplateMethod
                 $result = $processor->execute();
                 if ($feedItem->urlDbId) {
                     $result->setUrlDbId($feedItem->urlDbId);
+                    $crawlUrl = CrawlUrl::createFromResult($result);
+                    $crawlUrl->sync();
                 }
             }
         }
