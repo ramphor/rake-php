@@ -40,11 +40,13 @@ class ProcessResult
         return $this->guid;
     }
 
-    public function skip($isSkipped = false) {
+    public function skip($isSkipped = false)
+    {
         $this->isSkipped = (bool) $isSkipped;
     }
 
-    public function isSkipped() {
+    public function isSkipped()
+    {
         return $this->isSkipped;
     }
 

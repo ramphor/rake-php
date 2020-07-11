@@ -1,5 +1,6 @@
 <?php
 namespace Ramphor\Rake\Facades;
 
-class DB extends Facade {
+class DB extends Facade
+{
 }

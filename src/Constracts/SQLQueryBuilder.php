@@ -1,5 +1,7 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-interface SQLQueryBuilder {
+interface SQLQueryBuilder
+{
+    public function __toString();
 }

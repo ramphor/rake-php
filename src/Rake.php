@@ -4,8 +4,7 @@ namespace Ramphor\Rake;
 use Ramphor\Rake\Abstracts\TemplateMethod;
 use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\Abstracts\Tooth;
-use Ramphor\Rake\Abstracts\Driver;
-use Ramphor\Rake\Abstracts\Http\Client;
+use Ramphor\Rake\Manager;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
@@ -16,9 +15,12 @@ class Rake
     protected $teeth;
 
     public function __construct(
-        string $rakeId
+        string $rakeId,
+        Driver $driver = null,
+        HttpClient $httpClient = null
     ) {
         $this->setId($rakeId);
+        Manager::setRakeApplication($this);
     }
 
     public function setId(string $id)
@@ -77,6 +79,7 @@ class Rake
         $this->sync($results);
     }
 
-    public function sync($results) {
+    public function sync($results)
+    {
     }
 }

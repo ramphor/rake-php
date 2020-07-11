@@ -1,6 +1,7 @@
 <?php
 namespace Ramphor\Rake;
 
-abstract class Facade {
+abstract class Facade
+{
     protected static $rake;
 }
