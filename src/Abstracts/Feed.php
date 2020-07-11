@@ -6,7 +6,7 @@ use Ramphor\Rake\Constracts\Feed as FeedConstract;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
 
-abstract class Feed extends TemplateMethod implements FeedConstract
+abstract class Feed implements FeedConstract
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 
@@ -22,9 +22,17 @@ abstract class Feed extends TemplateMethod implements FeedConstract
     public function __construct(Tooth $tooth, string $feedId)
     {
         $this->setId($feedId);
-        $this->setDriver($tooth->getDriver());
-        $this->setHttpClient($tooth->getHttpClient());
         $this->setTooth($tooth);
+    }
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function setTooth(Tooth $tooth)

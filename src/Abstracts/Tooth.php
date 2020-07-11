@@ -15,7 +15,7 @@ use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
 
 use Ramphor\Rake\Exceptions\ToothFormatException;
 
-abstract class Tooth extends TemplateMethod implements ToothConstract
+abstract class Tooth implements ToothConstract
 {
     public const FORMAT_CSV  = 'csv';
     public const FORMAT_HTML = 'html';
@@ -33,9 +33,17 @@ abstract class Tooth extends TemplateMethod implements ToothConstract
     public function __construct(Rake $rake, string $toothId)
     {
         $this->setId($toothId);
-        $this->setDriver($rake->getDriver());
-        $this->setHttpClient($rake->getHttpClient());
         $this->setRake($rake);
+    }
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function setRake(Rake $rake)

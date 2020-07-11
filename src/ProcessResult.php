@@ -7,6 +7,7 @@ class ProcessResult
     protected $resultType;
     protected $errors;
     protected $urlDbId;
+    protected $isSkipped;
 
     protected $newGuid;
     protected $newType;
@@ -25,9 +26,10 @@ class ProcessResult
         return $result->setResultType(true);
     }
 
-    public static function createErrorResult($errorMessage): self
+    public static function createErrorResult($errorMessage, $isSkipped = false): self
     {
         $result = new static($guid);
+        $result->skip($isSkipped);
         $result->addErrorMessage($errorMessage);
 
         return $result->setResultType(false);
@@ -36,6 +38,14 @@ class ProcessResult
     public function getGuid()
     {
         return $this->guid;
+    }
+
+    public function skip($isSkipped = false) {
+        $this->isSkipped = (bool) $isSkipped;
+    }
+
+    public function isSkipped() {
+        return $this->isSkipped;
     }
 
     public function setResultType(bool $isSuccess): self

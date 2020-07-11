@@ -5,9 +5,20 @@ use Monolog\Logger;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\DataSource\FeedItem;
 
-abstract class Processor extends TemplateMethod implements ProcessorConstract
+abstract class Processor implements ProcessorConstract
 {
     protected $feedItem;
+    protected $id;
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 
     public function setFeedItem(FeedItem &$feedItem)
     {

@@ -10,23 +10,25 @@ use Ramphor\Rake\Abstracts\Http\Client;
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
 
-class Rake extends TemplateMethod
+class Rake
 {
     protected $id;
     protected $teeth;
 
     public function __construct(
-        string $rakeId,
-        Driver $driver = null,
-        Client $httpClient = null
+        string $rakeId
     ) {
         $this->setId($rakeId);
-        if (!is_null($driver)) {
-            $this->setDriver($driver);
-        }
-        if (!is_null($httpClient)) {
-            $this->setHttpClient($httpClient);
-        }
+    }
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function addTooth(Tooth $tooth)
@@ -43,6 +45,7 @@ class Rake extends TemplateMethod
             throw new ResourceException();
         }
 
+        $results = [];
         foreach ($this->teeth as $tooth) {
             // Crawl data from the feeds of tooth
             $tooth->execute();
@@ -52,6 +55,10 @@ class Rake extends TemplateMethod
 
             foreach ($feedItems as $feedItem) {
                 if (!$feedItem->isValid()) {
+                    array_push($results, ProcessResult::createErrorResult(
+                        sprintf('The feed item "%s" is invalid', $feedItem->guid),
+                        true
+                    ));
                     continue;
                 }
 
@@ -60,10 +67,16 @@ class Rake extends TemplateMethod
                 $result = $processor->execute();
                 if ($feedItem->urlDbId) {
                     $result->setUrlDbId($feedItem->urlDbId);
-                    $crawlUrl = CrawlUrl::createFromResult($result);
-                    $crawlUrl->sync();
                 }
+
+                // Store all results
+                array_push($results, $result);
             }
         }
+
+        $this->sync($results);
+    }
+
+    public function sync($results) {
     }
 }
