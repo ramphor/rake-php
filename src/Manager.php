@@ -18,6 +18,7 @@ final class Manager
     protected $defaultConnection;
 
     protected $httpClient;
+    protected $httpClientInstance;
 
     public static function instance()
     {
@@ -30,6 +31,16 @@ final class Manager
     // Make constructor is private method
     private function __construct()
     {
+    }
+
+    public static function __callStatic($name, $args)
+    {
+        $instance = static::instance();
+        $callback = [$instance, $name];
+
+        if (is_callable($callback)) {
+            return call_user_func_array($callback, $args);
+        }
     }
 
     /**
@@ -58,7 +69,7 @@ final class Manager
         }
     }
 
-    public function getConnection($name = null)
+    public function connection($name = null)
     {
         if (is_null($name)) {
             $name = $this->defaultConnection;
@@ -68,11 +79,21 @@ final class Manager
 
     public function registerHttpClient($httpClient)
     {
-        $this->httpClient = $httpClient;
+        if (is_object($httpClient)) {
+            $this->httpClient = get_class($httpClient);
+            $this->httpClientInstance = $httpClient;
+        } else {
+            $this->httpClient = $httpClient;
+        }
     }
 
     public function getHttpClient()
     {
         return $this->httpClient;
+    }
+
+    public function httpClientInstance()
+    {
+        return $this->httpClientInstance;
     }
 }
