@@ -15,7 +15,7 @@ class WordPress extends Driver
         $this->dbInstance = $GLOBALS['wpdb'];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return self::DRIVER_NAME;
     }
