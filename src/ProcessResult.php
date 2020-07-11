@@ -20,6 +20,7 @@ class ProcessResult
     public static function createSuccessResult($guid, $newGuid, $newType): self
     {
         $result = new static($guid);
+
         $result->setNewGuid($newGuid);
         $result->setNewType($newType);
 
@@ -29,6 +30,7 @@ class ProcessResult
     public static function createErrorResult($errorMessage, $isSkipped = false): self
     {
         $result = new static($guid);
+        
         $result->skip($isSkipped);
         $result->addErrorMessage($errorMessage);
 

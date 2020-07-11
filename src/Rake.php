@@ -20,7 +20,15 @@ class Rake
         HttpClient $httpClient = null
     ) {
         $this->setId($rakeId);
+
         Manager::setRakeApplication($this);
+
+        if (!is_null($httpClient)) {
+            Manager::registerHttpClient($httpClient);
+        }
+        if (!is_null($driver)) {
+            Manager::addConnection($driver->getName(), $driver);
+        }
     }
 
     public function setId(string $id)
