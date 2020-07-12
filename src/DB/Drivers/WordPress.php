@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\DB\Drivers;
 
-use Ramphor\Rake\Abstracts\Driver;
+use Ramphor\Sql as SqlBuilder;
 use Ramphor\Rake\Constracts\SQLQueryBuilder;
 
 class WordPress extends Driver
@@ -24,7 +24,7 @@ class WordPress extends Driver
         return $this->dbInstance->prefix;
     }
 
-    public function query(SQLQueryBuilder $query)
+    public function query(SqlBuilder $query)
     {
         return $this->dbInstance->query((string) $query);
     }
