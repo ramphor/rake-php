@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Rake\Http;
+namespace Ramphor\Rake;
 
 use Ramphor\Rake\Constracts\Response as ResponseConstract;
 

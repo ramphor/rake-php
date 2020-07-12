@@ -11,5 +11,9 @@ interface Driver
 
     public function query(SqlBuilder $query);
 
+    public function get(SqlBuilder $query);
+
     public function var(SqlBuilder $query);
+
+    public function exists(SqlBuilder $query);
 }

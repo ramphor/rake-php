@@ -1,5 +1,5 @@
 <?php
-namespace Ramphor\Rake\Constracts\Http;
+namespace Ramphor\Rake\Constracts;
 
 interface Response
 {

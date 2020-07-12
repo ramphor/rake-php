@@ -30,6 +30,12 @@ class WordPress extends Driver
     public function query(SqlBuilder $query)
     {
         return $this->dbInstance
+            ->query($query);
+    }
+
+    public function get(SqlBuilder $query)
+    {
+        return $this->dbInstance
             ->get_results($query);
     }
 
@@ -37,5 +43,11 @@ class WordPress extends Driver
     {
         return $this->dbInstance
             ->get_var($query);
+    }
+
+    public function exists(SqlBuilder $query)
+    {
+        return $this->dbInstance
+            ->get_var($query) != null;
     }
 }

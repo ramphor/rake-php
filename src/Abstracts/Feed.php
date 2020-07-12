@@ -59,6 +59,23 @@ abstract class Feed implements FeedConstract
         return $this->lifeCycle;
     }
 
+    public function urlExists(Link $url)
+    {
+        $tooth = $this->getTooth();
+        $rake  = $tooth->getRake();
+
+        $sql = sql()->select("ID")
+            ->from(DB::table('rake_crawled_urls'))
+            ->where(
+                'url=? AND rake_id=? AND tooth_id=?',
+                (string)$url,
+                $rake->getId(),
+                $tooth->getId()
+            );
+
+        return DB::exists($sql);
+    }
+
     public function insertCrawlUrl(Link $url, $checkingTooth = true)
     {
         $tooth = $this->getTooth();
@@ -68,8 +85,14 @@ abstract class Feed implements FeedConstract
             $tooth = null;
         }
 
-        if (!$this->driver->crawlUrlIsExists($url, $rake, $tooth)) {
-            $this->driver->insertCrawlUrl($url, $rake, $tooth);
+        if (!$this->urlExists($url)) {
+            $sql = sql()->insertInto(
+                DB::table('rake_crawled_urls'),
+                ['url', 'rake_id', 'crawled', 'retry', 'created_at', 'updated_at']
+            )
+            ->values('?, ?, ?, ?, @, @', (string)$url, $rake->getId(), 0, 0, 'NOW()', 'NOW()');
+
+            return DB::query($sql);
         }
     }
 
@@ -79,8 +102,42 @@ abstract class Feed implements FeedConstract
             $this->options = $this->getOptions();
         }
         $this->options[$option] = $value;
+        $tooth = $this->getTooth();
+        $rake  = $tooth->getRake();
 
-        $this->driver->updateFeedOptions($this, $this->options);
+        $exists_sql = sql()->select('ID')
+            ->from(DB::table('rake_feeds'))
+            ->where(
+                'rake_id=? AND tooth_id=? AND feed_id=?',
+                $rake->getId(),
+                $tooth->getId(),
+                $this->getId()
+            );
+
+        $sql = null;
+        if (DB::exists($exists_sql)) {
+            $sql = sql()->update(DB::table('rake_feeds'))
+            ->set(
+                'rake_id=?, tooth_id=?, feed_id=?, options=?, last_execute = @',
+                $rake->getId(),
+                $tooth->getId(),
+                $this->getId(),
+                serialize($this->options),
+                'NOW()'
+            );
+        } else {
+            $sql = sql()->insertInto(DB::table('rake_feeds'), ['rake_id', 'tooth_id', 'feed_id', 'options', 'last_execute'])
+                ->values(
+                    '?, ?, ?, ?, @',
+                    $rake->getId(),
+                    $tooth->getId(),
+                    $this->getId(),
+                    serialize($this->options),
+                    'NOW()'
+                );
+        }
+
+        return DB::query($sql);
     }
 
     public function getOption($optionName, $defaultValue = false)
