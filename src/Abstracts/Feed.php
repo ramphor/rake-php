@@ -60,10 +60,6 @@ abstract class Feed implements FeedConstract
 
     public function insertCrawlUrl(Link $url, $checkingTooth = true)
     {
-        if (empty($this->driver)) {
-            throw new \Exception("Rake driver is not exists");
-        }
-
         $tooth = $this->getTooth();
         $rake = $tooth->getRake();
 

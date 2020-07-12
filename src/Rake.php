@@ -5,6 +5,7 @@ use Ramphor\Rake\Abstracts\TemplateMethod;
 use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Manager;
+use Ramphor\Rake\Facades\Facade;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
@@ -21,16 +22,15 @@ class Rake
         $httpClient = null
     ) {
         $this->setId($rakeId);
-
+        $this->manager = Manager::instance();
         if (!is_null($httpClient)) {
-            Manager::registerHttpClient($httpClient);
+            $this->manager->_registerHttpClient($httpClient);
         }
         if (!is_null($driver)) {
-            Manager::addConnection($driver->getName(), $driver);
+            $this->manager->_addConnection($driver->getName(), $driver);
         }
 
-        $this->manager = Manager::instance();
-        Manager::setRakeApplication($this);
+        Facade::setRakeApplication($this);
     }
 
     public function setId(string $id)
@@ -53,9 +53,7 @@ class Rake
 
     public function execute()
     {
-        var_dump($this->manager);
-        die;
-        if (empty($this->teeth) || empty($this->driver)) {
+        if (empty($this->teeth)) {
             throw new ResourceException();
         }
 

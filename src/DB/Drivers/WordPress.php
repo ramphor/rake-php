@@ -2,6 +2,7 @@
 namespace Ramphor\Rake\DB\Drivers;
 
 use Ramphor\Sql as SqlBuilder;
+use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Constracts\SQLQueryBuilder;
 
 class WordPress extends Driver
@@ -20,7 +21,8 @@ class WordPress extends Driver
         return self::DRIVER_NAME;
     }
 
-    public function getPrefix() {
+    public function getPrefix()
+    {
         return $this->dbInstance->prefix;
     }
 

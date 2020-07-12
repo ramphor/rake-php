@@ -5,13 +5,6 @@ use Ramphor\Rake\Rake;
 
 final class Manager
 {
-    /**
-     * The Rake application instance being facaded.
-     *
-     * @var \Ramphor\Rake\Rake
-     */
-    protected static $rake;
-
     protected static $instance;
 
     protected $connections = [];
@@ -41,17 +34,6 @@ final class Manager
         if (is_callable($callback)) {
             return call_user_func_array($callback, $args);
         }
-    }
-
-    /**
-     * Set the application instance
-     *
-     * @param \Ramphor\Rake\Rake $rake
-     * @return void
-     */
-    public static function setRakeApplication(Rake $rake)
-    {
-        static::$rake = $rake;
     }
 
     public function _addConnection($name, $connection)
