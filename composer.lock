@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0c03959a02cccb76da0c9d40e9797ffb",
+    "content-hash": "5efefecf172102419b04c54e337d2122",
     "packages": [
         {
             "name": "psr/http-client",
@@ -104,6 +104,63 @@
                 "response"
             ],
             "time": "2019-08-29T13:16:46+00:00"
+        },
+        {
+            "name": "ramphor/sql",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ramphor/sql.git",
+                "reference": "ba2fdee1817ecf922e5f8f8b900ac0062bdef494"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ramphor/sql/zipball/ba2fdee1817ecf922e5f8f8b900ac0062bdef494",
+                "reference": "ba2fdee1817ecf922e5f8f8b900ac0062bdef494",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=5.6.4"
+            },
+            "suggest": {
+                "filp/whoops": "Interactive error and exception handling",
+                "jdorn/sql-formatter": "SQL query highlighting",
+                "symfony/var-dumper": "Pretty print complex values better with var-dumper available",
+                "vrana/adminer": "Database management in a single PHP file."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ramphor\\": "./src"
+                },
+                "files": [
+                    "helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Trevor Herselman",
+                    "email": "therselman@gmail.com"
+                },
+                {
+                    "name": "Puleeno Nguyen",
+                    "email": "puleeno@gmail.com"
+                }
+            ],
+            "description": "SQL Query String Builder",
+            "homepage": "https://github.com/ramphor/sql",
+            "keywords": [
+                "Raw SQL",
+                "SQL Wrapper",
+                "fluent style sql",
+                "sql"
+            ],
+            "time": "2020-07-12T02:29:58+00:00"
         }
     ],
     "packages-dev": [],
