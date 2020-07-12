@@ -12,16 +12,15 @@ use Ramphor\Rake\Exceptions\ProcessorException;
 class Rake
 {
     protected $id;
+    protected $manager;
     protected $teeth;
 
     public function __construct(
         string $rakeId,
-        Driver $driver = null,
-        HttpClient $httpClient = null
+        $driver = null,
+        $httpClient = null
     ) {
         $this->setId($rakeId);
-
-        Manager::setRakeApplication($this);
 
         if (!is_null($httpClient)) {
             Manager::registerHttpClient($httpClient);
@@ -29,6 +28,9 @@ class Rake
         if (!is_null($driver)) {
             Manager::addConnection($driver->getName(), $driver);
         }
+
+        $this->manager = Manager::instance();
+        Manager::setRakeApplication($this);
     }
 
     public function setId(string $id)
@@ -51,6 +53,8 @@ class Rake
 
     public function execute()
     {
+        var_dump($this->manager);
+        die;
         if (empty($this->teeth) || empty($this->driver)) {
             throw new ResourceException();
         }

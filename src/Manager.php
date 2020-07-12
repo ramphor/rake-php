@@ -36,7 +36,7 @@ final class Manager
     public static function __callStatic($name, $args)
     {
         $instance = static::instance();
-        $callback = [$instance, $name];
+        $callback = [$instance, '_' . $name];
 
         if (is_callable($callback)) {
             return call_user_func_array($callback, $args);
@@ -54,7 +54,7 @@ final class Manager
         static::$rake = $rake;
     }
 
-    public function addConnection($name, $connection)
+    public function _addConnection($name, $connection)
     {
         if (isset($this->connections[$name])) {
             return;
@@ -69,7 +69,7 @@ final class Manager
         }
     }
 
-    public function connection($name = null)
+    public function _connection($name = null)
     {
         if (is_null($name)) {
             $name = $this->defaultConnection;
@@ -77,7 +77,7 @@ final class Manager
         return $this->connections[$name];
     }
 
-    public function registerHttpClient($httpClient)
+    public function _registerHttpClient($httpClient)
     {
         if (is_object($httpClient)) {
             $this->httpClient = get_class($httpClient);
@@ -87,12 +87,12 @@ final class Manager
         }
     }
 
-    public function getHttpClient()
+    public function _getHttpClient()
     {
         return $this->httpClient;
     }
 
-    public function httpClientInstance()
+    public function _httpClientInstance()
     {
         return $this->httpClientInstance;
     }

@@ -58,8 +58,6 @@ abstract class Tooth implements ToothConstract
 
     public function registerProcessor(Processor $processor)
     {
-        $processor->setDriver($this->driver);
-        $processor->setHttpClient($this->httpClient);
         $this->processor = $processor;
     }
 
