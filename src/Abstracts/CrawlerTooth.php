@@ -4,6 +4,7 @@ namespace Ramphor\Rake\Abstracts;
 use Ramphor\Rake\Response;
 use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
+use Ramphor\Rake\Facades\Client;
 use Ramphor\Sql as QueryBuilder;
 
 abstract class CrawlerTooth extends Tooth
@@ -59,20 +60,17 @@ abstract class CrawlerTooth extends Tooth
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
 
-        var_dump($crawlDatas);
-        die;
-
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
                 continue;
             }
-            $html = $this->httpClient->request(
+            $html = Client::request(
                 'GET',
                 $crawlData->url,
                 $this->crawlRequestOptions()
             );
             if (!$this->validateResponse || $this->validateRequestResponse($response)) {
-                $response->append($crawlData->url, $html, $crawlData->ID);
+                $response->append($crawlData->url, $html->getBody(), $crawlData->ID);
             }
         }
 
