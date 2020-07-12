@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Http;
 
-use Ramphor\Rake\Constracts\Http\Response as ResponseConstract;
+use Ramphor\Rake\Constracts\Response as ResponseConstract;
 
 final class Response implements ResponseConstract
 {

@@ -1,10 +1,11 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Link;
-use Ramphor\Rake\Constracts\Feed as FeedConstract;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Link;
+use Ramphor\Rake\Constracts\Feed as FeedConstract;
 
 abstract class Feed implements FeedConstract
 {
@@ -96,6 +97,23 @@ abstract class Feed implements FeedConstract
 
     public function getOptions()
     {
-        return $this->driver->getFeedOptions($this);
+        $tooth = $this->getTooth();
+        $rake  = $tooth->getRake();
+
+        $sql = sql()->select('options')
+            ->from(DB::prefix() . 'rake_feeds')
+            ->where(
+                'rake_id = ? AND feed_id = ? AND tooth_id = ?',
+                $rake->getId(),
+                $this->getId(),
+                $tooth->getId()
+            );
+
+        $options = DB::var($sql);
+
+        if (empty($options)) {
+            return [];
+        }
+        return unserialize($options);
     }
 }

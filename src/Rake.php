@@ -4,33 +4,34 @@ namespace Ramphor\Rake;
 use Ramphor\Rake\Abstracts\TemplateMethod;
 use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\Abstracts\Tooth;
-use Ramphor\Rake\Manager;
 use Ramphor\Rake\Facades\Facade;
+use Ramphor\Rake\App;
+use Ramphor\Rake\Abstracts\Driver;
+use Psr\Http\Client\ClientInterface;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
 
 class Rake
 {
+    protected static $app;
+
     protected $id;
-    protected $manager;
     protected $teeth;
 
-    public function __construct(
-        string $rakeId,
-        $driver = null,
-        $httpClient = null
-    ) {
+    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null)
+    {
+        static::$app = App::instance();
+
         $this->setId($rakeId);
-        $this->manager = Manager::instance();
-        if (!is_null($httpClient)) {
-            $this->manager->_registerHttpClient($httpClient);
-        }
         if (!is_null($driver)) {
-            $this->manager->_addConnection($driver->getName(), $driver);
+            static::$app->bind('db', $driver);
+        }
+        if (!is_null($client)) {
+            static::$app->bind('http', $client);
         }
 
-        Facade::setRakeApplication($this);
+        Facade::setFacadeApplication(static::$app);
     }
 
     public function setId(string $id)

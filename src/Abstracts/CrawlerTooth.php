@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Http\Response;
+use Ramphor\Rake\Response;
 use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
 
@@ -30,7 +30,7 @@ abstract class CrawlerTooth extends Tooth
     public function getCrawlUrls($skipTooth)
     {
         $sql = Sql::select()
-            ->from(Db::table('rake_crawled_urls'))
+            ->from(DB::table('rake_crawled_urls'))
             ->where('rake_id = ?', $this->rake->getId());
     }
 

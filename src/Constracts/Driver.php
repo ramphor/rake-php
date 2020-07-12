@@ -5,9 +5,11 @@ use Ramphor\Sql as SqlBuilder;
 
 interface Driver
 {
-    public function getName();
+    public function name();
 
-    public function getPrefix();
+    public function prefix();
 
     public function query(SqlBuilder $query);
+
+    public function var(SqlBuilder $query);
 }
