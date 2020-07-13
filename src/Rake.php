@@ -111,7 +111,7 @@ class Rake
             }
             $query = $query->where('ID=?', $result->getUrlDbId());
 
-            var_dump(DB::query($query));
+            DB::query($query);
         }
     }
 }
