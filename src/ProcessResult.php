@@ -1,15 +1,17 @@
 <?php
 namespace Ramphor\Rake;
 
+use Ramphor\Rake\DataSource\FeedItem;
+
 class ProcessResult
 {
     protected $guid;
     protected $resultType;
-    protected $urlDbId;
     protected $isSkipped;
 
     protected $newGuid;
     protected $newType;
+    protected $feedItem;
 
     protected $errors = [];
 
@@ -84,14 +86,14 @@ class ProcessResult
         return $this->newType;
     }
 
-    public function setUrlDbId($urlId)
+    public function setFeedItem(FeedItem &$feedItem)
     {
-        $this->urlDbId = $urlId;
+        $this->feedItem = $feedItem;
     }
 
-    public function getUrlDbId()
+    public function getFeedItem()
     {
-        return $this->urlDbId;
+        return $this->feedItem;
     }
 
     public function addErrorMessage($errorMessage)

@@ -75,11 +75,9 @@ class Rake
                     $processor->setFeedItem($feedItem);
                     $result = $processor->execute();
                 }
+                $result->setFeedItem($feedItem);
 
                 // Store all results
-                if ($feedItem->urlDbId) {
-                    $result->setUrlDbId($feedItem->urlDbId);
-                }
                 array_push($results, $result);
             }
         }
@@ -94,7 +92,8 @@ class Rake
                 continue;
             }
 
-            if (!$result->getUrlDbId()) {
+            $feedItem = $result->getFeedItem();
+            if (empty($feedItem->urlDbId)) {
                 // Processing later
                 continue;
             }
@@ -107,7 +106,7 @@ class Rake
             } else {
                 $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
             }
-            $query = $query->where('ID=?', $result->getUrlDbId());
+            $query = $query->where('ID=?', $feedItem->urlDbId);
 
             DB::query($query);
         }
