@@ -1,19 +1,57 @@
 <?php
 namespace Ramphor\Rake;
 
+use Ramphor\Rake\ProcessResult;
+
 class Resource
 {
-    public $id;
-    public $guid;
-    public $url;
-    public $text;
+    protected $id;
+    protected $guid;
+    protected $resourceType;
+    protected $imported;
+    protected $content;
+    protected $contentHash;
 
-    public $newURL;
-    public $newGuid;
+    protected $newType;
+    protected $newGuid;
 
-    public $resourceType;
+    public function __construct($guid, $resourceType)
+    {
+        $this->guid = $guid;
+        $this->resourceType = $resourceType;
+    }
 
-    public $isDownloaded;
+    public static function createFromResult(ProcessResult $result)
+    {
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function setNewGuid($newGuid)
+    {
+        $this->newGuid = $newGuid;
+    }
+
+    public function setNewType($newType)
+    {
+        $this->newType = $newType;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+    public function generateContentHash()
+    {
+    }
+
+    public function save()
+    {
+    }
 
     public function getRelations()
     {
