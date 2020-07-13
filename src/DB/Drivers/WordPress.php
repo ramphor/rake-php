@@ -50,4 +50,10 @@ class WordPress extends Driver
         return $this->dbInstance
             ->get_var($query) != null;
     }
+
+    public function raw_query($sql)
+    {
+        return $this->dbInstance
+            ->query($sql);
+    }
 }

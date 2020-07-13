@@ -8,7 +8,7 @@ use Ramphor\Rake\Facades\DB;
 
 class Initialize
 {
-    protected $driver;
+    protected static $app;
 
     public function __construct(Driver $driver)
     {
@@ -35,7 +35,7 @@ class Initialize
                 PRIMARY KEY (`ID`)",
             'rake_mapping' => "`resource_id` bigint(20) NOT NULL,
                 `source_id` bigint(20) NOT NULL COMMENT 'The resource #ID contain resource_id',
-                `map_type` char(64) NOT NULL DEFAULT 'parent',",
+                `map_type` char(64) NOT NULL DEFAULT 'parent'",
             'rake_resources' => "`ID` bigint(20) NOT NULL AUTO_INCREMENT,
                 `rake_id` VARCHAR(255) NOT NULL,
                 `tooth_id` VARCHAR(255) NULL,
@@ -60,9 +60,11 @@ class Initialize
 
         foreach ($tables as $table => $syntax) {
             $sql = sprintf('CREATE TABLE IF NOT EXISTS %s (%s)', DB::table($table), $syntax);
+            var_dump($sql);
 
             // Create table
-            DB::query($sql);
+            DB::raw_query($sql);
         }
+        die;
     }
 }
