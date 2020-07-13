@@ -118,7 +118,7 @@ abstract class Feed implements FeedConstract
         if (DB::exists($exists_sql)) {
             $sql = sql()->update(DB::table('rake_feeds'))
             ->set(
-                'rake_id=?, tooth_id=?, feed_id=?, options=?, last_execute = @',
+                'rake_id=?, tooth_id=?, feed_id=?, options=?, last_execute=@',
                 $rake->getId(),
                 $tooth->getId(),
                 $this->getId(),

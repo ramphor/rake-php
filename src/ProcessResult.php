@@ -5,12 +5,13 @@ class ProcessResult
 {
     protected $guid;
     protected $resultType;
-    protected $errors;
     protected $urlDbId;
     protected $isSkipped;
 
     protected $newGuid;
     protected $newType;
+
+    protected $errors = [];
 
     public function __construct($guid)
     {
@@ -30,7 +31,7 @@ class ProcessResult
     public static function createErrorResult($errorMessage, $isSkipped = false): self
     {
         $result = new static($guid);
-        
+
         $result->skip($isSkipped);
         $result->addErrorMessage($errorMessage);
 

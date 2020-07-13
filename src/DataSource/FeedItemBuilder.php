@@ -72,15 +72,25 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     public function newItem($data)
     {
         $this->originalData = $data['body'];
-        if ($this->dataType === 'html') {
-            $this->document->load($data['body']);
-        }
         $this->feedItem = new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
+
+        if (empty($data['skipped'])) {
+            if ($this->dataType === 'html') {
+                $this->document->load($data['body']);
+            }
+        } else {
+            $this->feedItem->setSkipped();
+        }
     }
 
     public function build()
     {
         if (count($this->mappingFields) <= 0) {
+            return;
+        }
+
+        if ($this->feedItem->isSkipped()) {
+            $this->feedItem->deleteGuid();
             return;
         }
 

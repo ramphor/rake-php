@@ -42,12 +42,14 @@ abstract class CrawlerTooth extends Tooth
                 ->from(DB::table('rake_crawled_urls'));
 
         if ($this->skipCheckTooth) {
-            $sql = $sql->where('rake_id=?', $this->rake->getId());
+            $sql = $sql->where('rake_id=? AND crawled=? AND skipped=?', $this->rake->getId(), 0, 0);
         } else {
             $sql = $sql->where(
-                'rake_id=? AND tooth_id=?',
+                'rake_id=? AND tooth_id=? AND crawled=? AND skipped=?',
                 $this->rake->getId(),
-                $this->getId()
+                $this->getId(),
+                0,
+                0
             );
         }
         $sql = $this->crawlUrlsQuery($sql);
@@ -62,6 +64,7 @@ abstract class CrawlerTooth extends Tooth
 
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
+                $response->append($crawlData->url, null, $crawlData->ID, true);
                 continue;
             }
             $html = Client::request(
