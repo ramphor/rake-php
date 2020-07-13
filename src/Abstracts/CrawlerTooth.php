@@ -33,7 +33,7 @@ abstract class CrawlerTooth extends Tooth
     {
         return $query
             ->orderBy('retry ASC, updated_at ASC, ID ASC')
-            ->limit(2);
+            ->limit(10);
     }
 
     public function getCrawlUrls()
