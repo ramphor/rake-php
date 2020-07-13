@@ -22,6 +22,12 @@ final class Link
         $this->setSourceUrl($sourceUrl);
     }
 
+    public function __get($name) {
+        if (method_exists(__CLASS__, $name)) {
+            return $this->$name;
+        }
+    }
+
     public function setRawUrl($url)
     {
         $this->rawUrl = rtrim($url, '/');
@@ -45,7 +51,7 @@ final class Link
                 $this->host = $parsedSourceUrl['host'];
             }
             if (empty($this->scheme) && isset($parsedSourceUrl['scheme'])) {
-                $this->scheme = $parsedSourceUrl['host'];
+                $this->scheme = $parsedSourceUrl['scheme'];
             }
         }
         $this->parsed = true;
