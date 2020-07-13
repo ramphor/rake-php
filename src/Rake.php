@@ -2,7 +2,6 @@
 namespace Ramphor\Rake;
 
 use Ramphor\Rake\App;
-use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Facades\Facade;
 use Ramphor\Rake\Facades\DB;
@@ -10,8 +9,7 @@ use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Driver;
 use Psr\Http\Client\ClientInterface;
 
-use Ramphor\Rake\Exceptions\ResourceException;
-use Ramphor\Rake\Exceptions\ProcessorException;
+use Ramphor\Rake\Exceptions\RuntimeException;
 
 class Rake
 {
@@ -56,7 +54,7 @@ class Rake
     public function execute()
     {
         if (empty($this->teeth)) {
-            throw new ResourceException();
+            throw new RuntimeException('Rake framework do not has any teeth');
         }
 
         $results = [];
