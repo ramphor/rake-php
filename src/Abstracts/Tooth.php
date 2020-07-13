@@ -58,6 +58,10 @@ abstract class Tooth implements ToothConstract
 
     public function registerProcessor(Processor $processor)
     {
+        // Set this tooth as processor parent
+        $processor->setToothParent($this);
+
+        // Register processor for this tooth
         $this->processor = $processor;
     }
 

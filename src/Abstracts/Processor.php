@@ -4,11 +4,13 @@ namespace Ramphor\Rake\Abstracts;
 use Monolog\Logger;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\DataSource\FeedItem;
+use Ramphor\Rake\Abstracts\Tooth;
 
 abstract class Processor implements ProcessorConstract
 {
-    protected $feedItem;
     protected $id;
+    protected $tooh;
+    protected $feedItem;
 
     public function setId(string $id)
     {
@@ -23,5 +25,9 @@ abstract class Processor implements ProcessorConstract
     public function setFeedItem(FeedItem &$feedItem)
     {
         $this->feedItem =$feedItem;
+    }
+
+    public function setToothParent(Tooth &$tooth) {
+        $this->tooth = $tooth;
     }
 }
