@@ -2,7 +2,7 @@
 namespace Ramphor\Rake\DataSource;
 
 use Ramphor\Rake\Constracts\FeedItemBuilder as FeedItemBuilderConstract;
-use PHPHtmlParser\Dom as Document;
+use Ramphor\Rake\Facades\Document;
 
 class FeedItemBuilder implements FeedItemBuilderConstract
 {
@@ -21,7 +21,6 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         if (!is_null($dataType)) {
             $this->setDataType($dataType);
         }
-        $this->document = new Document();
     }
 
     public function setDataType($dataType)
@@ -76,7 +75,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
         if (empty($data['skipped'])) {
             if ($this->dataType === 'html') {
-                $this->document->load($data['body']);
+                $this->document = Document::load($data['body']);
             }
         } else {
             $this->feedItem->setSkipped();

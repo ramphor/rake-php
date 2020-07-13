@@ -50,6 +50,11 @@ class Rake
         $this->teeth[$tooth->getId()] = $tooth;
     }
 
+    public function registerHtmlParser($closure)
+    {
+        static::$app->bind('document', $closure);
+    }
+
     public function registerResourceManager(ResourceManager $manager)
     {
         static::$app->bind('resource', $manager);
@@ -77,6 +82,8 @@ class Rake
                     );
                 } else {
                     $processor->setFeedItem($feedItem);
+                    $processor->getResources();
+
                     $result = $processor->execute();
                 }
                 $result->setFeedItem($feedItem);

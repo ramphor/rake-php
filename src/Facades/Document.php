@@ -1,10 +1,10 @@
 <?php
 namespace Ramphor\Rake\Facades;
 
-class Resource
+class Document extends Facade
 {
     public static function getFacadeAccessor()
     {
-        return 'resource';
+        return 'document';
     }
 }

@@ -17,14 +17,12 @@ class Resource
     protected $rakeId;
     protected $toothId;
 
-    public function __construct($guid, $resourceType)
+    public function __construct($guid, $resourceType, $rakeId, $toothId)
     {
         $this->guid = $guid;
         $this->type = $resourceType;
-    }
-
-    public static function createFromResult(ProcessResult $result)
-    {
+        $this->rakeId = $rakeId;
+        $this->toothId = $toothId;
     }
 
     public function __get($name)

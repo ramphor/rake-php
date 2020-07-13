@@ -61,8 +61,12 @@ class App implements Iterator
     public function resolve($name)
     {
         if (isset($this->resolvedInstance[$name])) {
+            if (is_callable($this->resolvedInstance[$name])) {
+                return call_user_func($this->resolvedInstance[$name]);
+            }
             return $this->resolvedInstance[$name];
-        } elseif ($name === "resource") {
+        }
+        if ($name === "resources") {
             return $this->resolvedInstance[$name] = new ResourceManager();
         }
     }

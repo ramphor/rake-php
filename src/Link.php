@@ -22,7 +22,8 @@ final class Link
         $this->setSourceUrl($sourceUrl);
     }
 
-    public function __get($name) {
+    public function __get($name)
+    {
         if (method_exists(__CLASS__, $name)) {
             return $this->$name;
         }
