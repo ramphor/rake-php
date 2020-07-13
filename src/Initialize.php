@@ -43,6 +43,7 @@ class Initialize
                 `resource_type` VARCHAR(255) NOT NULL,
                 `content_text` LONGTEXT NULL,
                 `content_hash` char(64) NOT NULL,
+                `init_content_hash` char(64) NOT NULL,
                 `new_guid` text,
                 `new_type` varchar(255) DEFAULT NULL,
                 `imported` tinyint(4) NOT NULL DEFAULT 0,
