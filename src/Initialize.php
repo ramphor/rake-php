@@ -25,9 +25,9 @@ class Initialize
             `url` text NOT NULL,
             `rake_id` VARCHAR(255) NOT NULL,
             `tooth_id` VARCHAR(255) NULL,
-            `crawled` tinyint(4) NOT NULL,
-            `skipped` tinyint(4) NOT NULL,
-            `retry` tinyint(4) NOT NULL DEFAULT '0',
+            `crawled` tinyint(4) NOT NULL DEFAULT 0 ,
+            `skipped` tinyint(4) NOT NULL DEFAULT 0 ,
+            `retry` tinyint(4) NOT NULL DEFAULT 0,
             `created_at` timestamp NULL DEFAULT NULL,
             `updated_at` timestamp NULL DEFAULT NULL,
             PRIMARY KEY (`ID`)");
@@ -44,8 +44,8 @@ class Initialize
             `sha256_hash` char(64) NOT NULL,
             `new_guid` text,
             `new_type` varchar(255) DEFAULT NULL,
-            `imported` tinyint(4) NOT NULL DEFAULT '0',
-            `retry` int(11) NOT NULL DEFAULT '0',
+            `imported` tinyint(4) NOT NULL DEFAULT 0,
+            `retry` int(11) NOT NULL DEFAULT 0,
             `created_at` timestamp NULL DEFAULT NULL,
             `updated_at` timestamp NULL DEFAULT NULL,
             PRIMARY KEY (`ID`)");

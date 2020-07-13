@@ -1,32 +1,48 @@
 <?php
 namespace Ramphor\Rake;
 
-use Ramphor\Rake\Abstracts\TemplateMethod;
+use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Facades\Facade;
+use Ramphor\Rake\Facades\DB;
+
 use Ramphor\Rake\Abstracts\Driver;
-use Ramphor\Rake\Abstracts\Http\Client;
+use Psr\Http\Client\ClientInterface;
 
 use Ramphor\Rake\Exceptions\ResourceException;
 use Ramphor\Rake\Exceptions\ProcessorException;
 
-class Rake extends TemplateMethod
+class Rake
 {
+    protected static $app;
+
     protected $id;
     protected $teeth;
 
-    public function __construct(
-        string $rakeId,
-        Driver $driver = null,
-        Client $httpClient = null
-    ) {
+    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null)
+    {
+        static::$app = App::instance();
+
         $this->setId($rakeId);
         if (!is_null($driver)) {
-            $this->setDriver($driver);
+            static::$app->bind('db', $driver);
         }
-        if (!is_null($httpClient)) {
-            $this->setHttpClient($httpClient);
+        if (!is_null($client)) {
+            static::$app->bind('http', $client);
         }
+
+        Facade::setFacadeApplication(static::$app);
+    }
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function addTooth(Tooth $tooth)
@@ -39,10 +55,11 @@ class Rake extends TemplateMethod
 
     public function execute()
     {
-        if (empty($this->teeth) || empty($this->driver)) {
+        if (empty($this->teeth)) {
             throw new ResourceException();
         }
 
+        $results = [];
         foreach ($this->teeth as $tooth) {
             // Crawl data from the feeds of tooth
             $tooth->execute();
@@ -52,16 +69,49 @@ class Rake extends TemplateMethod
 
             foreach ($feedItems as $feedItem) {
                 if (!$feedItem->isValid()) {
-                    continue;
+                    $result = ProcessResult::createErrorResult(
+                        sprintf('The feed item "%s" is invalid', $feedItem->guid),
+                        $feedItem->isSkipped()
+                    );
+                } else {
+                    $processor->setFeedItem($feedItem);
+                    $result = $processor->execute();
                 }
 
-                $processor->setFeedItem($feedItem);
-
-                $result = $processor->execute();
+                // Store all results
                 if ($feedItem->urlDbId) {
                     $result->setUrlDbId($feedItem->urlDbId);
                 }
+                array_push($results, $result);
             }
+        }
+
+        $this->sync($results);
+    }
+
+    public function sync($results)
+    {
+        foreach ($results as $result) {
+            if (!($result instanceof ProcessResult)) {
+                continue;
+            }
+
+            if (!$result->getUrlDbId()) {
+                // Processing later
+                continue;
+            }
+
+            $query = sql()->update(DB::table('rake_crawled_urls'));
+            if ($result->isSkipped()) {
+                $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
+            } elseif ($result->isSuccess()) {
+                $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
+            } else {
+                $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
+            }
+            $query = $query->where('ID=?', $result->getUrlDbId());
+
+            DB::query($query);
         }
     }
 }

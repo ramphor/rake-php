@@ -11,7 +11,9 @@
         }
     ],
     "require": {
-        "psr/http-message": "~1.0"
+        "psr/http-message": "1.0",
+        "psr/http-client": "1.0",
+        "ramphor/sql": "1.0.0"
     },
     "autoload": {
         "psr-4": {

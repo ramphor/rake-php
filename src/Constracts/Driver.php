@@ -1,22 +1,19 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-use Ramphor\Rake\Rake;
-use Ramphor\Rake\Link;
-use Ramphor\Rake\Abstracts\Feed;
-use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Sql as SqlBuilder;
 
 interface Driver
 {
-    public function dbQuery(string $sql);
+    public function name();
 
-    public function createDbTable(string $tableName, string $syntaxContent);
+    public function prefix();
 
-    public function crawlUrlIsExists(Link $url, Rake $rake, Tooth $tooth = null);
+    public function query(SqlBuilder $query);
 
-    public function insertCrawlUrl(Link $url, Rake $rake, Tooth $tooth = null);
+    public function get(SqlBuilder $query);
 
-    public function updateFeedOptions(Feed $feed, $options = null);
+    public function var(SqlBuilder $query);
 
-    public function getCrawlUrls(Rake $rake, Tooth $tooth = null, $options = []);
+    public function exists(SqlBuilder $query);
 }

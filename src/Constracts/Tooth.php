@@ -3,7 +3,7 @@ namespace Ramphor\Rake\Constracts;
 
 use Iterator;
 use Resource;
-use Ramphor\Rake\Http\Response;
+use Ramphor\Rake\Response;
 use Ramphor\Rake\DataSource\FeedItem;
 
 interface Tooth

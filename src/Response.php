@@ -1,7 +1,7 @@
 <?php
-namespace Ramphor\Rake\Http;
+namespace Ramphor\Rake;
 
-use Ramphor\Rake\Constracts\Http\Response as ResponseConstract;
+use Ramphor\Rake\Constracts\Response as ResponseConstract;
 
 final class Response implements ResponseConstract
 {
@@ -28,12 +28,13 @@ final class Response implements ResponseConstract
         return $this->type;
     }
 
-    public function append($guid, $body, $urlID = null)
+    public function append($guid, $body, $urlID = null, $isSkipped = false)
     {
         $this->body[] = [
             'guid' => $guid,
             'body' => $body,
             'urlID' => $urlID,
+            'skipped' => $isSkipped,
         ];
     }
 

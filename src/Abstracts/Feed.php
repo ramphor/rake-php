@@ -1,12 +1,13 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Link;
-use Ramphor\Rake\Constracts\Feed as FeedConstract;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Link;
+use Ramphor\Rake\Constracts\Feed as FeedConstract;
 
-abstract class Feed extends TemplateMethod implements FeedConstract
+abstract class Feed implements FeedConstract
 {
     const LIFE_CYCLE_ONE_TIME = 1;
 
@@ -22,9 +23,17 @@ abstract class Feed extends TemplateMethod implements FeedConstract
     public function __construct(Tooth $tooth, string $feedId)
     {
         $this->setId($feedId);
-        $this->setDriver($tooth->getDriver());
-        $this->setHttpClient($tooth->getHttpClient());
         $this->setTooth($tooth);
+    }
+
+    public function setId(string $id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function setTooth(Tooth $tooth)
@@ -50,12 +59,25 @@ abstract class Feed extends TemplateMethod implements FeedConstract
         return $this->lifeCycle;
     }
 
+    public function urlExists(Link $url)
+    {
+        $tooth = $this->getTooth();
+        $rake  = $tooth->getRake();
+
+        $sql = sql()->select("ID")
+            ->from(DB::table('rake_crawled_urls'))
+            ->where(
+                'url=? AND rake_id=? AND tooth_id=?',
+                (string)$url,
+                $rake->getId(),
+                $tooth->getId()
+            );
+
+        return DB::exists($sql);
+    }
+
     public function insertCrawlUrl(Link $url, $checkingTooth = true)
     {
-        if (empty($this->driver)) {
-            throw new \Exception("Rake driver is not exists");
-        }
-
         $tooth = $this->getTooth();
         $rake = $tooth->getRake();
 
@@ -63,8 +85,14 @@ abstract class Feed extends TemplateMethod implements FeedConstract
             $tooth = null;
         }
 
-        if (!$this->driver->crawlUrlIsExists($url, $rake, $tooth)) {
-            $this->driver->insertCrawlUrl($url, $rake, $tooth);
+        if (!$this->urlExists($url)) {
+            $sql = sql()->insertInto(
+                DB::table('rake_crawled_urls'),
+                ['url', 'rake_id', 'crawled', 'retry', 'created_at', 'updated_at']
+            )
+            ->values('?, ?, ?, ?, @, @', (string)$url, $rake->getId(), 0, 0, 'NOW()', 'NOW()');
+
+            return DB::query($sql);
         }
     }
 
@@ -74,8 +102,42 @@ abstract class Feed extends TemplateMethod implements FeedConstract
             $this->options = $this->getOptions();
         }
         $this->options[$option] = $value;
+        $tooth = $this->getTooth();
+        $rake  = $tooth->getRake();
 
-        $this->driver->updateFeedOptions($this, $this->options);
+        $exists_sql = sql()->select('ID')
+            ->from(DB::table('rake_feeds'))
+            ->where(
+                'rake_id=? AND tooth_id=? AND feed_id=?',
+                $rake->getId(),
+                $tooth->getId(),
+                $this->getId()
+            );
+
+        $sql = null;
+        if (DB::exists($exists_sql)) {
+            $sql = sql()->update(DB::table('rake_feeds'))
+            ->set(
+                'rake_id=?, tooth_id=?, feed_id=?, options=?, last_execute=@',
+                $rake->getId(),
+                $tooth->getId(),
+                $this->getId(),
+                serialize($this->options),
+                'NOW()'
+            );
+        } else {
+            $sql = sql()->insertInto(DB::table('rake_feeds'), ['rake_id', 'tooth_id', 'feed_id', 'options', 'last_execute'])
+                ->values(
+                    '?, ?, ?, ?, @',
+                    $rake->getId(),
+                    $tooth->getId(),
+                    $this->getId(),
+                    serialize($this->options),
+                    'NOW()'
+                );
+        }
+
+        return DB::query($sql);
     }
 
     public function getOption($optionName, $defaultValue = false)
@@ -92,6 +154,23 @@ abstract class Feed extends TemplateMethod implements FeedConstract
 
     public function getOptions()
     {
-        return $this->driver->getFeedOptions($this);
+        $tooth = $this->getTooth();
+        $rake  = $tooth->getRake();
+
+        $sql = sql()->select('options')
+            ->from(DB::prefix() . 'rake_feeds')
+            ->where(
+                'rake_id = ? AND feed_id = ? AND tooth_id = ?',
+                $rake->getId(),
+                $this->getId(),
+                $tooth->getId()
+            );
+
+        $options = DB::var($sql);
+
+        if (empty($options)) {
+            return [];
+        }
+        return unserialize($options);
     }
 }

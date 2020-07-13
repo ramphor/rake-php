@@ -5,11 +5,13 @@ class ProcessResult
 {
     protected $guid;
     protected $resultType;
-    protected $errors;
     protected $urlDbId;
+    protected $isSkipped;
 
     protected $newGuid;
     protected $newType;
+
+    protected $errors = [];
 
     public function __construct($guid)
     {
@@ -19,15 +21,18 @@ class ProcessResult
     public static function createSuccessResult($guid, $newGuid, $newType): self
     {
         $result = new static($guid);
+
         $result->setNewGuid($newGuid);
         $result->setNewType($newType);
 
         return $result->setResultType(true);
     }
 
-    public static function createErrorResult($errorMessage): self
+    public static function createErrorResult($errorMessage, $isSkipped = false): self
     {
         $result = new static($guid);
+
+        $result->skip($isSkipped);
         $result->addErrorMessage($errorMessage);
 
         return $result->setResultType(false);
@@ -38,13 +43,23 @@ class ProcessResult
         return $this->guid;
     }
 
+    public function skip($isSkipped = false)
+    {
+        $this->isSkipped = (bool) $isSkipped;
+    }
+
+    public function isSkipped()
+    {
+        return $this->isSkipped;
+    }
+
     public function setResultType(bool $isSuccess): self
     {
         $this->resultType = $isSuccess;
         return $this;
     }
 
-    public function isSucess()
+    public function isSuccess()
     {
         return $this->resultType;
     }

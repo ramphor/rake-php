@@ -1,7 +1,11 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Http\Response;
+use Ramphor\Rake\Response;
+use Ramphor\Sql;
+use Ramphor\Rake\Facades\Db;
+use Ramphor\Rake\Facades\Client;
+use Ramphor\Sql as QueryBuilder;
 
 abstract class CrawlerTooth extends Tooth
 {
@@ -11,14 +15,6 @@ abstract class CrawlerTooth extends Tooth
     public function skipCheckToothWhenCrawl($skip = false)
     {
         $this->skipCheckTooth = (bool)$skip;
-    }
-
-    public function crawlOptions()
-    {
-        return [
-            'limit' => 2,
-            'crawled' => 0
-        ];
     }
 
     public function crawlRequestOptions()
@@ -33,30 +29,51 @@ abstract class CrawlerTooth extends Tooth
         return !empty($response);
     }
 
-    public function fetch(): Response
+    public function crawlUrlsQuery(QueryBuilder $query): QueryBuilder
     {
-        $response = new Response(Response::TYPE_ARRAY);
-        $rake     = $this->getRake();
+        return $query
+            ->orderBy('retry ASC, updated_at ASC, ID ASC')
+            ->limit(2);
+    }
+
+    public function getCrawlUrls()
+    {
+        $sql = sql()->select('*')
+                ->from(DB::table('rake_crawled_urls'));
 
         if ($this->skipCheckTooth) {
-            $tooth = null;
+            $sql = $sql->where('rake_id=? AND crawled=? AND skipped=?', $this->rake->getId(), 0, 0);
         } else {
-            $tooth = $this;
+            $sql = $sql->where(
+                'rake_id=? AND tooth_id=? AND crawled=? AND skipped=?',
+                $this->rake->getId(),
+                $this->getId(),
+                0,
+                0
+            );
         }
+        $sql = $this->crawlUrlsQuery($sql);
 
-        $crawlDatas = $this->driver->getCrawlUrls($rake, $tooth, $this->crawlOptions());
+        return DB::get($sql);
+    }
+
+    public function fetch(): Response
+    {
+        $response   = new Response(Response::TYPE_ARRAY);
+        $crawlDatas = $this->getCrawlUrls();
 
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
+                $response->append($crawlData->url, null, $crawlData->ID, true);
                 continue;
             }
-            $html = $this->httpClient->request(
+            $html = Client::request(
                 'GET',
                 $crawlData->url,
                 $this->crawlRequestOptions()
             );
             if (!$this->validateResponse || $this->validateRequestResponse($response)) {
-                $response->append($crawlData->url, $html, $crawlData->ID);
+                $response->append($crawlData->url, $html->getBody(), $crawlData->ID);
             }
         }
 

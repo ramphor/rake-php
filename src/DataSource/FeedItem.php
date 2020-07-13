@@ -18,6 +18,8 @@ class FeedItem
     protected $status;
     protected $metas;
 
+    protected $skipped = false;
+
     public function __construct($guid = null, $urlDbId = null)
     {
         $this->guid = $guid;
@@ -39,6 +41,16 @@ class FeedItem
     public function isValid()
     {
         return !empty($this->guid);
+    }
+
+    public function setSkipped()
+    {
+        $this->skipped = true;
+    }
+
+    public function isSkipped()
+    {
+        return $this->skipped;
     }
 
     public function setProperty($propName, $propValue)
