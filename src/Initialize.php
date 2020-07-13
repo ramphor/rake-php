@@ -60,11 +60,9 @@ class Initialize
 
         foreach ($tables as $table => $syntax) {
             $sql = sprintf('CREATE TABLE IF NOT EXISTS %s (%s)', DB::table($table), $syntax);
-            var_dump($sql);
 
             // Create table
             DB::raw_query($sql);
         }
-        die;
     }
 }
