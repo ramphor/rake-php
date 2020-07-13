@@ -1,14 +1,13 @@
 <?php
 namespace Ramphor\Rake;
 
+use Psr\Http\Client\ClientInterface;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Facades\Facade;
 use Ramphor\Rake\Facades\DB;
-
 use Ramphor\Rake\Abstracts\Driver;
-use Psr\Http\Client\ClientInterface;
-
+use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Exceptions\RuntimeException;
 
 class Rake
@@ -49,6 +48,11 @@ class Rake
             throw new \Exception(sprintf('Tooth "%s" is already exists', $tooth->getId()));
         }
         $this->teeth[$tooth->getId()] = $tooth;
+    }
+
+    public function registerResourceManager(ResourceManager $manager)
+    {
+        static::$app->bind('resource', $manager);
     }
 
     public function execute()

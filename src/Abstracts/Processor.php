@@ -9,8 +9,10 @@ use Ramphor\Rake\Abstracts\Tooth;
 abstract class Processor implements ProcessorConstract
 {
     protected $id;
-    protected $tooh;
+    protected $tooth;
     protected $feedItem;
+
+    protected $crawlLinks = false;
 
     public function setId(string $id)
     {
@@ -27,7 +29,23 @@ abstract class Processor implements ProcessorConstract
         $this->feedItem =$feedItem;
     }
 
-    public function setToothParent(Tooth &$tooth) {
+    public function setToothParent(Tooth &$tooth)
+    {
         $this->tooth = $tooth;
+    }
+
+    protected function getFeedImagesResources()
+    {
+    }
+
+    protected function getContentLinkResources()
+    {
+    }
+
+    public function getResources()
+    {
+        $resources = $this->getFeedImagesResources();
+
+        return $resources;
     }
 }

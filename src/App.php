@@ -21,7 +21,9 @@ class App implements Iterator
 
     public function bind($name, $closure)
     {
-        $this->resolvedInstance[$name] = $closure;
+        if (!isset($this->resolvedInstance[$name])) {
+            $this->resolvedInstance[$name] = $closure;
+        }
     }
 
     public function key()
@@ -60,6 +62,8 @@ class App implements Iterator
     {
         if (isset($this->resolvedInstance[$name])) {
             return $this->resolvedInstance[$name];
+        } elseif ($name === "resource") {
+            return $this->resolvedInstance[$name] = new ResourceManager();
         }
     }
 }
