@@ -195,7 +195,7 @@ class ProcessResult
                 'guid' => $url,
                 'type' => 'link',
             ]);
-            $link->setAttribue('href', (string)$url);
+            $link->setAttribute('href', (string)$url);
         }
 
         return $resources;
