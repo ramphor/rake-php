@@ -16,6 +16,10 @@ final class Link
     protected $query;
     protected $fragment;
 
+    public static function create($url, $sourceUrl = null) {
+        return new static($url, $sourceUrl);
+    }
+
     public function __construct($url, $sourceUrl = null)
     {
         $this->setRawUrl($url);
