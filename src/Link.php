@@ -30,7 +30,7 @@ final class Link
 
     public function __get($name)
     {
-        if (method_exists(__CLASS__, $name)) {
+        if (property_exists(__CLASS__, $name)) {
             return $this->$name;
         }
     }
