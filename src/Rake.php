@@ -63,7 +63,7 @@ class Rake
 
     public function registerResourceManager(ResourceManager $manager)
     {
-        static::$app->bind('resource', $manager);
+        static::$app->bind('resources', $manager);
     }
 
     public function execute()
