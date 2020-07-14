@@ -4,6 +4,7 @@ Rake PHP
 The spider/crawler framework written in PHP
 
 # Example code
+
 ```
 $rake  = new Rake( 'rake_id', new Your_DB_Driver(), new Your_HTTP_Client() );
 $rake->registerHtmlParser(function() {
