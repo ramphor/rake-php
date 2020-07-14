@@ -17,6 +17,11 @@ class Resource
     protected $rakeId;
     protected $toothId;
 
+    public static function create($guid, $type, $rakeId, $toothId): self
+    {
+        return new static($guid, $type, $rakeId, $toothId);
+    }
+
     public function __construct($guid, $resourceType, $rakeId, $toothId)
     {
         $this->guid = $guid;
@@ -40,6 +45,11 @@ class Resource
     public function setNewGuid($newGuid)
     {
         $this->newGuid = $newGuid;
+    }
+
+    public function imported()
+    {
+        $this->imported = true;
     }
 
     public function setNewType($newType)

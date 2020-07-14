@@ -139,7 +139,7 @@ class ProcessResult
         if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
             foreach ($this->feedItem->galleryImages as $imageUrl) {
                 array_push($resources, [
-                    'guid' => new Link($imageUrl, $this->feedItem->guid),
+                    'guid' => Link::create($imageUrl, $this->feedItem->guid),
                     'type' => 'gallary',
                 ]);
             }
@@ -148,7 +148,7 @@ class ProcessResult
         return $resources;
     }
 
-    protected function getContentLinkResources()
+    protected function getContentImageResources()
     {
         $resources = [];
         if (empty($this->feedItem->body)) {
@@ -156,14 +156,42 @@ class ProcessResult
         }
 
         $document = Document::load($this->feedItem->body);
-        $links = $document->find('a');
+        $images    = $document->find('img');
+        foreach ($images as $image) {
+            array_push($resources, [
+                'guid' => Link::create($image->getAttribute('src'), $this->feedItem->guid),
+                'type' => 'content_image',
+            ]);
+        }
+
+        return $resources;
+    }
+
+    protected function getContentLinkResources()
+    {
+        $resources = [];
+        if (!is_null($this->feedItem) && !$this->feedItem->body) {
+            return $resources;
+        }
+
+        $document = Document::load($this->feedItem->body);
+        $links    = $document->find('a');
         foreach ($links as $link) {
             array_push($resources, [
-                'guid' => new Link($link->getAttribute('href'), $this->feedItem->guid),
+                'guid' => Link::create($link->getAttribute('href'), $this->feedItem->guid),
                 'type' => 'link',
             ]);
         }
 
         return $resources;
+    }
+
+    public function getResources()
+    {
+        return array_merge(
+            $this->getFeedImagesResources(),
+            $this->getContentImageResources(),
+            $this->getContentLinkResources(),
+        );
     }
 }

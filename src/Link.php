@@ -3,7 +3,8 @@ namespace Ramphor\Rake;
 
 final class Link
 {
-    protected $parsed = false;
+    protected $parsed       = false;
+    protected $isSameSource = false;
     protected $rawUrl;
     protected $sourceUrl;
 
@@ -16,7 +17,8 @@ final class Link
     protected $query;
     protected $fragment;
 
-    public static function create($url, $sourceUrl = null) {
+    public static function create($url, $sourceUrl = null)
+    {
         return new static($url, $sourceUrl);
     }
 
@@ -31,35 +33,6 @@ final class Link
         if (method_exists(__CLASS__, $name)) {
             return $this->$name;
         }
-    }
-
-    public function setRawUrl($url)
-    {
-        $this->rawUrl = rtrim($url, '/');
-    }
-
-    public function setSourceUrl($sourceUrl)
-    {
-        $this->sourceUrl = $sourceUrl;
-    }
-
-    public function parse()
-    {
-        $parsedUrl = parse_url($this->rawUrl);
-        foreach ($parsedUrl as $key => $value) {
-            $this->$key = $value;
-        }
-
-        if (!empty($this->sourceUrl)) {
-            $parsedSourceUrl = parse_url($this->sourceUrl);
-            if (empty($this->host) && isset($parsedSourceUrl['host'])) {
-                $this->host = $parsedSourceUrl['host'];
-            }
-            if (empty($this->scheme) && isset($parsedSourceUrl['scheme'])) {
-                $this->scheme = $parsedSourceUrl['scheme'];
-            }
-        }
-        $this->parsed = true;
     }
 
     public function __toString()
@@ -88,5 +61,50 @@ final class Link
             $prefix .= $account . '@';
         }
         return $prefix . $this->host . $suffix;
+    }
+
+    public function setRawUrl($url)
+    {
+        $this->rawUrl = rtrim($url, '/');
+    }
+
+    public function setSourceUrl($sourceUrl)
+    {
+        $this->sourceUrl = $sourceUrl;
+    }
+
+    public function parse()
+    {
+        $parsedUrl = parse_url($this->rawUrl);
+        foreach ($parsedUrl as $key => $value) {
+            $this->$key = $value;
+        }
+        $parsedSourceUrl = [];
+        if (!empty($this->sourceUrl)) {
+            $parsedSourceUrl = parse_url($this->sourceUrl);
+        }
+
+        if (!$this->host) {
+            $this->isSameSource = true;
+            if (isset($parsedSourceUrl['host'])) {
+                $this->host = $parsedSourceUrl['host'];
+            }
+        } else {
+            $this->isSameSource = empty($parsedSourceUrl['host']) || $this->host == $parsedSourceUrl['host'];
+        }
+
+        if (empty($this->scheme) && isset($parsedSourceUrl['scheme'])) {
+            $this->scheme = $parsedSourceUrl['scheme'];
+        }
+        $this->parsed = true;
+    }
+
+    public function isSameSource()
+    {
+        if (!$this->parsed) {
+            $this->parse();
+        }
+
+        return (bool) $this->isSameSource;
     }
 }
