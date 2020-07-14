@@ -2,6 +2,7 @@
 namespace Ramphor\Rake;
 
 use Ramphor\Rake\ProcessResult;
+use Ramphor\Rake\Facades\DB;
 
 class Resource
 {
@@ -10,7 +11,6 @@ class Resource
     protected $type;
     protected $imported;
     protected $content;
-    protected $contentHash;
 
     protected $newType;
     protected $newGuid;
@@ -44,6 +44,25 @@ class Resource
         $this->id = $id;
     }
 
+    public function findId()
+    {
+        if ($this->id) {
+            return $this->id;
+        }
+
+        $query = sql()->select('ID')
+            ->from(DB::table('rake_resources'))
+            ->where(
+                'guid = ? AND resource_type = ? AND rake_id = ? AND tooth_id =?',
+                $this->guid,
+                $this->type,
+                $this->rakeId,
+                $this->toothId
+            );
+
+        return $this->id = (int)DB::var($query);
+    }
+
     public function setNewGuid($newGuid)
     {
         $this->newGuid = $newGuid;
@@ -64,12 +83,38 @@ class Resource
         $this->content = $content;
     }
 
-    public function generateContentHash()
+    public function insert()
     {
+        $values = [
+            '?, ?, ?, ?, ?, ?, ?, ?, @, @',
+            $this->guid, $this->type, $this->rakeId, $this->toothId,
+            $this->newGuid, $this->newType, (bool)$this->imported, 0, 'NOW()', 'NOW()'
+        ];
+        $query = sql()->insertInto(
+            DB::table('rake_resources'),
+            [
+                'guid', 'resource_type', 'rake_id', 'tooth_id', 'new_guid', 'new_type',
+                'imported', 'retry', 'created_at', 'updated_at'
+            ]
+        );
+        $query = call_user_func_array([$query, 'values'], $values);
+
+        return DB::insert($query);
+    }
+
+    public function update()
+    {
+        $query = $query->update(DB::table('rake_resources'))
+            ->set([
+            ])
+            ->where('ID =?', $thi->id);
     }
 
     public function save()
     {
+        return ($this->findId() > 0)
+            ? $this->update()
+            : $this->insert();
     }
 
     public function getRelations()

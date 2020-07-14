@@ -44,7 +44,8 @@ class ResourceManager extends ResourceManagerAbstract
 
     public function import()
     {
-        var_dump($this->resources);
-        die;
+        foreach ($this->resources as $resource) {
+            $resource->save();
+        }
     }
 }

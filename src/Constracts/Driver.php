@@ -17,5 +17,7 @@ interface Driver
 
     public function exists(SqlBuilder $query);
 
+    public function insert(SqlBuilder $query);
+
     public function raw_query($sql);
 }

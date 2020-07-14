@@ -51,6 +51,13 @@ class WordPress extends Driver
             ->get_var($query) != null;
     }
 
+    public function insert(SqlBuilder $query)
+    {
+        if ($this->dbInstance->query($query)) {
+            return $this->dbInstance->insert_id;
+        }
+    }
+
     public function raw_query($sql)
     {
         return $this->dbInstance
