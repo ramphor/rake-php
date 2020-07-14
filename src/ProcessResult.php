@@ -163,17 +163,19 @@ class ProcessResult
 
     protected function getContentImageResources()
     {
-        $resources = [];
-        if (empty($this->feedItem->body)) {
-            return $resources;
+        if (is_null($this->content)) {
+            return [];
         }
 
+        $resources = [];
         $images    = $this->content->find('img');
         foreach ($images as $image) {
+            $image_url = Link::create($image->getAttribute('src'), $this->feedItem->guid);
             array_push($resources, [
-                'guid' => Link::create($image->getAttribute('src'), $this->feedItem->guid),
+                'guid' => $image_url,
                 'type' => 'content_image',
             ]);
+            $image->setAttribute('src', (string)$image_url);
         }
 
         return $resources;
@@ -181,17 +183,19 @@ class ProcessResult
 
     protected function getContentLinkResources()
     {
-        $resources = [];
-        if (!is_null($this->feedItem) && !$this->feedItem->body) {
-            return $resources;
+        if (is_null($this->content)) {
+            return [];
         }
 
-        $links    = $this->content->find('a');
+        $resources = [];
+        $links     = $this->content->find('a');
         foreach ($links as $link) {
+            $url = Link::create($link->getAttribute('href'), $this->feedItem->guid);
             array_push($resources, [
-                'guid' => Link::create($link->getAttribute('href'), $this->feedItem->guid),
+                'guid' => $url,
                 'type' => 'link',
             ]);
+            $link->setAttribue('href', (string)$url);
         }
 
         return $resources;
