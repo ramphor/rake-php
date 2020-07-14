@@ -9,7 +9,7 @@ class CrawlerManager
     public function syncFromResult(ProcessResult $result)
     {
         $feedItem = $result->getFeedItem();
-        if (empty($feedItem->urlDbId)) {
+        if ((int)$feedItem->urlDbId <= 0) {
             // Processing later
             return;
         }
