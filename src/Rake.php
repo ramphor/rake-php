@@ -69,7 +69,8 @@ class Rake
     public function execute()
     {
         if (empty($this->teeth)) {
-            throw new RuntimeException('Rake framework do not has any teeth');
+            // Add the log warning later
+            return;
         }
 
         $results = [];
