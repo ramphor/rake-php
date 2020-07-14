@@ -124,6 +124,18 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         return $this->feedItem;
     }
 
+    public function methodTransformer($method)
+    {
+        $method = strtolower($method);
+        if ($method === 'innerhtml') {
+            return 'innerHtml';
+        }
+        if ($method === 'outerhtml') {
+            return 'outerHtml';
+        }
+        return $method;
+    }
+
     public function getXPathValue($xpath, $mappingField)
     {
         if (is_null($this->document)) {
@@ -133,7 +145,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         if (count($elements) <= 0) {
             return $mappingField->getDefaultValue();
         }
-        $get = $mappingField->getMeta('get', 'text');
+        $get = $this->methodTransformer($mappingField->getMeta('get', 'text'));
         if (!in_array($get, ['text', 'attribute', 'innerHtml', 'outerHtml'])) {
             // Will show warning later
 
