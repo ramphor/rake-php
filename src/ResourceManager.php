@@ -7,18 +7,12 @@ class ResourceManager extends ResourceManagerAbstract
 {
     protected $resources = [];
 
-    public function append(Resource $resource)
+    public function createResourcesFromResult($result): self
     {
-        array_push($this->resources, $resource);
+        return $this;
     }
 
-    public function create($guid, $type, $rakeId, $toothId)
+    public function import()
     {
-        return new Resource((string)$guid, $type, $rakeId, $toothId);
-    }
-
-    public function get()
-    {
-        return array_values($this->resources);
     }
 }

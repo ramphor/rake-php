@@ -3,11 +3,14 @@ namespace Ramphor\Rake;
 
 use Psr\Http\Client\ClientInterface;
 use Ramphor\Rake\App;
-use Ramphor\Rake\Abstracts\Tooth;
-use Ramphor\Rake\Facades\Facade;
-use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Driver;
+use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Abstracts\ResourceManager;
+use Ramphor\Rake\Facades\Facade;
+use Ramphor\Rake\Facades\Crawler;
+use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Facades\Resources;
+
 use Ramphor\Rake\Exceptions\RuntimeException;
 
 class Rake
@@ -28,6 +31,9 @@ class Rake
         if (!is_null($client)) {
             static::$app->bind('http', $client);
         }
+        static::$app->bind('crawler', function () {
+            return new CrawlerManager();
+        });
 
         Facade::setFacadeApplication(static::$app);
     }
@@ -101,24 +107,12 @@ class Rake
             if (!($result instanceof ProcessResult)) {
                 continue;
             }
+            // Sync the crawl URL from ProcessResult
+            Crawler::syncFromResult($result);
 
-            $feedItem = $result->getFeedItem();
-            if (empty($feedItem->urlDbId)) {
-                // Processing later
-                continue;
-            }
-
-            $query = sql()->update(DB::table('rake_crawled_urls'));
-            if ($result->isSkipped()) {
-                $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
-            } elseif ($result->isSuccess()) {
-                $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
-            } else {
-                $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
-            }
-            $query = $query->where('ID=?', $feedItem->urlDbId);
-
-            DB::query($query);
+            // Import resources
+            $resourceManager = Resources::createResourcesFromResult($result);
+            $resourceManager->import();
         }
     }
 }

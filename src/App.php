@@ -67,7 +67,10 @@ class App implements Iterator
             return $this->resolvedInstance[$name];
         }
         if ($name === "resources") {
-            return $this->resolvedInstance[$name] = new ResourceManager();
+            $closure = function () {
+                return new ResourceManager();
+            };
+            return $this->resolvedInstance[$name] = $closure;
         }
     }
 }
