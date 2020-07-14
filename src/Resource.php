@@ -6,6 +6,8 @@ use Ramphor\Rake\Facades\DB;
 
 class Resource
 {
+    protected $contentChanged = false;
+
     protected $id;
     protected $guid;
     protected $type;
@@ -80,21 +82,22 @@ class Resource
 
     public function setContent($content)
     {
-        $this->content = $content;
+        $this->contentChanged = $content != $this->content;
+        $this->content        = $content;
     }
 
     public function insert()
     {
         $values = [
-            '?, ?, ?, ?, ?, ?, ?, ?, @, @',
-            $this->guid, $this->type, $this->rakeId, $this->toothId,
-            $this->newGuid, $this->newType, (bool)$this->imported, 0, 'NOW()', 'NOW()'
+            '?, ?, ?, ?, ?, ?, ?, ?, ?, @, @',
+            $this->guid, $this->type, $this->rakeId, $this->toothId, $this->newGuid,
+            $this->newType, (int)$this->imported, 0, $this->content, 'NOW()', 'NOW()'
         ];
         $query = sql()->insertInto(
             DB::table('rake_resources'),
             [
                 'guid', 'resource_type', 'rake_id', 'tooth_id', 'new_guid', 'new_type',
-                'imported', 'retry', 'created_at', 'updated_at'
+                'imported', 'retry', 'content_text', 'created_at', 'updated_at'
             ]
         );
         $query = call_user_func_array([$query, 'values'], $values);
@@ -104,10 +107,24 @@ class Resource
 
     public function update()
     {
-        $query = $query->update(DB::table('rake_resources'))
-            ->set([
-            ])
-            ->where('ID =?', $thi->id);
+        $values = [
+            'new_guid'    => $this->newGuid,
+            'new_type'    => $this->newType,
+            'imported'    => (int)$this->imported,
+            '@updated_at' => 'NOW()'
+        ];
+        if (!$this->imported) {
+            $values['@retry'] = 'retry + 1';
+        }
+        if ($this->contentChanged) {
+            $values['content'] = $this->content;
+        }
+
+        $query = sql()->update(DB::table('rake_resources'))
+            ->set($values)
+            ->where('ID=?', $this->id);
+
+        return DB::query($query);
     }
 
     public function save()
