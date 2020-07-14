@@ -7,7 +7,7 @@ class ResourceManager extends ResourceManagerAbstract
 {
     protected $resources = [];
 
-    public function createResourcesFromResult($result): self
+    public function createFromResult($result): self
     {
         return $this;
     }

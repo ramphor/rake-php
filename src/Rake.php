@@ -112,7 +112,7 @@ class Rake
             Crawler::syncFromResult($result);
 
             // Import resources
-            $resourceManager = Resources::createResourcesFromResult($result);
+            $resourceManager = Resources::createFromResult($result);
             $resourceManager->import();
         }
     }
