@@ -36,6 +36,8 @@ class ResourceManager extends ResourceManagerAbstract
             );
             array_push($this->resources, $resource);
         }
+
+        // Return current ResourceManager instance
         return $this;
     }
 
