@@ -102,7 +102,7 @@ class Resource
         );
         $query = call_user_func_array([$query, 'values'], $values);
 
-        return DB::insert($query);
+        return $this->id = DB::insert($query);
     }
 
     public function update()
