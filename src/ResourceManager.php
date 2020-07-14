@@ -15,15 +15,15 @@ class ResourceManager extends ResourceManagerAbstract
         $rake  = $tooth->getRake();
 
         $rawResources = $result->getResources();
-        $resource = Resource::create($result->getGuid(), 'link', $rake->getId(), $tooth->getId());
+        $parent =& Resource::create($result->getGuid(), 'link', $rake->getId(), $tooth->getId());
         if ($result->isSuccess()) {
-            $resource->imported();
-            $resource->setNewGuid($result->getNewGuid());
-            $resource->setNewType($result->getNewType());
-            $resource->setContent($result->getContent(false));
+            $parent->imported();
+            $parent->setNewGuid($result->getNewGuid());
+            $parent->setNewType($result->getNewType());
+            $parent->setContent($result->getContent(false));
         }
         // Insert processing URL to resource with flag `imported` is `true`
-        array_push($this->resources, $resource);
+        array_push($this->resources, $parent);
 
         foreach ($rawResources as $rawResource) {
             if ($rawResource['type'] === 'link' && !$rawResource['guid']->isSameSource()) {
@@ -33,12 +33,13 @@ class ResourceManager extends ResourceManagerAbstract
                 continue;
             }
 
-            $resource = Resource::create(
+            $resource =& Resource::create(
                 (string)$rawResource['guid'],
                 $rawResource['type'],
                 $rake->getId(),
                 $tooth->getId()
             );
+            $parent->addRelation($resource, 'child');
             array_push($this->resources, $resource);
         }
 
