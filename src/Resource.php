@@ -17,6 +17,8 @@ class Resource
     protected $rakeId;
     protected $toothId;
 
+    protected $maps = [];
+
     public static function create($guid, $type, $rakeId, $toothId): self
     {
         return new static($guid, $type, $rakeId, $toothId);
@@ -72,5 +74,17 @@ class Resource
 
     public function getRelations()
     {
+    }
+
+    public function mapWith(Resource &$resource, $type = 'child')
+    {
+        if (!in_array($type, ['parent', 'child', 'cover', 'gallery'])) {
+            return;
+        }
+
+        if (!isset($this->maps[$type])) {
+            $this->maps[$type] = [];
+        }
+        array_push($this->maps[$type], $resource);
     }
 }
