@@ -3,10 +3,12 @@ namespace Ramphor\Rake;
 
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Facades\Document;
 
 class ProcessResult
 {
     protected $guid;
+    protected $content;
     protected $resultType;
     protected $isSkipped;
 
@@ -91,11 +93,22 @@ class ProcessResult
     public function setFeedItem(FeedItem &$feedItem)
     {
         $this->feedItem = $feedItem;
+        $this->content  = Document::load(
+            (string)$feedItem->content
+        );
     }
 
     public function getFeedItem()
     {
         return $this->feedItem;
+    }
+
+    public function getContent($loadDom = false)
+    {
+        if ($loadDom) {
+            return $this->content;
+        }
+        return $this->content->outerHtml;
     }
 
     public function setProcessingTooth(Tooth &$tooth)
@@ -155,8 +168,7 @@ class ProcessResult
             return $resources;
         }
 
-        $document = Document::load($this->feedItem->body);
-        $images    = $document->find('img');
+        $images    = $this->content->find('img');
         foreach ($images as $image) {
             array_push($resources, [
                 'guid' => Link::create($image->getAttribute('src'), $this->feedItem->guid),
@@ -174,8 +186,7 @@ class ProcessResult
             return $resources;
         }
 
-        $document = Document::load($this->feedItem->body);
-        $links    = $document->find('a');
+        $links    = $this->content->find('a');
         foreach ($links as $link) {
             array_push($resources, [
                 'guid' => Link::create($link->getAttribute('href'), $this->feedItem->guid),

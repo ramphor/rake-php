@@ -19,6 +19,7 @@ class ResourceManager extends ResourceManagerAbstract
             $resource->imported();
             $resource->setNewGuid($result->getNewGuid());
             $resource->setNewType($result->getNewType());
+            $resource->setContent($result->getContent(false));
         }
         // Insert processing URL to resource with flag `imported` is `true`
         array_push($this->resources, $resource);
@@ -43,5 +44,7 @@ class ResourceManager extends ResourceManagerAbstract
 
     public function import()
     {
+        var_dump($this->resources);
+        die;
     }
 }
