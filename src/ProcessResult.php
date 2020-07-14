@@ -2,6 +2,7 @@
 namespace Ramphor\Rake;
 
 use Ramphor\Rake\DataSource\FeedItem;
+use Ramphor\Rake\Abstracts\Tooth;
 
 class ProcessResult
 {
@@ -12,6 +13,7 @@ class ProcessResult
     protected $newGuid;
     protected $newType;
     protected $feedItem;
+    protected $tooth;
 
     protected $errors = [];
 
@@ -96,6 +98,16 @@ class ProcessResult
         return $this->feedItem;
     }
 
+    public function setProcessingTooth(Tooth &$tooth)
+    {
+        $this->tooth = $tooth;
+    }
+
+    public function getTooth()
+    {
+        return $this->tooth;
+    }
+
     public function addErrorMessage($errorMessage)
     {
         array_push($this->errors, $errorMessage);
@@ -113,5 +125,45 @@ class ProcessResult
     public function getErrorMessages()
     {
         return $this->errors;
+    }
+
+    protected function getFeedImagesResources()
+    {
+        $resources = [];
+        if ($this->feedItem->coverImage) {
+            array_push($resources, [
+                'guid' => new Link($this->feedId->coverImage, $this->feedItem->guid),
+                'type' => 'cover'
+            ]);
+        }
+        if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
+            foreach ($this->feedItem->galleryImages as $imageUrl) {
+                array_push($resources, [
+                    'guid' => new Link($imageUrl, $this->feedItem->guid),
+                    'type' => 'gallary',
+                ]);
+            }
+        }
+
+        return $resources;
+    }
+
+    protected function getContentLinkResources()
+    {
+        $resources = [];
+        if (empty($this->feedItem->body)) {
+            return $resources;
+        }
+
+        $document = Document::load($this->feedItem->body);
+        $links = $document->find('a');
+        foreach ($links as $link) {
+            array_push($resources, [
+                'guid' => new Link($link->getAttribute('href'), $this->feedItem->guid),
+                'type' => 'link',
+            ]);
+        }
+
+        return $resources;
     }
 }

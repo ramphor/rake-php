@@ -82,11 +82,10 @@ class Rake
                     );
                 } else {
                     $processor->setFeedItem($feedItem);
-                    $processor->getResources();
-
                     $result = $processor->execute();
                 }
                 $result->setFeedItem($feedItem);
+                $result->setProcessingTooth($tooth);
 
                 // Store all results
                 array_push($results, $result);
