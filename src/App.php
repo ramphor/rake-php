@@ -38,9 +38,7 @@ class App implements Iterator
 
     public function valid()
     {
-        $instanceName = array_keys($this->resolvedInstance);
-
-        return isset($instanceName[$this->currentKey]);
+        return isset($this->resolvedInstance[$this->key()]);
     }
 
     public function next()
