@@ -6,6 +6,7 @@ use Ramphor\Rake\Abstracts\ResourceManager as ResourceManagerAbstract;
 
 class ResourceManager extends ResourceManagerAbstract
 {
+    protected $protocols = ['ftp', 'http', 'https'];
     protected $resources = [];
 
     public function createFromResult($result): self
@@ -28,6 +29,9 @@ class ResourceManager extends ResourceManagerAbstract
             if ($rawResource['type'] === 'link' && !$rawResource['guid']->isSameSource()) {
                 continue;
             }
+            if (!in_array($rawResource['guid']->scheme, $this->protocols)) {
+                continue;
+            }
 
             $resource = Resource::create(
                 (string)$rawResource['guid'],
@@ -37,6 +41,9 @@ class ResourceManager extends ResourceManagerAbstract
             );
             array_push($this->resources, $resource);
         }
+
+        // Freeup memory
+        unset($rawResources);
 
         // Return current ResourceManager instance
         return $this;
