@@ -33,7 +33,7 @@ class Initialize
                 `created_at` timestamp NULL DEFAULT NULL,
                 `updated_at` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`ID`)",
-            'rake_mapping' => "`resource_id` bigint(20) NOT NULL,
+            'rake_relations' => "`resource_id` bigint(20) NOT NULL,
                 `source_id` bigint(20) NOT NULL COMMENT 'The resource #ID contain resource_id',
                 `map_type` char(64) NOT NULL DEFAULT 'child'",
             'rake_resources' => "`ID` bigint(20) NOT NULL AUTO_INCREMENT,
