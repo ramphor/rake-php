@@ -9,7 +9,7 @@ class ResourceManager extends ResourceManagerAbstract
     protected $protocols = ['ftp', 'http', 'https'];
     protected $resources = [];
 
-    public function createFromResult($result): self
+    public function createFromResult($result): ResourceManagerAbstract
     {
         $tooth = $result->getTooth();
         $rake  = $tooth->getRake();
