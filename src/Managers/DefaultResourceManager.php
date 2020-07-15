@@ -52,14 +52,14 @@ class DefaultResourceManager extends ResourceManager
             ->from(DB::table('rake_resources'))
             ->where('imported=?', 0)
             ->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
-            ->limit();
+            ->limit(10);
 
         return DB::get($query);
     }
 
     public function getFromDatabase(): ResourceManager
     {
-        var_dump($this->queryResources());die;
+        $dbResources = $this->queryResources();
 
         return $this;
     }
