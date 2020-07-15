@@ -123,7 +123,7 @@ class Rake
             $resources->importCrawlUrls();
 
             if (Option::isAutoTransferFiles()) {
-                $resources = Resources::getFromDB();
+                $resources = Resources::getFromDatabase();
                 $resources->transferFiles();
             }
         }
