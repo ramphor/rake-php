@@ -8,4 +8,6 @@ use Ramphor\Rake\Abstracts\ResourceManager as ResourceManagerAbstract;
 interface ResourceManager
 {
     public function createFromResult(ProcessResult $result): ResourceManagerAbstract;
+
+    public function getFromDatabase(): ResourceManagerAbstract;
 }

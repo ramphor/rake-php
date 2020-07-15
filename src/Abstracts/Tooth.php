@@ -23,6 +23,7 @@ abstract class Tooth implements ToothConstract
     protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $feeds              = [];
     protected $mappingFields      = [];
+    protected $skipCheckTooth     = false;
 
     protected $id;
     protected $rake;
@@ -32,13 +33,8 @@ abstract class Tooth implements ToothConstract
 
     public function __construct(Rake $rake, string $toothId)
     {
-        $this->setId($toothId);
-        $this->setRake($rake);
-    }
-
-    public function setId(string $id)
-    {
-        $this->id = $id;
+        $this->id = $toothId;
+        $this->rake    = $rake;
     }
 
     public function getId()
@@ -46,14 +42,19 @@ abstract class Tooth implements ToothConstract
         return $this->id;
     }
 
-    public function setRake(Rake $rake)
-    {
-        $this->rake = $rake;
-    }
-
     public function getRake():Rake
     {
         return $this->rake;
+    }
+
+    public function skipCheckToothWhenCrawl($skip = false)
+    {
+        $this->skipCheckTooth = (bool)$skip;
+    }
+
+    public function isSkipCheckTooth()
+    {
+        return $this->skipCheckTooth;
     }
 
     public function registerProcessor(Processor $processor)

@@ -8,9 +8,9 @@ use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Facades\Facade;
 use Ramphor\Rake\Facades\Crawler;
-use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Resources;
-
+use Ramphor\Rake\Managers\InstanceManager;
+use Ramphor\Rake\Managers\CrawlerManager;
 use Ramphor\Rake\Exceptions\RuntimeException;
 
 class Rake
@@ -20,11 +20,13 @@ class Rake
     protected $id;
     protected $teeth;
 
+    protected $options = [];
+
     public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null)
     {
         static::$app = App::instance();
+        $this->id    = $rakeId;
 
-        $this->setId($rakeId);
         if (!is_null($driver)) {
             static::$app->bind('db', $driver);
         }
@@ -35,12 +37,9 @@ class Rake
             return new CrawlerManager();
         });
 
+        static::$app->bind('instances', new InstanceManager());
+        static::$app->resolve('instances')->add($this);
         Facade::setFacadeApplication(static::$app);
-    }
-
-    public function setId(string $id)
-    {
-        $this->id = $id;
     }
 
     public function getId()
@@ -54,6 +53,13 @@ class Rake
             throw new \Exception(sprintf('Tooth "%s" is already exists', $tooth->getId()));
         }
         $this->teeth[$tooth->getId()] = $tooth;
+    }
+
+    public function findTooth($id)
+    {
+        if (isset($this->teeth[$id])) {
+            return $this->teeth[$id];
+        }
     }
 
     public function registerHtmlParser($closure)
@@ -114,6 +120,12 @@ class Rake
             // Import resources
             $resources = Resources::createFromResult($result);
             $resources->import();
+            $resources->importCrawlUrls();
+
+            if (Option::isAutoTransferFiles()) {
+                $resources = Resources::getFromDB();
+                $resources->transferFiles();
+            }
         }
     }
 }

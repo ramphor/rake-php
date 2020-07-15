@@ -2,10 +2,11 @@
 namespace Ramphor\Rake;
 
 use Iterator;
+use Ramphor\Rake\Managers\DefaultResourceManager;
 
 class App implements Iterator
 {
-    protected $resolvedInstance;
+    protected $resolvedInstance = [];
     protected $currentKey;
 
     protected static $instance;
@@ -67,7 +68,7 @@ class App implements Iterator
 
         if ($name === "resources") {
             $this->resolvedInstance[$name] = function () {
-                return new ResourceManager();
+                return new DefaultResourceManager();
             };
 
             return $this->resolve($name);

@@ -9,13 +9,7 @@ use Ramphor\Sql as QueryBuilder;
 
 abstract class CrawlerTooth extends Tooth
 {
-    protected $skipCheckTooth   = false;
     protected $validateResponse = false;
-
-    public function skipCheckToothWhenCrawl($skip = false)
-    {
-        $this->skipCheckTooth = (bool)$skip;
-    }
 
     public function crawlRequestOptions()
     {

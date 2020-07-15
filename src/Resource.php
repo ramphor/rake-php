@@ -3,6 +3,7 @@ namespace Ramphor\Rake;
 
 use Ramphor\Rake\ProcessResult;
 use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Abstracts\Tooth;
 
 class Resource
 {
@@ -17,20 +18,18 @@ class Resource
 
     protected $newType;
     protected $newGuid;
-    protected $rakeId;
-    protected $toothId;
+    protected $tooth;
 
-    public static function create($guid, $type, $rakeId, $toothId): self
+    public static function create($guid, $type, Tooth &$tooth): self
     {
-        return new static($guid, $type, $rakeId, $toothId);
+        return new static($guid, $type, $tooth);
     }
 
-    public function __construct($guid, $resourceType, $rakeId, $toothId)
+    public function __construct($guid, $resourceType, Tooth &$tooth)
     {
         $this->guid = $guid;
         $this->type = $resourceType;
-        $this->rakeId = $rakeId;
-        $this->toothId = $toothId;
+        $this->tooth = $tooth;
     }
 
     public function __get($name)
@@ -50,6 +49,7 @@ class Resource
         if ($this->id) {
             return $this->id;
         }
+        $rake = $this->tooth->getRake();
 
         $query = sql()->select('ID')
             ->from(DB::table('rake_resources'))
@@ -57,8 +57,8 @@ class Resource
                 'guid = ? AND resource_type = ? AND rake_id = ? AND tooth_id =?',
                 $this->guid,
                 $this->type,
-                $this->rakeId,
-                $this->toothId
+                $rake->getId(),
+                $this->tooth->getId()
             );
 
         return $this->id = (int)DB::var($query);
@@ -87,11 +87,13 @@ class Resource
 
     public function insert()
     {
+        $rake   = $this->tooth->getRake();
         $values = [
             '?, ?, ?, ?, ?, ?, ?, ?, ?, @, @',
-            $this->guid, $this->type, $this->rakeId, $this->toothId, $this->newGuid,
+            $this->guid, $this->type, $rake->getId(), $this->tooth->getId(), $this->newGuid,
             $this->newType, (int)$this->imported, 0, $this->content, 'NOW()', 'NOW()'
         ];
+
         $query = sql()->insertInto(
             DB::table('rake_resources'),
             [
