@@ -9,5 +9,5 @@ interface ResourceManager
 {
     public function createFromResult(ProcessResult $result): ResourceManagerAbstract;
 
-    public function getFromDatabase(): ResourceManagerAbstract;
+    public function getFilesFromDatabase(): ResourceManagerAbstract;
 }
