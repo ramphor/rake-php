@@ -62,8 +62,21 @@ class ResourceManager extends ResourceManagerAbstract
         }
     }
 
+    protected function relationIsExists($resourceId, $sourceId, $type)
+    {
+        $query = sql()->select("COUNT(resource_id)")
+            ->from(DB::table('rake_relations'))
+            ->where('resource_id=? AND source_id=? AND map_type=?', $resourceId, $sourceId, $type);
+
+        return (int)DB::var($query) > 0;
+    }
+
     protected function createRelation($resourceId, $sourceId, $type)
     {
+        if ($this->relationIsExists($resourceId, $sourceId, $type)) {
+            return;
+        }
+
         $query = sql()
             ->insertInto(DB::table('rake_relations'), ['resource_id', 'source_id', 'map_type'])
             ->values('?, ?, ?', $resourceId, $sourceId, $type);
