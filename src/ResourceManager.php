@@ -1,8 +1,9 @@
 <?php
 namespace Ramphor\Rake;
 
-use Ramphor\Rake\Resource;
 use Ramphor\Rake\Abstracts\ResourceManager as ResourceManagerAbstract;
+use Ramphor\Rake\Resource;
+use Ramphor\Rake\Facades\DB;
 
 class ResourceManager extends ResourceManagerAbstract
 {
@@ -54,6 +55,34 @@ class ResourceManager extends ResourceManagerAbstract
     {
         foreach ($this->resources as $resource) {
             $resource->save();
+            $relations = $resource->getRelations();
+            if (count($relations) > 0) {
+                $this->importRelations($relations, $resource);
+            }
+        }
+    }
+
+    protected function createRelation($resourceId, $sourceId, $type)
+    {
+        $query = sql()
+            ->insertInto(DB::table('rake_relations'), ['resource_id', 'source_id', 'map_type'])
+            ->values('?, ?, ?', $resourceId, $sourceId, $type);
+
+        return DB::insert($query);
+    }
+
+    protected function importRelations($relations, $parent)
+    {
+        $parentId = $parent->findId();
+        foreach ($relations as $type => $resources) {
+            foreach ($resources as $resource) {
+                $resourceId = $resource->findId();
+                if ($resourceId <= 0) {
+                    $resourceId = $resource->save();
+                }
+
+                $this->createRelation($resourceId, $parentId, $type);
+            }
         }
     }
 }

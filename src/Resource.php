@@ -7,6 +7,7 @@ use Ramphor\Rake\Facades\DB;
 class Resource
 {
     protected $contentChanged = false;
+    protected $relations      = [];
 
     protected $id;
     protected $guid;
@@ -18,8 +19,6 @@ class Resource
     protected $newGuid;
     protected $rakeId;
     protected $toothId;
-
-    protected $relations = [];
 
     public static function create($guid, $type, $rakeId, $toothId): self
     {
