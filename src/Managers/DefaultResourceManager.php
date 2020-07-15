@@ -47,19 +47,20 @@ class DefaultResourceManager extends ResourceManager
         return $this;
     }
 
-    protected function queryResources() {
+    protected function queryFileResources()
+    {
         $query = sql()->select('*')
             ->from(DB::table('rake_resources'))
-            ->where('imported=?', 0)
+            ->where('imported=? AND resource_type <> ?', 0, 'link')
             ->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
             ->limit(10);
 
         return DB::get($query);
     }
 
-    public function getFromDatabase(): ResourceManager
+    public function getFilesFromDatabase(): ResourceManager
     {
-        $dbResources = $this->queryResources();
+        $dbResources = $this->queryFileResources();
 
         return $this;
     }
