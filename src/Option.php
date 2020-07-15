@@ -3,7 +3,7 @@ namespace Ramphor\Rake;
 
 class Option
 {
-    protected static $autoTransferFiles = false;
+    protected static $autoTransferFiles = true;
 
     public static function autoTranferFiles($enable = true)
     {
