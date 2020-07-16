@@ -15,6 +15,8 @@ interface Driver
 
     public function var(SqlBuilder $query);
 
+    public function row(SqlBuilder $query);
+
     public function exists(SqlBuilder $query);
 
     public function insert(SqlBuilder $query);

@@ -85,4 +85,24 @@ abstract class ResourceManager implements ResourceManagerContract
             $newResource->save();
         }
     }
+
+    protected function mapFromDB(Resource &$resource, $dbResource)
+    {
+        $resource->setId($dbResource->ID);
+        if ((bool)$dbResource->imported) {
+            $resource->imported();
+        }
+        $resource->setNewGuid($dbResource->new_guid);
+        $resource->setNewType($dbResource->new_type);
+        $resource->setContent($dbResource->content_text);
+
+        $resource->mapOthers([
+            'init_hash' => $dbResource->init_hash,
+            'retry' => $dbResource->retry,
+            'created_at' => $dbResource->created_at,
+            'updated_at' => $dbResource->updated_at,
+        ]);
+
+        return $resource;
+    }
 }

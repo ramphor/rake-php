@@ -89,25 +89,35 @@ class DefaultResourceManager extends ResourceManager
                 $filesResource->resource_type,
                 $tooth
             );
-            $resource->setId($filesResource->ID);
-            if ((bool)$filesResource->imported) {
-                $resource->imported();
-            }
-            $resource->setNewGuid($filesResource->new_guid);
-            $resource->setNewType($filesResource->new_type);
-            $resource->setContent($filesResource->content_text);
-
-            $resource->mapOthers([
-                'init_hash' => $filesResource->init_hash,
-                'retry' => $filesResource->retry,
-                'created_at' => $filesResource->created_at,
-                'updated_at' => $filesResource->updated_at,
-            ]);
+            $this->mapFromDB($resource, $filesResource);
 
             array_push($this->resources, $resource);
         }
 
         // Return this instance after get resource from database
         return $this;
+    }
+
+    public function find(int $resouceId): ? Resource
+    {
+        $query = sql()->select("*")
+            ->from(DB::table('rake_resources'))
+            ->where('ID=?', $resourceId);
+
+        $row = DB::row($query);
+        if (empty($row)) {
+            return null;
+        }
+        $rake = Intances::find($row->rake_id);
+        if (is_null($rake)) {
+            return null;
+        }
+        $tooth = $rake->findTheTooth($row->tooth_id);
+        if (is_null($tooth)) {
+            return null;
+        }
+
+        $resource =& Resource::create($row->guid, $row->resource_type, $tooth);
+        return $this->mapFromDB($resource, $row);
     }
 }
