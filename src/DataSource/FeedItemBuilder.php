@@ -73,12 +73,12 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         $this->originalData = $data['body'];
         $this->feedItem = new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
 
-        if (empty($data['skipped'])) {
+        if (isset($data['status']) && $data['status'] === 'success') {
             if ($this->dataType === 'html') {
                 $this->document = Document::load($data['body']);
             }
         } else {
-            $this->feedItem->setSkipped();
+            $this->feedItem->setError($data['status']);
         }
     }
 

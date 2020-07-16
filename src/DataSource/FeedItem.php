@@ -18,7 +18,7 @@ class FeedItem
     protected $status;
     protected $metas;
 
-    protected $skipped = false;
+    protected $errorType;
 
     public function __construct($guid = null, $urlDbId = null)
     {
@@ -43,14 +43,14 @@ class FeedItem
         return !empty($this->guid);
     }
 
-    public function setSkipped()
+    public function setError($type = 'skip')
     {
-        $this->skipped = true;
+        $this->errorType = $type;
     }
 
     public function isSkipped()
     {
-        return $this->skipped;
+        return $this->errorType === 'skip';
     }
 
     public function setProperty($propName, $propValue)

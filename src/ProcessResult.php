@@ -10,7 +10,6 @@ class ProcessResult
     protected $guid;
     protected $content;
     protected $resultType;
-    protected $isSkipped;
 
     protected $newGuid;
     protected $newType;
@@ -27,21 +26,18 @@ class ProcessResult
     public static function createSuccessResult($guid, $newGuid, $newType): self
     {
         $result = new static($guid);
-
         $result->setNewGuid($newGuid);
         $result->setNewType($newType);
 
-        return $result->setResultType(true);
+        return $result->setResultType('success');
     }
 
-    public static function createErrorResult($errorMessage, $isSkipped = false): self
+    public static function createErrorResult($errorMessage, $errorType = 'skip'): self
     {
         $result = new static($guid);
-
-        $result->skip($isSkipped);
         $result->addErrorMessage($errorMessage);
 
-        return $result->setResultType(false);
+        return $result->setResultType($errorType);
     }
 
     public function getGuid()
@@ -49,26 +45,27 @@ class ProcessResult
         return $this->guid;
     }
 
-    public function skip($isSkipped = false)
+    public function setResultType($resultType): self
     {
-        $this->isSkipped = (bool) $isSkipped;
-    }
-
-    public function isSkipped()
-    {
-        return $this->isSkipped;
-    }
-
-    public function setResultType(bool $isSuccess): self
-    {
-        $this->resultType = $isSuccess;
+        $this->resultType = $resultType;
         return $this;
     }
 
     public function isSuccess()
     {
-        return $this->resultType;
+        return $this->resultType === 'success';
     }
+
+    public function isError()
+    {
+        return $this->resultType === 'error';
+    }
+
+    public function isSkipped()
+    {
+        return $this->resultType === 'skip';
+    }
+
 
     public function setNewGuid($newGuid)
     {

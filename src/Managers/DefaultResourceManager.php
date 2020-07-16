@@ -60,7 +60,7 @@ class DefaultResourceManager extends ResourceManager
 
     public function getFilesFromDatabase(): ResourceManager
     {
-        $dbResources = $this->queryFileResources();
+        $filesResources = $this->queryFileResources();
 
         return $this;
     }

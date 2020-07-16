@@ -1,6 +1,7 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
+use Psr\Http\Client\ClientExceptionInterface;
 use Ramphor\Rake\Response;
 use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
@@ -63,16 +64,37 @@ abstract class CrawlerTooth extends Tooth
 
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
-                $response->append($crawlData->url, null, $crawlData->ID, true);
+                $response->append($crawlData->url, null, $crawlData->ID, 'skip');
                 continue;
             }
-            $html = Client::request(
-                'GET',
-                $crawlData->url,
-                $this->crawlRequestOptions()
-            );
-            if (!$this->validateResponse || $this->validateRequestResponse($response)) {
-                $response->append($crawlData->url, $html->getBody(), $crawlData->ID);
+            try {
+                $html = Client::request(
+                    'GET',
+                    $crawlData->url,
+                    $this->crawlRequestOptions()
+                );
+                if (!$this->validateResponse || $this->validateRequestResponse($response)) {
+                    $response->append($crawlData->url, $html->getBody(), $crawlData->ID);
+                }
+            } catch (ClientExceptionInterface $e) {
+                if ($e->hasResponse()) {
+                    $requestResponse = $e->getResponse();
+                    $statusCode      = $requestResponse->getStatusCode();
+
+                    $response->append(
+                        $crawlData->url,
+                        null,
+                        $crawlData->ID,
+                        $statusCode >= 500 ? 'error' : 'skip'
+                    );
+                } else {
+                    $response->append(
+                        $crawlData->url,
+                        null,
+                        $crawlData->ID,
+                        (int)$crawlData->retry < 20 ? 'error' : 'skip'
+                    );
+                }
             }
         }
 

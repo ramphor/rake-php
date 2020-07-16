@@ -91,7 +91,7 @@ class Rake
                 if (!$feedItem->isValid()) {
                     $result = ProcessResult::createErrorResult(
                         sprintf('The feed item "%s" is invalid', $feedItem->guid),
-                        $feedItem->isSkipped()
+                        $feedItem->errorType
                     );
                 } else {
                     $processor->setFeedItem($feedItem);
