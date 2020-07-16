@@ -151,4 +151,9 @@ class Resource
         }
         array_push($this->relations[$type], $resource);
     }
+
+    public function mapOthers($fields)
+    {
+        // Implement later
+    }
 }

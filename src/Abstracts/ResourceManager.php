@@ -72,5 +72,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     public function transferFiles()
     {
+        foreach ($this->resources as $resource) {
+        }
     }
 }

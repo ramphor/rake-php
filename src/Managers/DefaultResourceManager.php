@@ -4,6 +4,7 @@ namespace Ramphor\Rake\Managers;
 use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Facades\Instances;
 
 class DefaultResourceManager extends ResourceManager
 {
@@ -54,14 +55,56 @@ class DefaultResourceManager extends ResourceManager
             ->where('imported=? AND resource_type <> ?', 0, 'link')
             ->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
             ->limit(10);
+        $rows = DB::get($query);
 
-        return DB::get($query);
+        return empty($rows) ? [] : $rows;
+    }
+
+    protected function findTheTooth($rakeId, $toothId)
+    {
+        $rake = Instances::find($rakeId);
+        if (is_null($rake)) {
+            // Will logging later
+            return;
+        }
+
+        return $rake->findTooth($toothId);
     }
 
     public function getFilesFromDatabase(): ResourceManager
     {
         $filesResources = $this->queryFileResources();
+        foreach ($filesResources as $filesResource) {
+            $tooth = $this->findTheTooth($filesResource->rake_id, $filesResource->tooth_id);
+            if (is_null($tooth)) {
+                // Will logging later
+                continue;
+            }
 
+            $resource =& Resource::create(
+                $filesResource->guid,
+                $filesResource->resource_type,
+                $tooth
+            );
+            $resource->setId($filesResource->ID);
+            if ((bool)$filesResource->imported) {
+                $resource->imported();
+            }
+            $resource->setNewGuid($filesResource->new_guid);
+            $resource->setNewType($filesResource->new_type);
+            $resource->setContent($filesResource->content_text);
+
+            $resource->mapOthers([
+                'init_hash' => $filesResource->init_hash,
+                'retry' => $filesResource->retry,
+                'created_at' => $filesResource->created_at,
+                'updated_at' => $filesResource->updated_at,
+            ]);
+
+            array_push($this->resources, $resource);
+        }
+
+        // Return this instance after get resource from database
         return $this;
     }
 }
