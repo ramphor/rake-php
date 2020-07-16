@@ -72,7 +72,17 @@ abstract class ResourceManager implements ResourceManagerContract
 
     public function transferFiles()
     {
+        if (empty($this->resources)) {
+            return;
+        }
         foreach ($this->resources as $resource) {
+            $tooth       = $resource->getTooth();
+            $newResource = $tooth->downloadResource($resource);
+
+            /* After download files via Tooth.
+             * Rake will be update resource to database with new GUID and Type
+             */
+            $newResource->save();
         }
     }
 }
