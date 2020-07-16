@@ -121,11 +121,11 @@ class Rake
             $resources = Resources::createFromResult($result);
             $resources->import();
             $resources->importCrawlUrls();
+        }
 
-            if (Option::isAutoTransferFiles()) {
-                $resources = Resources::getFilesFromDatabase();
-                $resources->transferFiles();
-            }
+        if (Option::isAutoTransferFiles()) {
+            $resources = Resources::getFilesFromDatabase();
+            $resources->transferFiles();
         }
     }
 }
