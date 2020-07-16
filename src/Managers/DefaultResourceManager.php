@@ -84,12 +84,12 @@ class DefaultResourceManager extends ResourceManager
                 continue;
             }
 
-            $resource =& Resource::create(
+            $resource = Resource::create(
                 $filesResource->guid,
                 $filesResource->resource_type,
                 $tooth
             );
-            $this->mapFromDB($resource, $filesResource);
+            $resource =& $this->mapFromDB($resource, $filesResource);
 
             array_push($this->resources, $resource);
         }
@@ -117,7 +117,7 @@ class DefaultResourceManager extends ResourceManager
             return null;
         }
 
-        $resource =& Resource::create($row->guid, $row->resource_type, $tooth);
+        $resource = Resource::create($row->guid, $row->resource_type, $tooth);
         return $this->mapFromDB($resource, $row);
     }
 }

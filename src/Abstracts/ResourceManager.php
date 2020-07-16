@@ -77,17 +77,17 @@ abstract class ResourceManager implements ResourceManagerContract
             return;
         }
         foreach ($this->resources as $resource) {
-            $tooth       = $resource->getTooth();
-            $newResource = $tooth->downloadResource($resource);
+            $tooth    = $resource->getTooth();
+            $resource =& $tooth->downloadResource($resource);
 
             /* After download files via Tooth.
              * Rake will be update resource to database with new GUID and Type
              */
-            $newResource->save();
+            $resource->save();
         }
     }
 
-    protected function mapFromDB(Resource &$resource, $dbResource)
+    protected function mapFromDB(Resource $resource, $dbResource)
     {
         $resource->setId($dbResource->ID);
         if ((bool)$dbResource->imported) {
