@@ -56,7 +56,7 @@ class CrawlerManager
         $rake = $tooth->getRake();
         $query = sql()->insertInto(
             DB::table('rake_crawled_urls'),
-            ['url', 'rake_id', 'tooth_id', 'crawled', 'skip', 'retry', 'created_at', 'updated_at']
+            ['url', 'rake_id', 'tooth_id', 'crawled', 'skipped', 'retry', 'created_at', 'updated_at']
         )->values(
             '?, ?, ?, ?, ?, ?, @, @',
             $url,
