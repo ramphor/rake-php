@@ -10,8 +10,9 @@ class DefaultResourceManager extends ResourceManager
 {
     public function createFromResult($result): ResourceManager
     {
-        $tooth = $result->getTooth();
-        $rake  = $tooth->getRake();
+        $this->resources = [];
+        $tooth           = $result->getTooth();
+        $rake            = $tooth->getRake();
 
         $rawResources = $result->getResources();
         $parent =& Resource::create($result->getGuid(), 'link', $tooth);
@@ -73,7 +74,9 @@ class DefaultResourceManager extends ResourceManager
 
     public function getFilesFromDatabase(): ResourceManager
     {
-        $filesResources = $this->queryFileResources();
+        $this->resources = [];
+        $filesResources  = $this->queryFileResources();
+
         foreach ($filesResources as $filesResource) {
             $tooth = $this->findTheTooth($filesResource->rake_id, $filesResource->tooth_id);
             if (is_null($tooth)) {
