@@ -3,6 +3,7 @@
 namespace Ramphor\Rake\Abstracts;
 
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
+use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Crawler;
 
