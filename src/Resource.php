@@ -44,6 +44,11 @@ class Resource
         $this->id = $id;
     }
 
+    public function getTooth()
+    {
+        return $this->tooth;
+    }
+
     public function findId()
     {
         if ($this->id) {
