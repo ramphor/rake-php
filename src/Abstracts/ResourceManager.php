@@ -25,24 +25,24 @@ abstract class ResourceManager implements ResourceManagerContract
         }
     }
 
-    protected function relationIsExists($resourceId, $sourceId, $type)
+    protected function relationIsExists($resourceId, $sourceId)
     {
         $query = sql()->select("COUNT(resource_id)")
             ->from(DB::table('rake_relations'))
-            ->where('resource_id=? AND source_id=? AND map_type=?', $resourceId, $sourceId, $type);
+            ->where('resource_id=? AND source_id=?', $resourceId, $sourceId);
 
         return (int)DB::var($query) > 0;
     }
 
-    protected function createRelation($resourceId, $sourceId, $type)
+    protected function createRelation($resourceId, $sourceId)
     {
-        if ($this->relationIsExists($resourceId, $sourceId, $type)) {
+        if ($this->relationIsExists($resourceId, $sourceId)) {
             return;
         }
 
         $query = sql()
-            ->insertInto(DB::table('rake_relations'), ['resource_id', 'source_id', 'map_type'])
-            ->values('?, ?, ?', $resourceId, $sourceId, $type);
+            ->insertInto(DB::table('rake_relations'), ['resource_id', 'parent_id'])
+            ->values('?, ?, ?', $resourceId, $sourceId);
 
         return DB::insert($query);
     }
@@ -50,15 +50,13 @@ abstract class ResourceManager implements ResourceManagerContract
     protected function importRelations($relations, $parent)
     {
         $parentId = $parent->findId();
-        foreach ($relations as $type => $resources) {
-            foreach ($resources as $resource) {
-                $resourceId = $resource->findId();
-                if ($resourceId <= 0) {
-                    $resourceId = $resource->save();
-                }
-
-                $this->createRelation($resourceId, $parentId, $type);
+        foreach ($resources as $resource) {
+            $resourceId = $resource->findId();
+            if ($resourceId <= 0) {
+                $resourceId = $resource->save();
             }
+
+            $this->createRelation($resourceId, $parentId);
         }
     }
 

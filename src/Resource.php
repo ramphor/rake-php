@@ -161,6 +161,9 @@ class Resource
 
     public function getChildrens()
     {
+        DB::selectDistinct('res.*')->from(DB::table('rake_resources res'))
+            ->innerJoin(DB::table('rake_relations rel'))
+            ->on('res.ID = rel.');
     }
 
     public function getRelations()
@@ -168,16 +171,11 @@ class Resource
         return $this->relations;
     }
 
-    public function addRelation(Resource &$resource, $type = 'child')
+    public function addRelation(Resource &$resource)
     {
-        if (!in_array($type, ['parent', 'child', 'cover', 'gallery'])) {
-            return;
+        if (!array_search($resource, $this->resources)) {
+            array_push($this->relations, $resource);
         }
-
-        if (!isset($this->relations[$type])) {
-            $this->relations[$type] = [];
-        }
-        array_push($this->relations[$type], $resource);
     }
 
     public function mapOthers($fields)

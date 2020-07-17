@@ -38,7 +38,7 @@ class DefaultResourceManager extends ResourceManager
                 $rawResource['type'],
                 $tooth
             );
-            $parent->addRelation($resource, 'child');
+            $parent->addRelation($resource);
             array_push($this->resources, $resource);
         }
 
