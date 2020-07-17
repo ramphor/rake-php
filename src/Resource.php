@@ -161,4 +161,18 @@ class Resource
     {
         // Implement later
     }
+
+    public function saveHash($hash)
+    {
+        $id = $this->findId();
+        if ($id <= 0) {
+            // Will be logging later
+            return;
+        }
+        $query = sql()
+            ->insertInto(DB::table('rake_hash_map'), ['sha256', 'resource_id', 'created_at'])
+            ->values('?, ?, @', $hash, $id, 'NOW()');
+
+        return DB::insert($query);
+    }
 }
