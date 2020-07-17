@@ -119,7 +119,7 @@ abstract class ResourceManager implements ResourceManagerContract
         if (is_null($rake)) {
             return null;
         }
-        $tooth = $rake->findTheTooth($row->tooth_id);
+        $tooth = $rake->findTooth($row->tooth_id);
         if (is_null($tooth)) {
             return null;
         }
