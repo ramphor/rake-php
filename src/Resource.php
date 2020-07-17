@@ -4,6 +4,7 @@ namespace Ramphor\Rake;
 use Ramphor\Rake\ProcessResult;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Facades\Resources;
 
 class Resource
 {
@@ -53,6 +54,12 @@ class Resource
 
     public function findParent()
     {
+        $query = sql()->select("res.*")->from(DB::table('rake_resources res'))
+            ->innerJoin(DB::table('rake_relations rel'))
+            ->on('res.ID = rel.parent_id')
+            ->where('rel.resource_id=?', $this->id);
+
+        return Resources::findByQuery($query);
     }
 
     public function getTooth()
@@ -155,6 +162,8 @@ class Resource
                 $this->tooth->updateSystemResource($this);
             }
             $parentResource = $this->findParent();
+            var_dump($parentResource);
+            die;
             $childResources = $this->getChildrens();
             if (!is_null($parentResource)) {
                 $this->tooth->updateParentSystemResource($this, $parentResource);

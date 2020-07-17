@@ -101,7 +101,7 @@ abstract class ResourceManager implements ResourceManagerContract
         return $resource;
     }
 
-    protected function findQuery(QueryBuilder $query, callable $callback = null): ? Resource
+    public function findByQuery(QueryBuilder $query, callable $callback = null): ? Resource
     {
         $queryResult = DB::row($query);
         if (empty($queryResult)) {
@@ -131,7 +131,7 @@ abstract class ResourceManager implements ResourceManagerContract
             ->from(DB::table('rake_resources'))
             ->where('ID=?', $resourceId);
 
-        return $this->findQuery($query);
+        return $this->findByQuery($query);
     }
 
     public function generateHash($data, $type)
@@ -150,7 +150,7 @@ abstract class ResourceManager implements ResourceManagerContract
             ->on('s.ID = h.resource_id')
             ->where('h.sha256 = ? AND h.new_type=?', $hash, $type);
 
-        return $this->findQuery($query, function ($resource, $queryResult) {
+        return $this->findByQuery($query, function ($resource, $queryResult) {
             if (is_null($resource)) {
                 return $resource;
             }
