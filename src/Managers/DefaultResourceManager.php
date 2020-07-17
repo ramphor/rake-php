@@ -23,6 +23,9 @@ class DefaultResourceManager extends ResourceManager
         }
 
         foreach ($resultResources as $resultResource) {
+            // Parse link to ensure working correctly
+            $resultResource['guid']->parse();
+
             if ($resultResource['type'] === 'link' && !$resultResource['guid']->isSameSource()) {
                 continue;
             }
