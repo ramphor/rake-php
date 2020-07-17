@@ -5,6 +5,7 @@ namespace Ramphor\Rake\Abstracts;
 use Ramphor\Sql as QueryBuilder;
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
+use Ramphor\Rake\Facades\Instances;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Crawler;
 
@@ -114,7 +115,7 @@ abstract class ResourceManager implements ResourceManagerContract
         if (empty($row)) {
             return null;
         }
-        $rake = Intances::find($row->rake_id);
+        $rake = Instances::find($row->rake_id);
         if (is_null($rake)) {
             return null;
         }
