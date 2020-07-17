@@ -173,8 +173,6 @@ class Resource
             ->insertInto(DB::table('rake_hash_maps'), ['sha256', 'resource_id', 'new_guid', 'new_type', 'created_at'])
             ->values('?, ?, ?, ?, @', $hash, $id, $newGuid, $newType, 'NOW()');
 
-        die($query);
-
         return DB::insert($query);
     }
 }
