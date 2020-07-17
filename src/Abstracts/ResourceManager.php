@@ -17,10 +17,17 @@ abstract class ResourceManager implements ResourceManagerContract
     public function import()
     {
         foreach ($this->resources as $resource) {
-            $resource->save();
-            $relations = $resource->getRelations();
-            if (count($relations) > 0) {
-                $this->importRelations($relations, $resource);
+            $resourceId = $resource->save();
+            $parent     = $resource->parent;
+            if ($parent) {
+                $parentId = $parent->findId();
+                if ($parentId <= 0) {
+                    $parentId = $parent->save();
+                }
+                if ($parentId <= 0) {
+                    continue;
+                }
+                $this->createRelation($resourceId, $parentId);
             }
         }
     }
@@ -42,22 +49,9 @@ abstract class ResourceManager implements ResourceManagerContract
 
         $query = sql()
             ->insertInto(DB::table('rake_relations'), ['resource_id', 'parent_id'])
-            ->values('?, ?, ?', $resourceId, $sourceId);
+            ->values('?, ?', $resourceId, $sourceId);
 
         return DB::insert($query);
-    }
-
-    protected function importRelations($relations, $parent)
-    {
-        $parentId = $parent->findId();
-        foreach ($resources as $resource) {
-            $resourceId = $resource->findId();
-            if ($resourceId <= 0) {
-                $resourceId = $resource->save();
-            }
-
-            $this->createRelation($resourceId, $parentId);
-        }
     }
 
     public function importCrawlUrls()

@@ -13,8 +13,7 @@ class DefaultResourceManager extends ResourceManager
         $this->resources = [];
         $tooth           = $result->getTooth();
         $rake            = $tooth->getRake();
-
-        $rawResources = $result->getResources();
+        $resultResources    = $result->getResources();
         $parent =& Resource::create($result->getGuid(), 'link', $tooth);
         if ($result->isSuccess()) {
             $parent->imported();
@@ -22,28 +21,26 @@ class DefaultResourceManager extends ResourceManager
             $parent->setNewType($result->getNewType());
             $parent->setContent($result->getContent(false));
         }
-        // Insert processing URL to resource with flag `imported` is `true`
-        array_push($this->resources, $parent);
 
-        foreach ($rawResources as $rawResource) {
-            if ($rawResource['type'] === 'link' && !$rawResource['guid']->isSameSource()) {
+        foreach ($resultResources as $resultResource) {
+            if ($resultResource['type'] === 'link' && !$resultResource['guid']->isSameSource()) {
                 continue;
             }
-            if (!in_array($rawResource['guid']->scheme, $this->protocols)) {
+            if (!in_array($resultResource['guid']->scheme, $this->protocols)) {
                 continue;
             }
 
             $resource =& Resource::create(
-                (string)$rawResource['guid'],
-                $rawResource['type'],
+                (string)$resultResource['guid'],
+                $resultResource['type'],
                 $tooth
             );
-            $parent->addRelation($resource);
+            $resource->setParent($parent);
             array_push($this->resources, $resource);
         }
 
         // Freeup memory
-        unset($rawResources);
+        unset($resultResources);
 
         // Return current ResourceManager instance
         return $this;

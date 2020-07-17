@@ -8,7 +8,6 @@ use Ramphor\Rake\Abstracts\Tooth;
 class Resource
 {
     protected $contentChanged = false;
-    protected $relations      = [];
 
     protected $id;
     protected $guid;
@@ -19,6 +18,9 @@ class Resource
     protected $newType;
     protected $newGuid;
     protected $tooth;
+
+    // Parent resource
+    protected $parent;
 
     public static function create($guid, $type, Tooth &$tooth): self
     {
@@ -42,6 +44,15 @@ class Resource
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    public function setParent(self $parent)
+    {
+        $this->parent = $parent;
+    }
+
+    public function findParent()
+    {
     }
 
     public function getTooth()
@@ -143,7 +154,7 @@ class Resource
             if ($this->type === 'link') {
                 $this->tooth->updateSystemResource($this);
             }
-            $parentResource = $this->getParent();
+            $parentResource = $this->findParent();
             $childResources = $this->getChildrens();
             if (!is_null($parentResource)) {
                 $this->tooth->updateParentSystemResource($this, $parentResource);
@@ -155,27 +166,13 @@ class Resource
         return $this->id;
     }
 
-    public function getParent()
-    {
-    }
-
     public function getChildrens()
     {
-        DB::selectDistinct('res.*')->from(DB::table('rake_resources res'))
+        $query = sql()->selectDistinct('res.*')->from(DB::table('rake_resources res'))
             ->innerJoin(DB::table('rake_relations rel'))
-            ->on('res.ID = rel.');
-    }
+            ->on('res.ID = rel.parent_id');
 
-    public function getRelations()
-    {
-        return $this->relations;
-    }
-
-    public function addRelation(Resource &$resource)
-    {
-        if (!array_search($resource, $this->resources)) {
-            array_push($this->relations, $resource);
-        }
+        return [];
     }
 
     public function mapOthers($fields)
