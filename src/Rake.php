@@ -22,7 +22,7 @@ class Rake
 
     protected $options = [];
 
-    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null)
+    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null, $logger = null)
     {
         static::$app = App::instance();
         $this->id    = $rakeId;
@@ -32,6 +32,9 @@ class Rake
         }
         if (!is_null($client)) {
             static::$app->bind('http', $client);
+        }
+        if (!is_null($logger)) {
+            static::$app->bind('logger', $logger);
         }
         static::$app->bind('crawler', function () {
             return new CrawlerManager();
@@ -60,6 +63,11 @@ class Rake
         if (isset($this->teeth[$id])) {
             return $this->teeth[$id];
         }
+    }
+
+    public function registerLogger($logger)
+    {
+        static::$app->bind('logger', $logger);
     }
 
     public function registerHtmlParser($closure)
