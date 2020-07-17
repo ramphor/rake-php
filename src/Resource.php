@@ -135,9 +135,32 @@ class Resource
 
     public function save()
     {
-        return ($this->findId() > 0)
+        ($this->findId() > 0)
             ? $this->update()
             : $this->insert();
+
+        if ($this->imported && $this->tooth->validateSystemResource($this->newGuid, $this->newType)) {
+            if ($this->type === 'link') {
+                $this->tooth->updateSystemResource($this);
+            }
+            $parentResource = $this->getParent();
+            $childResources = $this->getChildrens();
+            if (!is_null($parentResource)) {
+                $this->tooth->updateParentSystemResource($this, $parentResource);
+            }
+            if (count($childResources) > 0) {
+                $this->tooth->updateChildSystemResource($this, $childResources);
+            }
+        }
+        return $this->id;
+    }
+
+    public function getParent()
+    {
+    }
+
+    public function getChildrens()
+    {
     }
 
     public function getRelations()

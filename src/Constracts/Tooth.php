@@ -13,4 +13,10 @@ interface Tooth
     public function getItems(): Iterator;
 
     public function downloadResource(Resource $resource): Resource;
+
+    public function validateSystemResource($newGuid, $newType): bool;
+
+    public function updateParentSystemResource(Resource $resource, Resource $parentResource);
+
+    public function updateChildSystemResource(Resource $resource, $childrens);
 }
