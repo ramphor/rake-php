@@ -19,6 +19,4 @@ interface Tooth
     public function updateSystemResource(Resource $resource);
 
     public function updateParentSystemResource(Resource $resource, Resource $parentResource);
-
-    public function updateChildSystemResource(Resource $resource, $childrens);
 }
