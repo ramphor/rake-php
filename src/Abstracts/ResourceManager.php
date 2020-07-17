@@ -156,7 +156,7 @@ abstract class ResourceManager implements ResourceManagerContract
             ->from(DB::table('rake_resources') . ' s')
             ->innerJoin(DB::table('rake_hash_maps') . ' h')
             ->on('s.ID = h.resource_id')
-            ->where('h.sha256 = ?, h.new_type=?', $hash, $type);
+            ->where('h.sha256 = ? AND h.new_type=?', $hash, $type);
 
         return $this->findQuery($query, function ($resource, $queryResult) {
             if (is_null($resource)) {
@@ -164,10 +164,10 @@ abstract class ResourceManager implements ResourceManagerContract
             }
 
             if (empty($resource->newGuid)) {
-                $resource->newGuid = $queryResult->map_guid;
+                $resource->setNewGuid($queryResult->map_guid);
             }
             if (empty($resource->newType)) {
-                $resource->newType = $queryResult->map_type;
+                $resource->setNewType($queryResult->map_type);
             }
 
             return $resource;
