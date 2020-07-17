@@ -169,6 +169,8 @@ abstract class ResourceManager implements ResourceManagerContract
             if (empty($resource->newType)) {
                 $resource->newType = $queryResult->map_type;
             }
+
+            return $resource;
         });
     }
 }
