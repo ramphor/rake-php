@@ -33,10 +33,10 @@ class Initialize
                 `created_at` timestamp NULL DEFAULT NULL,
                 `updated_at` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`ID`)",
-            'rake_relations' => "`ID` INT NOT NULL AUTO_INCREMENT
+            'rake_relations' => "`ID` INT NOT NULL AUTO_INCREMENT,
                 `resource_id` bigint(20) NOT NULL,
                 `source_id` bigint(20) NOT NULL COMMENT 'The resource #ID contain resource_id',
-                `map_type` char(64) NOT NULL DEFAULT 'child'
+                `map_type` varchar(64) NOT NULL DEFAULT 'child',
                 PRIMARY KEY (`ID`)",
             'rake_resources' => "`ID` bigint(20) NOT NULL AUTO_INCREMENT,
                 `rake_id` VARCHAR(255) NOT NULL,
@@ -44,7 +44,7 @@ class Initialize
                 `guid` text NOT NULL,
                 `resource_type` VARCHAR(255) NOT NULL,
                 `content_text` LONGTEXT NULL,
-                `init_hash` char(64) NOT NULL,
+                `init_hash` varchar(64) NOT NULL,
                 `new_guid` text,
                 `new_type` varchar(255) DEFAULT NULL,
                 `imported` tinyint(4) NOT NULL DEFAULT 0,
@@ -52,7 +52,7 @@ class Initialize
                 `created_at` timestamp NULL DEFAULT NULL,
                 `updated_at` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`ID`)",
-            'rake_hash_map' => '`sha256` char(64) NOT NULL,
+            'rake_hash_map' => '`sha256` varchar(64) NOT NULL,
                 `resource_id` INT NOT NULL,
                 `created_at` INT NOT NULL,
                 PRIMARY KEY (`sha256`)',
@@ -66,10 +66,9 @@ class Initialize
         ];
 
         foreach ($tables as $table => $syntax) {
-            $sql = sprintf('CREATE TABLE IF NOT EXISTS %s (%s)', DB::table($table), $syntax);
-
+            $query = sprintf('CREATE TABLE IF NOT EXISTS %s (%s)', DB::table($table), $syntax);
             // Create table
-            DB::raw_query($sql);
+            DB::raw_query($query);
         }
     }
 }
