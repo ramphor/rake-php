@@ -162,7 +162,7 @@ class Resource
         // Implement later
     }
 
-    public function saveHash($hash)
+    public function saveHash($hash, $newType, $newGuid)
     {
         $id = $this->findId();
         if ($id <= 0) {
@@ -170,8 +170,10 @@ class Resource
             return;
         }
         $query = sql()
-            ->insertInto(DB::table('rake_hash_map'), ['sha256', 'resource_id', 'created_at'])
-            ->values('?, ?, @', $hash, $id, 'NOW()');
+            ->insertInto(DB::table('rake_hash_maps'), ['sha256', 'resource_id', 'new_guid', 'new_type', 'created_at'])
+            ->values('?, ?, ?, ?, @', $hash, $id, $newGuid, $newType, 'NOW()');
+
+        die($query);
 
         return DB::insert($query);
     }

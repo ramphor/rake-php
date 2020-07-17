@@ -109,23 +109,28 @@ abstract class ResourceManager implements ResourceManagerContract
         return $resource;
     }
 
-    protected function findQuery(QueryBuilder $query): ? Resource
+    protected function findQuery(QueryBuilder $query, callable $callback = null): ? Resource
     {
-        $row = DB::row($query);
-        if (empty($row)) {
+        $queryResult = DB::row($query);
+        if (empty($queryResult)) {
             return null;
         }
-        $rake = Instances::find($row->rake_id);
+        $rake = Instances::find($queryResult->rake_id);
         if (is_null($rake)) {
             return null;
         }
-        $tooth = $rake->findTooth($row->tooth_id);
+        $tooth = $rake->findTooth($queryResult->tooth_id);
         if (is_null($tooth)) {
             return null;
         }
 
-        $resource = Resource::create($row->guid, $row->resource_type, $tooth);
-        return $this->mapFromDB($resource, $row);
+        $resource = Resource::create($queryResult->guid, $queryResult->resource_type, $tooth);
+        $resource = $this->mapFromDB($resource, $queryResult);
+        if (is_null($callback)) {
+            return $resource;
+        }
+
+        return $callback($resource, $queryResult);
     }
 
     public function find(int $resouceId): ? Resource
@@ -145,13 +150,25 @@ abstract class ResourceManager implements ResourceManagerContract
         return hash('sha256', $data);
     }
 
-    public function getFromHash($hash): ? Resource
+    public function getFromHash($hash, $type): ? Resource
     {
-        $query = sql()->select("s.*")->from(DB::table('rake_resources') . ' s')
-            ->innerJoin(DB::table('rake_hash_map') . ' h')
+        $query = sql()->select("s.*, h.new_guid as map_guid, h.new_type as map_type")
+            ->from(DB::table('rake_resources') . ' s')
+            ->innerJoin(DB::table('rake_hash_maps') . ' h')
             ->on('s.ID = h.resource_id')
-            ->where('h.sha256 = ?', $hash);
+            ->where('h.sha256 = ?, h.new_type=?', $hash, $type);
 
-        return $this->findQuery($query);
+        return $this->findQuery($query, function ($resource, $queryResult) {
+            if (is_null($resource)) {
+                return $resource;
+            }
+
+            if (empty($resource->newGuid)) {
+                $resource->newGuid = $queryResult->map_guid;
+            }
+            if (empty($resource->newType)) {
+                $resource->newType = $queryResult->map_type;
+            }
+        });
     }
 }
