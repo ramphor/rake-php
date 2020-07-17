@@ -36,7 +36,7 @@ abstract class ResourceManager implements ResourceManagerContract
     {
         $query = sql()->select("COUNT(resource_id)")
             ->from(DB::table('rake_relations'))
-            ->where('resource_id=? AND source_id=?', $resourceId, $sourceId);
+            ->where('resource_id=? AND parent_id=?', $resourceId, $sourceId);
 
         return (int)DB::var($query) > 0;
     }
