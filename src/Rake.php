@@ -2,6 +2,7 @@
 namespace Ramphor\Rake;
 
 use Psr\Http\Client\ClientInterface;
+use Psr\Log\LoggerInterface;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
@@ -22,7 +23,7 @@ class Rake
 
     protected $options = [];
 
-    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null, $logger = null)
+    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null, LoggerInterface $logger = null)
     {
         static::$app = App::instance();
         $this->id    = $rakeId;
@@ -65,7 +66,7 @@ class Rake
         }
     }
 
-    public function registerLogger($logger)
+    public function registerLogger(LoggerInterface $logger)
     {
         static::$app->bind('logger', $logger);
     }
