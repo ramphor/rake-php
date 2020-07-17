@@ -165,4 +165,14 @@ abstract class ResourceManager implements ResourceManagerContract
             return $resource;
         });
     }
+
+    public function findParent($childId)
+    {
+        $query = sql()->select("res.*")->from(DB::table('rake_resources res'))
+            ->innerJoin(DB::table('rake_relations rel'))
+            ->on('res.ID = rel.parent_id')
+            ->where('rel.resource_id=?', $childId);
+
+        return $this->findByQuery($query);
+    }
 }

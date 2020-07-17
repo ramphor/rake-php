@@ -52,16 +52,6 @@ class Resource
         $this->parent = $parent;
     }
 
-    public function findParent()
-    {
-        $query = sql()->select("res.*")->from(DB::table('rake_resources res'))
-            ->innerJoin(DB::table('rake_relations rel'))
-            ->on('res.ID = rel.parent_id')
-            ->where('rel.resource_id=?', $this->id);
-
-        return Resources::findByQuery($query);
-    }
-
     public function getTooth()
     {
         return $this->tooth;
@@ -161,27 +151,12 @@ class Resource
             if ($this->type === 'link') {
                 $this->tooth->updateSystemResource($this);
             }
-            $parentResource = $this->findParent();
-            var_dump($parentResource);
-            die;
-            $childResources = $this->getChildrens();
+            $parentResource = Resources::findParent($this->id);
             if (!is_null($parentResource)) {
                 $this->tooth->updateParentSystemResource($this, $parentResource);
             }
-            if (count($childResources) > 0) {
-                $this->tooth->updateChildSystemResource($this, $childResources);
-            }
         }
         return $this->id;
-    }
-
-    public function getChildrens()
-    {
-        $query = sql()->selectDistinct('res.*')->from(DB::table('rake_resources res'))
-            ->innerJoin(DB::table('rake_relations rel'))
-            ->on('res.ID = rel.parent_id');
-
-        return [];
     }
 
     public function mapOthers($fields)
