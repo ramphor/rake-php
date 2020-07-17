@@ -2,6 +2,7 @@
 
 namespace Ramphor\Rake\Abstracts;
 
+use Ramphor\Sql as QueryBuilder;
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
@@ -105,5 +106,51 @@ abstract class ResourceManager implements ResourceManagerContract
         ]);
 
         return $resource;
+    }
+
+    protected function findQuery(QueryBuilder $query): ? Resource
+    {
+        $row = DB::row($query);
+        if (empty($row)) {
+            return null;
+        }
+        $rake = Intances::find($row->rake_id);
+        if (is_null($rake)) {
+            return null;
+        }
+        $tooth = $rake->findTheTooth($row->tooth_id);
+        if (is_null($tooth)) {
+            return null;
+        }
+
+        $resource = Resource::create($row->guid, $row->resource_type, $tooth);
+        return $this->mapFromDB($resource, $row);
+    }
+
+    public function find(int $resouceId): ? Resource
+    {
+        $query = sql()->select("*")
+            ->from(DB::table('rake_resources'))
+            ->where('ID=?', $resourceId);
+
+        return $this->findQuery($query);
+    }
+
+    public function generateHash($data, $type)
+    {
+        if (in_array($type, ['content_image', 'gallary', 'cover'])) {
+            return hash_file('sha256', $data);
+        }
+        return hash('sha256', $data);
+    }
+
+    public function getFromHash($hash): ? Resource
+    {
+        $query = sql()->select("s.*")->from(DB::table('rake_resources') . ' s')
+            ->innerJoin(DB::table('rake_hash_map') . ' h')
+            ->on('s.ID = h.resource_id')
+            ->where('h.sha256 = ?', $hash);
+
+        return $this->findQuery($query);
     }
 }

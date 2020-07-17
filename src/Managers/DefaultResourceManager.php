@@ -97,27 +97,4 @@ class DefaultResourceManager extends ResourceManager
         // Return this instance after get resource from database
         return $this;
     }
-
-    public function find(int $resouceId): ? Resource
-    {
-        $query = sql()->select("*")
-            ->from(DB::table('rake_resources'))
-            ->where('ID=?', $resourceId);
-
-        $row = DB::row($query);
-        if (empty($row)) {
-            return null;
-        }
-        $rake = Intances::find($row->rake_id);
-        if (is_null($rake)) {
-            return null;
-        }
-        $tooth = $rake->findTheTooth($row->tooth_id);
-        if (is_null($tooth)) {
-            return null;
-        }
-
-        $resource = Resource::create($row->guid, $row->resource_type, $tooth);
-        return $this->mapFromDB($resource, $row);
-    }
 }
