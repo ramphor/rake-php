@@ -16,7 +16,7 @@ interface Tooth
 
     public function validateSystemResource($newGuid, $newType): bool;
 
-    public function updateSystemResource(Resource $resource);
+    public function updatePostResource(Resource $resource);
 
-    public function updateParentSystemResource(Resource $resource, Resource $parentResource);
+    public function updateSystemResource(Resource $resource, Resource $parentResource);
 }

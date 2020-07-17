@@ -149,11 +149,11 @@ class Resource
 
         if ($this->imported && $this->tooth->validateSystemResource($this->newGuid, $this->newType)) {
             if ($this->type === 'link') {
-                $this->tooth->updateSystemResource($this);
+                $this->tooth->updatePostResource($this);
             }
             $parentResource = Resources::findParent($this->id);
             if (!is_null($parentResource)) {
-                $this->tooth->updateParentSystemResource($this, $parentResource);
+                $this->tooth->updateSystemResource($this, $parentResource);
             }
         }
         return $this->id;
