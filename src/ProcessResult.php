@@ -143,14 +143,14 @@ class ProcessResult
         if ($this->feedItem->coverImage) {
             array_push($resources, [
                 'guid' => new Link($this->feedId->coverImage, $this->feedItem->guid),
-                'type' => 'cover'
+                'type' => 'cover_image'
             ]);
         }
         if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
             foreach ($this->feedItem->galleryImages as $imageUrl) {
                 array_push($resources, [
                     'guid' => Link::create($imageUrl, $this->feedItem->guid),
-                    'type' => 'gallary',
+                    'type' => 'gallary_image',
                 ]);
             }
         }

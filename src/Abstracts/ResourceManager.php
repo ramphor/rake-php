@@ -136,7 +136,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     public function generateHash($data, $type)
     {
-        if (in_array($type, ['content_image', 'gallary', 'cover'])) {
+        if (in_array($type, ['content_image', 'gallary_image', 'cover_image'])) {
             return hash_file('sha256', $data);
         }
         return hash('sha256', $data);
