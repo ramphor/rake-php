@@ -142,7 +142,7 @@ class ProcessResult
         $resources = [];
         if ($this->feedItem->coverImage) {
             array_push($resources, [
-                'guid' => new Link($this->feedId->coverImage, $this->feedItem->guid),
+                'guid' => Link::create($this->feedItem->coverImage, $this->feedItem->guid),
                 'type' => 'cover_image'
             ]);
         }
