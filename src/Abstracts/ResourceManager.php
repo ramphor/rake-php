@@ -5,9 +5,9 @@ namespace Ramphor\Rake\Abstracts;
 use Ramphor\Sql as QueryBuilder;
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
-use Ramphor\Rake\Facades\Instances;
-use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Crawler;
+use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Facades\Instances;
 
 abstract class ResourceManager implements ResourceManagerContract
 {

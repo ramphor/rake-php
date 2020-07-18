@@ -10,11 +10,11 @@ class DefaultResourceManager extends ResourceManager
 {
     public function createFromResult($result): ResourceManager
     {
-        $this->resources = [];
-        $tooth           = $result->getTooth();
-        $rake            = $tooth->getRake();
-        $resultResources    = $result->getResources();
-        $parent =& Resource::create($result->getGuid(), 'link', $tooth);
+        $this->resources  = [];
+        $tooth            = $result->getTooth();
+        $rake             = $tooth->getRake();
+        $resultResources  = $result->getResources();
+        $parent           =& Resource::create($result->getGuid(), 'link', $tooth);
         if ($result->isSuccess()) {
             $parent->imported();
             $parent->setNewGuid($result->getNewGuid());
