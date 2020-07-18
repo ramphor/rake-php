@@ -44,7 +44,7 @@ class Resource
 
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (int)$id;
     }
 
     public function setParent(self $parent)
