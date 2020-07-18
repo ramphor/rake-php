@@ -71,11 +71,6 @@ class Rake
         static::$app->bind('logger', $logger);
     }
 
-    public function registerHtmlParser($closure)
-    {
-        static::$app->bind('document', $closure);
-    }
-
     public function registerResourceManager(ResourceManager $manager)
     {
         static::$app->bind('resources', $manager);
@@ -125,8 +120,6 @@ class Rake
             }
             // Sync the crawl URL from ProcessResult
             Crawler::syncFromResult($result);
-
-            var_dump(strlen($result->getContent(false)));
 
             // Import resources
             $resources = Resources::createFromResult($result);

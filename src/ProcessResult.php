@@ -3,7 +3,7 @@ namespace Ramphor\Rake;
 
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\Tooth;
-use Ramphor\Rake\Facades\Document;
+use PHPHtmlParser\Dom as Document;
 
 class ProcessResult
 {
@@ -90,9 +90,9 @@ class ProcessResult
     public function setFeedItem(FeedItem &$feedItem)
     {
         $this->feedItem = $feedItem;
-        $this->content  = Document::load(
-            (string)$feedItem->content
-        );
+        $this->content  = new Document();
+
+        $this->content->load((string)$feedItem->content);
     }
 
     public function getFeedItem()

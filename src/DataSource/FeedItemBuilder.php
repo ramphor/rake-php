@@ -2,7 +2,7 @@
 namespace Ramphor\Rake\DataSource;
 
 use Ramphor\Rake\Constracts\FeedItemBuilder as FeedItemBuilderConstract;
-use Ramphor\Rake\Facades\Document;
+use PHPHtmlParser\Dom as Document;
 
 class FeedItemBuilder implements FeedItemBuilderConstract
 {
@@ -76,7 +76,8 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
         if (isset($data['status']) && $data['status'] === 'success') {
             if ($this->dataType === 'html') {
-                $this->document = Document::load($data['body']);
+                $this->document = new Document();
+                $this->document->load($data['body']);
             }
         } else {
             $this->feedItem->setError($data['status']);
