@@ -126,6 +126,8 @@ class Rake
             // Sync the crawl URL from ProcessResult
             Crawler::syncFromResult($result);
 
+            var_dump(strlen($result->getContent(false)));
+
             // Import resources
             $resources = Resources::createFromResult($result);
             $resources->import();

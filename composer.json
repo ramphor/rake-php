@@ -15,7 +15,8 @@
         "psr/http-message": "1.0",
         "psr/http-client": "1.0",
         "psr/log": "^1.0.1",
-        "ramphor/sql": "1.0.0"
+        "ramphor/sql": "1.0.0",
+        "paquettg/php-html-parser": "2.2.1"
     },
     "autoload": {
         "psr-4": {
