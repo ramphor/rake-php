@@ -1,14 +1,14 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Iterator;
 use TypeError;
 use Ramphor\Rake\Rake;
+use Ramphor\Rake\Response;
 use Ramphor\Rake\Constracts\Tooth as ToothConstract;
-use Ramphor\Rake\DataSource\FeedItem;
-use Ramphor\Rake\DataSource\FeedItemBuilder;
 use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Abstracts\Processor;
+use Ramphor\Rake\DataSource\FeedItem;
+use Ramphor\Rake\DataSource\FeedItemBuilder;
 
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
@@ -100,27 +100,33 @@ abstract class Tooth implements ToothConstract
         return new $parsers[$this->toothFormat]($resource, $parserOptions);
     }
 
-    public function getItems(): Iterator
+    public function getParsers()
     {
-        if (empty($this->toothFormat)) {
-            throw new ToothFormatException();
+        if (empty($this->toothFormat) || empty($this->mappingFields)) {
+            return [];
         }
 
-        $response = $this->getResponse();
-        $parser   = $this->createParser(
-            $response,
-            $this->parserOptions()
-        );
+        $parsers = [];
+        foreach ($this->getResponses() as $response) {
+            if (!($response instanceof Response)) {
+                continue;
+            }
+            $parser = $this->createParser(
+                $response,
+                $this->parserOptions()
+            );
+            $feedItemBuilder = new FeedItemBuilder(
+                $this->mappingFields,
+                $this->toothFormat
+            );
 
-        if (empty($this->mappingFields)) {
-            return $parser;
+            $parser->setFeedItemBuilder($feedItemBuilder);
+
+            // Push parser item to parsers list
+            array_push($parsers, $parser);
         }
 
-        $feedItemBuilder = new FeedItemBuilder(
-            $this->mappingFields,
-            $this->toothFormat
-        );
-        return $parser->setFeedItemBuilder($feedItemBuilder);
+        return $parsers;
     }
 
     public function execute()

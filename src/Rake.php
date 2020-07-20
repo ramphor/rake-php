@@ -87,25 +87,29 @@ class Rake
         foreach ($this->teeth as $tooth) {
             // Crawl data from the feeds of tooth
             $tooth->execute();
-
-            $feedItems = $tooth->getItems();
             $processor = $tooth->getProcessor();
-
-            foreach ($feedItems as $feedItem) {
-                if (!$feedItem->isValid()) {
-                    $result = ProcessResult::createErrorResult(
-                        sprintf('The feed item "%s" is invalid', $feedItem->guid),
-                        $feedItem->errorType
-                    );
-                } else {
-                    $processor->setFeedItem($feedItem);
-                    $result = $processor->execute();
+            $parsers   = $tooth->getParsers();
+            foreach ($parsers as $feedItems) {
+                if (!($feedItems instanceof Iterator)) {
+                    continue;
                 }
-                $result->setFeedItem($feedItem);
-                $result->setProcessingTooth($tooth);
 
-                // Store all results
-                array_push($results, $result);
+                foreach ($feedItems as $feedItem) {
+                    if (!$feedItem->isValid()) {
+                        $result = ProcessResult::createErrorResult(
+                            sprintf('The feed item "%s" is invalid', $feedItem->guid),
+                            $feedItem->errorType
+                        );
+                    } else {
+                        $processor->setFeedItem($feedItem);
+                        $result = $processor->execute();
+                    }
+                    $result->setFeedItem($feedItem);
+                    $result->setProcessingTooth($tooth);
+
+                    // Store all results
+                    array_push($results, $result);
+                }
             }
         }
 

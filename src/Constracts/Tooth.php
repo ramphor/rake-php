@@ -1,16 +1,15 @@
 <?php
 namespace Ramphor\Rake\Constracts;
 
-use Iterator;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Response;
 use Ramphor\Rake\DataSource\FeedItem;
 
 interface Tooth
 {
-    public function getResponse(): Response;
+    public function getResponses();
 
-    public function getItems(): Iterator;
+    public function getParsers();
 
     public function downloadResource(Resource $resource): Resource;
 
