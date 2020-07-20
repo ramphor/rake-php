@@ -98,6 +98,7 @@ abstract class CrawlerTooth extends Tooth
             }
         }
 
+        // Create a responses list to integrate with Rake structure
         return [$response];
     }
 }

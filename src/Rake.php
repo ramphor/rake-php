@@ -87,10 +87,12 @@ class Rake
         foreach ($this->teeth as $tooth) {
             // Crawl data from the feeds of tooth
             $tooth->execute();
+
             $processor = $tooth->getProcessor();
             $parsers   = $tooth->getParsers();
+
             foreach ($parsers as $feedItems) {
-                if (!($feedItems instanceof Iterator)) {
+                if (!($feedItems instanceof \Iterator)) {
                     continue;
                 }
 
