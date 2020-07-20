@@ -57,7 +57,7 @@ abstract class CrawlerTooth extends Tooth
         return DB::get($sql);
     }
 
-    public function getResponse): Response
+    public function getResponse(): Response
     {
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
