@@ -106,7 +106,7 @@ abstract class Tooth implements ToothConstract
             throw new ToothFormatException();
         }
 
-        $response = $this->fetch();
+        $response = $this->getResponse);
         $parser   = $this->createParser(
             $response,
             $this->parserOptions()

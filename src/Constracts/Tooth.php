@@ -8,7 +8,7 @@ use Ramphor\Rake\DataSource\FeedItem;
 
 interface Tooth
 {
-    public function fetch(): Response;
+    public function getResponse): Response;
 
     public function getItems(): Iterator;
 
