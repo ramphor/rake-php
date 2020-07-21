@@ -62,7 +62,7 @@ class Parser extends AbstractParser
             $this->currentRow = array_combine($this->header, $row);
         }
 
-        $this->feedBuilder->newItem($row);
+        $this->feedBuilder->newItem($this->currentRow);
         $this->feedBuilder->build();
 
         return $this->feedBuilder->getFeedItem();
