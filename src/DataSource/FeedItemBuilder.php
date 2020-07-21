@@ -71,16 +71,21 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     public function newItem($data)
     {
         $this->document     = null;
-        $this->feedItem     =  new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
-        $this->originalData = $data['body'];
-
-        if (isset($data['status']) && $data['status'] === 'success') {
-            if ($this->dataType === 'html') {
-                $this->document = new Document();
-                $this->document->load($data['body']);
+        // $data['body'] is exists when call `append()` method of Response object
+        if (isset($data['body'])) {
+            $this->feedItem     =  new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
+            $this->originalData = $data['body'];
+            if (isset($data['status']) && $data['status'] === 'success') {
+                if ($this->dataType === 'html') {
+                    $this->document = new Document();
+                    $this->document->load($data['body']);
+                }
+            } else {
+                $this->feedItem->setError($data['status']);
             }
         } else {
-            $this->feedItem->setError($data['status']);
+            $this->feedItem = new FeedItem();
+            $this->originalData = $data;
         }
     }
 
@@ -102,8 +107,13 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                     $mappingField->getSource(),
                     $mappingField
                 );
-            } elseif ($mappingField->getSourceType() == 'regex') {
+            } elseif ($mappingField->getSourceType() === 'regex') {
                 $value = $this->getRegexValue(
+                    $mappingField->getSource(),
+                    $mappingField
+                );
+            } elseif ($mappingField->getSourceType() === 'attribute') {
+                $value = $this->getAttributeValue(
                     $mappingField->getSource(),
                     $mappingField
                 );
@@ -197,7 +207,17 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         return $mappingField->getDefaultValue();
     }
 
-    public function getAttributeValue($attribue)
+    public function getAttributeValue($attribute, $mappingField)
     {
+        $attributeKeys = explode('.', $attribute);
+        $value         = $this->originalData;
+        foreach ($attributeKeys as $attributeKey) {
+            if (!isset($value[$attributeKey])) {
+                return $mappingField->getDefaultValue();
+            }
+            $value = $value[$attributeKey];
+        }
+
+        return $value;
     }
 }

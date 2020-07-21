@@ -12,6 +12,7 @@ use Ramphor\Rake\Facades\Crawler;
 use Ramphor\Rake\Facades\Resources;
 use Ramphor\Rake\Managers\InstanceManager;
 use Ramphor\Rake\Managers\CrawlerManager;
+use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Exceptions\RuntimeException;
 
 class Rake
@@ -99,6 +100,10 @@ class Rake
                 // Reset the Iterator
                 $feedItems->rewind();
                 foreach ($feedItems as $feedItem) {
+                    if (!($feedItem instanceof FeedItem)) {
+                        continue;
+                    }
+
                     if (!$feedItem->isValid()) {
                         $result = ProcessResult::createErrorResult(
                             sprintf('The feed item "%s" is invalid', $feedItem->guid),
