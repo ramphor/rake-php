@@ -78,6 +78,8 @@ class FeedItemBuilder implements FeedItemBuilderConstract
             if (isset($data['status']) && $data['status'] === 'success') {
                 if ($this->dataType === 'html') {
                     $this->document = new Document();
+
+                    // Create HTML Document from original HTML
                     $this->document->load($data['body']);
                 }
             } else {
@@ -212,10 +214,19 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         $attributeKeys = explode('.', $attribute);
         $value         = $this->originalData;
         foreach ($attributeKeys as $attributeKey) {
-            if (!isset($value[$attributeKey])) {
+            if (is_array($value)) {
+                if (!isset($value[$attributeKey])) {
+                    return $mappingField->getDefaultValue();
+                }
+                $value = $value[$attributeKey];
+            } elseif (is_object($value)) {
+                if (!isset($value->$attributeKey)) {
+                    return $mappingField->getDefaultValue();
+                }
+                $value = $value->$attributeKey;
+            } else {
                 return $mappingField->getDefaultValue();
             }
-            $value = $value[$attributeKey];
         }
 
         return $value;
