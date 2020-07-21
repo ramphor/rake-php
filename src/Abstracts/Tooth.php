@@ -145,4 +145,8 @@ abstract class Tooth implements ToothConstract
             }
         }
     }
+
+    public function parserOptions()
+    {
+    }
 }

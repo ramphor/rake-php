@@ -6,6 +6,7 @@ use Ramphor\Rake\DataSource\FeedItem;
 
 class Parser extends AbstractParser
 {
+    protected $feedBuilder;
     protected $currentIndex = 0;
 
     public function key()

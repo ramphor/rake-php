@@ -7,15 +7,14 @@ use Ramphor\Rake\DataSource\FeedItem;
 class Parser extends AbstractParser
 {
     protected $delimeter = ',';
-
     protected $enclosure = '"';
+    protected $escape    = '\\';
+    protected $hasHeader = false;
+    protected $header    = [];
 
-    protected $escape = '\\';
-
-    protected $header;
     protected $contentSize;
-
     protected $currentRow;
+    protected $feedBuilder;
 
     public function setDelimeter(string $delimeter = ',')
     {
@@ -35,9 +34,10 @@ class Parser extends AbstractParser
     public function setHeader($headerFields = true)
     {
         if (is_array($headerFields)) {
+            $this->hasHeader = true;
             $this->header = $headerFields;
         } else {
-            $this->header = (bool) $headerFields;
+            $this->hasHeader = (bool) $headerFields;
         }
     }
 
@@ -61,7 +61,11 @@ class Parser extends AbstractParser
         } else {
             $this->currentRow = array_combine($this->header, $row);
         }
-        return new FeedItem($this->currentRow);
+
+        $this->feedBuilder->newItem($row);
+        $this->feedBuilder->build();
+
+        return $this->feedBuilder->getFeedItem();
     }
 
     public function next()
@@ -76,10 +80,18 @@ class Parser extends AbstractParser
     {
         rewind($this->data);
 
-        $header = fgets($this->data);
+        if ($this->hasHeader) {
+            $header = fgetcsv(
+                $this->data,
+                $this->contentSize,
+                $this->delimeter,
+                $this->enclosure,
+                $this->escape
+            );
 
-        if ((bool) $this->header) {
-            $this->header = str_getcsv($header, $this->delimeter, $this->enclosure, $this->escape);
+            if (empty($this->header)) {
+                $this->header = $header;
+            }
         }
 
         $this->rowCounter  = 0;

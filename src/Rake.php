@@ -96,6 +96,8 @@ class Rake
                     continue;
                 }
 
+                // Reset the Iterator
+                $feedItems->rewind();
                 foreach ($feedItems as $feedItem) {
                     if (!$feedItem->isValid()) {
                         $result = ProcessResult::createErrorResult(

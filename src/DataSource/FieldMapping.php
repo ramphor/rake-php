@@ -3,6 +3,8 @@ namespace Ramphor\Rake\DataSource;
 
 class FieldMapping
 {
+    protected static $supportedSourceTypes = ["xpath", "dom", "regex", "attribute"];
+
     protected $sourceField;
     protected $destField;
     protected $sourceType;
@@ -10,9 +12,7 @@ class FieldMapping
     protected $isRequired   = false;
     protected $defaultValue = null;
     protected $metas        = [];
-
-    protected $supportedSourceTypes = ["xpath", "dom", "regex", "attribute"];
-    protected $callbacks = [];
+    protected $callbacks    = [];
 
     public function __construct($sourceField, $destField, $sourceType, $isRequired = false, $defaultValue = null)
     {
@@ -46,7 +46,7 @@ class FieldMapping
     public function setSourceType($souceType)
     {
         $souceType = strtolower(trim($souceType));
-        if (!in_array($souceType, $this->supportedSourceTypes)) {
+        if (!in_array($souceType, self::$supportedSourceTypes)) {
             throw new \Exception("Invalid resource type");
         }
         $this->sourceType = $souceType;
