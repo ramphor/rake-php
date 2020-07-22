@@ -14,7 +14,7 @@ class DefaultResourceManager extends ResourceManager
         $tooth            = $result->getTooth();
         $rake             = $tooth->getRake();
         $resultResources  = $result->getResources();
-        $parent           =& Resource::create($result->getGuid(), 'link', $tooth);
+        $parent           = Resource::create($result->getGuid(), 'link', $tooth);
         if ($result->isSuccess()) {
             $parent->imported();
             $parent->setNewGuid($result->getNewGuid());
@@ -33,13 +33,15 @@ class DefaultResourceManager extends ResourceManager
                 continue;
             }
 
-            $resource =& Resource::create(
+            $resource = Resource::create(
                 (string)$resultResource['guid'],
                 $resultResource['type'],
                 $tooth
             );
             $resource->setParent($parent);
-            array_push($this->resources, $resource);
+
+            // Make reference
+            $this->resources[] =& $resource;
         }
 
         // Freeup memory
@@ -89,7 +91,7 @@ class DefaultResourceManager extends ResourceManager
                 $filesResource->resource_type,
                 $tooth
             );
-            $resource =& $this->mapFromDB($resource, $filesResource);
+            $resource = $this->mapFromDB($resource, $filesResource);
 
             array_push($this->resources, $resource);
         }
