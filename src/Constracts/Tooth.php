@@ -11,7 +11,7 @@ interface Tooth
 
     public function getParsers();
 
-    public function downloadResource(Resource $resource): Resource;
+    public function downloadResource(Resource &$resource): Resource;
 
     public function validateSystemResource($newGuid, $newType): bool;
 
