@@ -135,7 +135,7 @@ abstract class Tooth implements ToothConstract
             return;
         }
         foreach ($this->getFeeds() as $feed) {
-            if (!$feed->validate()) {
+            if (!$feed->valid()) {
                 continue;
             }
             $response = new Response(Response::TYPE_STREAM);
