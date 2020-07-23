@@ -83,9 +83,8 @@ class Rake
             // Add the log warning later
             return;
         }
-
-        $results = [];
         foreach ($this->teeth as $tooth) {
+            $results = [];
             // Crawl data from the feeds of tooth
             $tooth->execute();
 
@@ -118,12 +117,12 @@ class Rake
                     array_push($results, $result);
                 }
             }
-        }
 
-        $this->sync($results);
+            $this->sync($tooth, $results);
+        }
     }
 
-    public function sync($results)
+    public function sync($tooth, $results)
     {
         foreach ($results as $result) {
             if (!($result instanceof ProcessResult)) {
@@ -133,13 +132,13 @@ class Rake
             Crawler::syncFromResult($result);
 
             // Import resources
-            $resources = Resources::createFromResult($result);
+            $resources = Resources::createFromResult($result, $tooth);
             $resources->import();
             $resources->importCrawlUrls();
         }
 
         if (Option::isAutoTransferFiles()) {
-            $resources = Resources::getFilesFromDatabase();
+            $resources = Resources::getFilesFromDatabase($tooth);
             $resources->transferFiles();
         }
     }

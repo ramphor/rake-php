@@ -25,6 +25,7 @@ abstract class Tooth implements ToothConstract
     protected $mappingFields      = [];
     protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $skipCheckTooth     = false;
+    protected $limitQueryResource = 10;
 
     protected $id;
     protected $rake;
@@ -161,5 +162,10 @@ abstract class Tooth implements ToothConstract
     public function getResponses()
     {
         return $this->responses;
+    }
+
+    public function limitQueryResource()
+    {
+        return $this->limitQueryResource;
     }
 }

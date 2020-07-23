@@ -2,16 +2,19 @@
 namespace Ramphor\Rake\Managers;
 
 use Ramphor\Rake\Abstracts\ResourceManager;
+use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Instances;
 
 class DefaultResourceManager extends ResourceManager
 {
-    public function createFromResult($result): ResourceManager
+    public function createFromResult($result, $tooth = null): ResourceManager
     {
+        if (is_null($tooth)) {
+            $tooth = $result->getTooth();
+        }
         $this->resources  = [];
-        $tooth            = $result->getTooth();
         $rake             = $tooth->getRake();
         $resultResources  = $result->getResources();
         $parent           = Resource::create($result->getGuid(), 'link', $tooth);
@@ -51,13 +54,18 @@ class DefaultResourceManager extends ResourceManager
         return $this;
     }
 
-    protected function queryFileResources()
+    protected function queryFileResources($rakeId, $toothId, $limit = 10)
     {
         $query = sql()->select('*')
             ->from(DB::table('rake_resources'))
-            ->where('imported=? AND resource_type <> ?', 0, 'link')
-            ->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
-            ->limit(10);
+            ->where(
+                'rake_id =? AND tooth_id = ? AND imported=? AND resource_type <> ?',
+                $rakeId,
+                $toothId,
+                0,
+                'link'
+            )->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
+            ->limit($limit);
         $rows = DB::get($query);
 
         return empty($rows) ? [] : $rows;
@@ -74,10 +82,15 @@ class DefaultResourceManager extends ResourceManager
         return $rake->findTooth($toothId);
     }
 
-    public function getFilesFromDatabase(): ResourceManager
+    public function getFilesFromDatabase(Tooth $tooth): ResourceManager
     {
         $this->resources = [];
-        $filesResources  = $this->queryFileResources();
+        $rake            = $tooth->getRake();
+        $filesResources  = $this->queryFileResources(
+            $rake>getId(),
+            $tooth->getId(),
+            $tooth->limitQueryResource()
+        );
 
         foreach ($filesResources as $filesResource) {
             $tooth = $this->findTheTooth($filesResource->rake_id, $filesResource->tooth_id);
