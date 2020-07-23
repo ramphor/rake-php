@@ -21,6 +21,7 @@ abstract class Tooth implements ToothConstract
     public const FORMAT_HTML = 'html';
 
     protected $feeds              = [];
+    protected $responses          = [];
     protected $mappingFields      = [];
     protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $skipCheckTooth     = false;
