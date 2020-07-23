@@ -87,7 +87,7 @@ class DefaultResourceManager extends ResourceManager
         $this->resources = [];
         $rake            = $tooth->getRake();
         $filesResources  = $this->queryFileResources(
-            $rake>getId(),
+            $rake->getId(),
             $tooth->getId(),
             $tooth->limitQueryResource()
         );
