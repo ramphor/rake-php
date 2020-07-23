@@ -20,9 +20,9 @@ abstract class Tooth implements ToothConstract
     public const FORMAT_CSV  = 'csv';
     public const FORMAT_HTML = 'html';
 
-    protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $feeds              = [];
     protected $mappingFields      = [];
+    protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $skipCheckTooth     = false;
 
     protected $id;
@@ -131,18 +131,20 @@ abstract class Tooth implements ToothConstract
 
     public function execute()
     {
-        // Run feeds before get feed items
-        $feeds = $this->getFeeds();
-        if (count($feeds) > 0) {
-            foreach ($feeds as $feed) {
-                $executedTimes = $feed->getOption('executed_times', 0);
-                if ($feed->getLifeCycle() <= $executedTimes) {
-                    continue;
-                }
-
-                $feed->execute();
-                $feed->updateOption('executed_times', $executedTimes + 1);
+        if (count($this->getFeeds()) <= 0) {
+            return;
+        }
+        foreach ($this->getFeeds() as $feed) {
+            if (!$feed->validate()) {
+                continue;
             }
+            $response = new Response(Response::TYPE_STREAM);
+            $response->setBody($feed->execute());
+
+            array_push($this->responses, $response);
+
+            // Update feed to get next page, next run
+            $feed->next();
         }
     }
 
