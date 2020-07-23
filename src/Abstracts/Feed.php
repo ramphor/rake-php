@@ -9,13 +9,6 @@ use Ramphor\Rake\Constracts\Feed as FeedConstract;
 
 abstract class Feed implements FeedConstract
 {
-    const LIFE_CYCLE_ONE_TIME = 1;
-
-    protected $lifeCycle = self::LIFE_CYCLE_ONE_TIME;
-    protected $allowedLifeCycles = [
-        self::LIFE_CYCLE_ONE_TIME,
-    ];
-
     protected $id;
     protected $tooth;
     protected $options;
@@ -44,19 +37,6 @@ abstract class Feed implements FeedConstract
     public function getTooth(): Tooth
     {
         return $this->tooth;
-    }
-
-    public function setLifeCycle($lifeCycle)
-    {
-        if (in_array($lifeCycle, $this->allowedLifeCycles)) {
-            throw new \Exception(sprintf("Invalid life cycle %d", $lifeCycle));
-        }
-        $this->lifeCycle = $lifeCycle;
-    }
-
-    public function getLifeCycle()
-    {
-        return $this->lifeCycle;
     }
 
     public function urlExists(Link $url)
