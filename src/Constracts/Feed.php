@@ -5,7 +5,7 @@ interface Feed
 {
     public function execute();
 
-    public function validate();
+    public function valid();
 
     public function next();
 
