@@ -157,4 +157,9 @@ abstract class Tooth implements ToothConstract
     public function parserOptions()
     {
     }
+
+    public function getResponses()
+    {
+        return $this->responses;
+    }
 }
