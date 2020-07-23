@@ -22,4 +22,21 @@ class Sitemap extends Feed
             $this->insertCrawlUrl($link);
         }
     }
+
+    public function valid()
+    {
+        $executed = $this->getOption('executed', false);
+
+        return empty($executed);
+    }
+
+    public function next()
+    {
+        $this->updateOption('executed', true);
+    }
+
+    public function rewind()
+    {
+        $this->updateOption('executed', false);
+    }
 }
