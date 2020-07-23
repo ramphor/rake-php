@@ -138,10 +138,15 @@ abstract class Tooth implements ToothConstract
             if (!$feed->valid()) {
                 continue;
             }
-            $response = new Response(Response::TYPE_STREAM);
-            $response->setBody($feed->execute());
 
-            array_push($this->responses, $response);
+            if ($feed->hasResponse()) {
+                $response = new Response(Response::TYPE_STREAM);
+                $response->setBody($feed->execute());
+
+                array_push($this->responses, $response);
+            } else {
+                $feed->execute();
+            }
 
             // Update feed to get next page, next run
             $feed->next();

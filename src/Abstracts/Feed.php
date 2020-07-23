@@ -9,6 +9,8 @@ use Ramphor\Rake\Constracts\Feed as FeedConstract;
 
 abstract class Feed implements FeedConstract
 {
+    protected $hasResponse = false;
+
     protected $id;
     protected $tooth;
     protected $options;
@@ -152,5 +154,10 @@ abstract class Feed implements FeedConstract
             return [];
         }
         return unserialize($options);
+    }
+
+    public function hasResponse()
+    {
+        return (bool)$this->hasResponse;
     }
 }
