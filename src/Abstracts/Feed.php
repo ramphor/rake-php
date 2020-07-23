@@ -99,14 +99,13 @@ abstract class Feed implements FeedConstract
         $sql = null;
         if (DB::exists($exists_sql)) {
             $sql = sql()->update(DB::table('rake_feeds'))
-            ->set(
-                'rake_id=?, tooth_id=?, feed_id=?, options=?, last_execute=@',
-                $rake->getId(),
-                $tooth->getId(),
-                $this->getId(),
-                serialize($this->options),
-                'NOW()'
-            );
+            ->set([
+                'rake_id'       => $rake->getId(),
+                'tooth_id'      => $tooth->getId(),
+                'feed_id'       => $this->getId(),
+                'options'       => serialize($this->options),
+                '@last_execute' => 'NOW()'
+            ]);
         } else {
             $sql = sql()->insertInto(DB::table('rake_feeds'), ['rake_id', 'tooth_id', 'feed_id', 'options', 'last_execute'])
                 ->values(
