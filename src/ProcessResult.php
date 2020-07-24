@@ -34,7 +34,7 @@ class ProcessResult
 
     public static function createErrorResult($errorMessage, $errorType = 'skip'): self
     {
-        $result = new static($guid);
+        $result = new static(null);
         $result->addErrorMessage($errorMessage);
 
         return $result->setResultType($errorType);
