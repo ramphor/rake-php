@@ -141,7 +141,7 @@ class Rake
             $resources->import();
             $resources->importCrawlUrls();
         }
-        var_dump(Option::isAutoTransferFiles());
+
         if (Option::isAutoTransferFiles()) {
             $resources = Resources::getFilesFromDatabase($tooth);
             $resources->transferFiles();
