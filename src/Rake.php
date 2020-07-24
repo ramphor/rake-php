@@ -10,8 +10,10 @@ use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Facades\Facade;
 use Ramphor\Rake\Facades\Crawler;
 use Ramphor\Rake\Facades\Resources;
+use Ramphor\Rake\Facades\Option;
 use Ramphor\Rake\Managers\InstanceManager;
 use Ramphor\Rake\Managers\CrawlerManager;
+use Ramphor\Rake\Managers\OptionManager;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Exceptions\RuntimeException;
 
@@ -40,6 +42,9 @@ class Rake
         }
         static::$app->bind('crawler', function () {
             return new CrawlerManager();
+        });
+        static::$app->bind('option', function () {
+            return new OptionManager();
         });
 
         static::$app->bind('instances', new InstanceManager());
@@ -136,7 +141,7 @@ class Rake
             $resources->import();
             $resources->importCrawlUrls();
         }
-
+        var_dump(Option::isAutoTransferFiles());
         if (Option::isAutoTransferFiles()) {
             $resources = Resources::getFilesFromDatabase($tooth);
             $resources->transferFiles();
