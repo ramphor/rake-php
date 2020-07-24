@@ -140,8 +140,14 @@ class Rake
             $resources = Resources::createFromResult($result, $tooth);
             $resources->import();
             $resources->importCrawlUrls();
+
+            // Transfer the resources are fetched from the feed
+            if ($tooth->isTransferResources()) {
+                $resources->transferFiles();
+            }
         }
 
+        // Transfer the resources are not imported from Database
         if (Option::isAutoTransferFiles()) {
             $resources = Resources::getFilesFromDatabase($tooth);
             $resources->transferFiles();
