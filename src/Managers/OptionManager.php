@@ -10,7 +10,7 @@ class OptionManager
         ],
     ];
 
-    public function register($optionName, $optionValue, $override = true)
+    public function set($optionName, $optionValue, $override = true)
     {
         if (!isset($this->options[$optionName])) {
             $this->options[$optionName] = [
@@ -54,6 +54,6 @@ class OptionManager
             }
         }, $name);
         array_unshift($args, $optionName);
-        return call_user_func_array([$this, 'register'], $args);
+        return call_user_func_array([$this, 'set'], $args);
     }
 }
