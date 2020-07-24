@@ -58,21 +58,23 @@ abstract class Feed implements FeedConstract
         return DB::exists($sql);
     }
 
-    public function insertCrawlUrl(Link $url, $checkingTooth = true)
+    public function insertCrawlUrl(Link $url)
     {
         $tooth = $this->getTooth();
         $rake = $tooth->getRake();
 
-        if (!$checkingTooth) {
-            $tooth = null;
+        if ($tooth->isSkipCheckTooth()) {
+            $toothId = null;
+        } else {
+            $toothId = $tooth->getId();
         }
 
         if (!$this->urlExists($url)) {
             $sql = sql()->insertInto(
                 DB::table('rake_crawled_urls'),
-                ['url', 'rake_id', 'crawled', 'retry', 'created_at', 'updated_at']
+                ['url', 'rake_id', 'tooth_id', 'crawled', 'retry', 'created_at', 'updated_at']
             )
-            ->values('?, ?, ?, ?, @, @', (string)$url, $rake->getId(), 0, 0, 'NOW()', 'NOW()');
+            ->values('?, ?, ?, ?, ?, @, @', (string)$url, $rake->getId(), $toothId, 0, 0, 'NOW()', 'NOW()');
 
             return DB::query($sql);
         }
