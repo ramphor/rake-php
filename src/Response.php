@@ -32,7 +32,7 @@ final class Response implements ResponseConstract
     {
         $this->body[] = [
             'guid' => $guid,
-            'body' => $body,
+            'body' => is_null($body) ? '' : $body,
             'urlID' => $urlID,
             'status' => $status,
         ];
