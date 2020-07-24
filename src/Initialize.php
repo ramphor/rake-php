@@ -58,7 +58,7 @@ class Initialize
                 `new_type` varchar(255) DEFAULT NULL,
                 `created_at` timestamp NULL DEFAULT NULL,
                 PRIMARY KEY (`ID`)',
-            'rake_feeds' => "`ID` int(11) NOT NULL,
+            'rake_feeds' => "`ID` int(11) NOT NULL AUTO_INCREMENT,
                 `rake_id` varchar(255) NOT NULL,
                 `tooth_id` varchar(255) NOT NULL,
                 `feed_id` varchar(255) NOT NULL,

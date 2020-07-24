@@ -25,7 +25,7 @@ abstract class Tooth implements ToothConstract
     protected $mappingFields      = [];
     protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $skipCheckTooth     = false;
-    protected $transferResources   = false;
+    protected $transferResources  = false;
     protected $limitQueryResource = 10;
 
     protected $id;
@@ -50,14 +50,9 @@ abstract class Tooth implements ToothConstract
         return $this->rake;
     }
 
-    public function skipCheckToothWhenCrawl($skip = false)
-    {
-        $this->skipCheckTooth = (bool)$skip;
-    }
-
     public function isSkipCheckTooth()
     {
-        return $this->skipCheckTooth;
+        return (bool) $this->skipCheckTooth;
     }
 
     public function registerProcessor(Processor $processor)
