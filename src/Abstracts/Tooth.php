@@ -50,11 +50,6 @@ abstract class Tooth implements ToothConstract
         return $this->rake;
     }
 
-    public function skipCheckToothWhenCrawl($skip = false)
-    {
-        $this->skipCheckTooth = (bool)$skip;
-    }
-
     public function isSkipCheckTooth()
     {
         return $this->skipCheckTooth;
