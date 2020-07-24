@@ -11,6 +11,7 @@ use Ramphor\Sql as QueryBuilder;
 abstract class CrawlerTooth extends Tooth
 {
     protected $validateResponse = false;
+    protected $limitQueryUrls = 10;
 
     public function crawlRequestOptions()
     {
@@ -28,7 +29,7 @@ abstract class CrawlerTooth extends Tooth
     {
         return $query
             ->orderBy('retry ASC, updated_at ASC, ID ASC')
-            ->limit(10);
+            ->limit($this->limitQueryUrls);
     }
 
     public function getCrawlUrls()
