@@ -44,5 +44,16 @@ class OptionManager
             }, $name);
             return $this->get(ltrim($optionName, '_'), false);
         }
+
+        if (!isset($args[0])) {
+            $args[1] = true;
+        }
+        $optionName = preg_replace_callback('/([A-Z])/', function ($matches) {
+            if (isset($matches[1])) {
+                return sprintf('_%s', strtolower($matches[1]));
+            }
+        }, $name);
+        array_unshift($args, $optionName);
+        return call_user_func_array([$this, 'register'], $args);
     }
 }
