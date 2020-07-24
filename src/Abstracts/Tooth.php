@@ -52,7 +52,7 @@ abstract class Tooth implements ToothConstract
 
     public function isSkipCheckTooth()
     {
-        return $this->skipCheckTooth;
+        return (bool) $this->skipCheckTooth;
     }
 
     public function registerProcessor(Processor $processor)
