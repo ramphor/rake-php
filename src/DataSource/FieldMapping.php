@@ -43,13 +43,13 @@ class FieldMapping
         return $this->destField;
     }
 
-    public function setSourceType($souceType)
+    public function setSourceType($sourceType)
     {
-        $souceType = strtolower(trim($souceType));
-        if (!in_array($souceType, self::$supportedSourceTypes)) {
+        $sourceType = strtolower(trim($sourceType));
+        if (!in_array($sourceType, self::$supportedSourceTypes)) {
             throw new \Exception("Invalid resource type");
         }
-        $this->sourceType = $souceType;
+        $this->sourceType = $sourceType;
     }
 
     public function getSourceType()
