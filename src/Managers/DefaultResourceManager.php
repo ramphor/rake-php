@@ -44,7 +44,7 @@ class DefaultResourceManager extends ResourceManager
             $resource->setParent($parent);
 
             // Make reference
-            $this->resources[] =& $resource;
+            $this->resources[] = $resource;
         }
 
         // Freeup memory
