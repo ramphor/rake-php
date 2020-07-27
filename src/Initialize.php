@@ -47,6 +47,7 @@ class Initialize
                 `new_guid` text,
                 `new_type` varchar(255) DEFAULT NULL,
                 `imported` tinyint(4) NOT NULL DEFAULT 0,
+                `skipped` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'Use when resource is errors',
                 `retry` int(11) NOT NULL DEFAULT 0,
                 `created_at` timestamp NULL DEFAULT NULL,
                 `updated_at` timestamp NULL DEFAULT NULL,
