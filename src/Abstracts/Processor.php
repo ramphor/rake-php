@@ -28,4 +28,15 @@ abstract class Processor implements ProcessorConstract
     {
         $this->feedItem = $feedItem;
     }
+
+    protected function checkImageIsFound($imageUrl)
+    {
+        try {
+            $response = Client::request('HEAD', $imageUrl, ['http_errors' => false, 'allow_redirects' => true]);
+            return $response->getStatusCode() < 400;
+        } catch (\Exception $e) {
+            // Will logging later
+        }
+        return false;
+    }
 }
