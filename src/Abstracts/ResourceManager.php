@@ -17,16 +17,17 @@ abstract class ResourceManager implements ResourceManagerContract
     public function import()
     {
         foreach ($this->resources as $resource) {
-            $resourceId = $resource->save();
+            $parentId   = 0;
             $parent     = $resource->parent;
             if ($parent) {
                 $parentId = $parent->findId();
                 if ($parentId <= 0) {
                     $parentId = $parent->save();
                 }
-                if ($parentId <= 0) {
-                    continue;
-                }
+            }
+
+            $resourceId = $resource->save();
+            if ($parentId > 0) {
                 $this->createRelation($resourceId, $parentId);
             }
         }
