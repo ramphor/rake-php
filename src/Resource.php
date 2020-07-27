@@ -18,6 +18,7 @@ class Resource
 
     protected $newType;
     protected $newGuid;
+    protected $skipped;
     protected $tooth;
 
     // Parent resource
@@ -87,6 +88,11 @@ class Resource
         $this->imported = true;
     }
 
+    public function skip()
+    {
+        $this->skipped = true;
+    }
+
     public function setNewType($newType)
     {
         $this->newType = $newType;
@@ -125,6 +131,7 @@ class Resource
             'new_guid'    => $this->newGuid,
             'new_type'    => $this->newType,
             'imported'    => (int)$this->imported,
+            'skipped'     => (int)$this->skipped,
             '@updated_at' => 'NOW()'
         ];
         if (!$this->imported) {

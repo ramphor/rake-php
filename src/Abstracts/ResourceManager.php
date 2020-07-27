@@ -73,11 +73,17 @@ abstract class ResourceManager implements ResourceManagerContract
         }
         foreach ($this->resources as $resource) {
             $tooth    = $resource->getTooth();
-            $resource = $tooth->downloadResource($resource);
+            try {
+                $resource = $tooth->downloadResource($resource);
+            } catch (\Exception $e) {
+                $resource->skip();
+
+                // Will logging and processing later
+            }
 
             /* After download files via Tooth.
-             * Rake will be update resource to database with new GUID and Type
-             */
+            * Rake will be update resource to database with new GUID and Type
+            */
             $resource->save();
         }
     }

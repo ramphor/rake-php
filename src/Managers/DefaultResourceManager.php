@@ -59,9 +59,10 @@ class DefaultResourceManager extends ResourceManager
         $query = sql()->select('*')
             ->from(DB::table('rake_resources'))
             ->where(
-                'rake_id =? AND tooth_id = ? AND imported=? AND resource_type <> ?',
+                'rake_id =? AND tooth_id = ? AND imported=? AND skipped = ? AND resource_type <> ?',
                 $rakeId,
                 $toothId,
+                0,
                 0,
                 'link'
             )->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
