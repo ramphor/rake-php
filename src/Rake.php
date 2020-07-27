@@ -136,14 +136,16 @@ class Rake
             // Sync the crawl URL from ProcessResult
             Crawler::syncFromResult($result);
 
-            // Import resources
-            $resources = Resources::createFromResult($result, $tooth);
-            $resources->import();
-            $resources->importCrawlUrls();
+            if ($result->isSuccess()) {
+                // Import resources
+                $resources = Resources::createFromResult($result, $tooth);
+                $resources->import();
+                $resources->importCrawlUrls();
 
-            // Transfer the resources are fetched from the feed
-            if ($tooth->isTransferResources()) {
-                $resources->transferFiles();
+                // Transfer the resources are fetched from the feed
+                if ($tooth->isTransferResources()) {
+                    $resources->transferFiles();
+                }
             }
         }
 
