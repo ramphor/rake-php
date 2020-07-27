@@ -187,6 +187,10 @@ class ProcessResult
         $resources = [];
         $links     = $this->content->find('a');
         foreach ($links as $link) {
+            if (preg_match('/^#/', $link)) {
+                continue;
+            }
+
             $url = Link::create($link->getAttribute('href'), $this->feedItem->guid);
             array_push($resources, [
                 'guid' => $url,
