@@ -138,7 +138,7 @@ class Resource
             $values['@retry'] = 'retry + 1';
         }
         if ($this->contentChanged) {
-            $values['content'] = $this->content;
+            $values['content_text'] = $this->content;
         }
 
         $query = sql()->update(DB::table('rake_resources'))
