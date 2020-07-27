@@ -5,6 +5,7 @@ use Monolog\Logger;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\DataSource\FeedItem;
+use Ramphor\Rake\Facades\Client;
 
 abstract class Processor implements ProcessorConstract
 {
