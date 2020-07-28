@@ -5,10 +5,22 @@ use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Instances;
 
 class DefaultResourceManager extends ResourceManager
 {
+    protected function checkLinkResourceIsOk($resource)
+    {
+        if (!$resource['guid']->isSameSource()) {
+            return false;
+        }
+        $response = Client::request('HEAD', (string)$resource['guid']);
+        $mimeType = $response->getHeaderLine('Content-Type');
+
+        return preg_match('/^(text|application)\//', $mimeType);
+    }
+
     public function createFromResult($result, $tooth = null): ResourceManager
     {
         if (is_null($tooth)) {
@@ -29,7 +41,7 @@ class DefaultResourceManager extends ResourceManager
             // Parse link to ensure working correctly
             $resultResource['guid']->parse();
 
-            if ($resultResource['type'] === 'link' && !$resultResource['guid']->isSameSource()) {
+            if ($resultResource['type'] === 'link' && !$this->checkLinkResourceIsOk($resultResource)) {
                 continue;
             }
             if (!in_array($resultResource['guid']->scheme, $this->protocols)) {
