@@ -40,4 +40,15 @@ abstract class Processor implements ProcessorConstract
         }
         return false;
     }
+
+    /**
+     * Convert image URL to real URL if need
+     * Default Rake doesn't do anything image URL
+     * @param string $imageUrl
+     * @return string the image URL after convert
+     */
+    public function convertImageUrl($imageUrl)
+    {
+        return $imageUrl;
+    }
 }
