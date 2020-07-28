@@ -110,7 +110,7 @@ class ProcessResult
 
     public function setProcessingTooth(Tooth &$tooth)
     {
-        $this->tooth     = $tooth;
+        $this->tooth = $tooth;
     }
 
     public function getTooth()
