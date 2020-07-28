@@ -110,7 +110,7 @@ class ProcessResult
 
     public function setProcessingTooth(Tooth &$tooth)
     {
-        $this->tooth = $tooth;
+        $this->tooth     = $tooth;
     }
 
     public function getTooth()
@@ -140,40 +140,51 @@ class ProcessResult
     protected function getFeedImagesResources()
     {
         $resources = [];
+        $processor = $this->tooth->getProcessor();
         if ($this->feedItem->coverImage) {
+            $convertedUrl = $processor->convertImageUrl($this->feedItem->coverImage);
             array_push($resources, [
-                'guid' => Link::create($this->feedItem->coverImage, $this->feedItem->guid),
+                'guid' => Link::create($convertedUrl, $this->feedItem->guid),
                 'type' => 'cover_image'
             ]);
         }
         if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
             foreach ($this->feedItem->galleryImages as $imageUrl) {
+                $convertedUrl = $processor->convertImageUrl($imageUrl);
                 array_push($resources, [
-                    'guid' => Link::create($imageUrl, $this->feedItem->guid),
+                    'guid' => Link::create($convertedUrl, $this->feedItem->guid),
                     'type' => 'gallary_image',
                 ]);
             }
         }
+
+        // Freeup memory
+        unset($processor);
 
         return $resources;
     }
 
     protected function getContentImageResources()
     {
-        if (is_null($this->content)) {
+        if (empty($this->content)) {
             return [];
         }
 
         $resources = [];
+        $processor = $this->tooth->getProcessor();
         $images    = $this->content->find('img');
         foreach ($images as $image) {
-            $image_url = Link::create($image->getAttribute('src'), $this->feedItem->guid);
+            $convertedUrl = $processor->convertImageUrl($image->getAttribute('src'));
+            $imageLink    = Link::create($convertedUrl, $this->feedItem->guid);
             array_push($resources, [
-                'guid' => $image_url,
+                'guid' => $imageLink,
                 'type' => 'content_image',
             ]);
-            $image->setAttribute('src', (string)$image_url);
+            $image->setAttribute('src', (string)$imageLink);
         }
+
+        // Freeup memory
+        unset($processor, $images);
 
         return $resources;
     }
