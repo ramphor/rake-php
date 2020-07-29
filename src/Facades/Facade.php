@@ -50,6 +50,10 @@ abstract class Facade
         $instance = static::getFacadeRoot();
 
         if (! $instance) {
+            // If logger is not registered don't do any things else not logger throw an exception.
+            if (static::getFacadeAccessor() == 'logger') {
+                return;
+            }
             throw new RuntimeException('A facade root has not been set.');
         }
 

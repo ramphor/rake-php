@@ -6,6 +6,7 @@ use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
 
 class DefaultResourceManager extends ResourceManager
@@ -88,7 +89,10 @@ class DefaultResourceManager extends ResourceManager
     {
         $rake = Instances::find($rakeId);
         if (is_null($rake)) {
-            // Will logging later
+            Logger::warning('The tooth is doesn\'t have a Rake instance to processing', [
+                'tooth_id' => $toothId,
+                'rake_id'  => $rakeId,
+            ]);
             return;
         }
 
@@ -108,7 +112,11 @@ class DefaultResourceManager extends ResourceManager
         foreach ($filesResources as $filesResource) {
             $tooth = $this->findTheTooth($filesResource->rake_id, $filesResource->tooth_id);
             if (is_null($tooth)) {
-                // Will logging later
+                Logger::warning('The resource doesn\'t have a tooth continue processing', [
+                    'ID'       => $filesResource->id,
+                    'type'     => $filesResource->resource_type,
+                    'tooth_id' => $filesResource->tooth_id,
+                ]);
                 continue;
             }
 

@@ -4,6 +4,7 @@ namespace Ramphor\Rake;
 use Ramphor\Rake\ProcessResult;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Resources;
 
 class Resource
@@ -175,7 +176,10 @@ class Resource
     {
         $id = $this->findId();
         if ($id <= 0) {
-            // Will be logging later
+            Logger::debug(
+                'The resource is not found to save the hash',
+                ['guid' => $this->guid, 'type' => $this->type]
+            );
             return;
         }
         $query = sql()

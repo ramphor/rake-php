@@ -1,11 +1,11 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Monolog\Logger;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
-use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Logger;
+use Ramphor\Rake\DataSource\FeedItem;
 
 abstract class Processor implements ProcessorConstract
 {
@@ -36,7 +36,9 @@ abstract class Processor implements ProcessorConstract
             $response = Client::request('HEAD', $imageUrl, ['http_errors' => false, 'allow_redirects' => true]);
             return $response->getStatusCode() < 400;
         } catch (\Exception $e) {
-            // Will logging later
+            Logger::warning($e->getMessage(), [
+                'image_url' => $imageUrl,
+            ]);
         }
         return false;
     }
