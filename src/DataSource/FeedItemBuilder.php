@@ -1,8 +1,9 @@
 <?php
 namespace Ramphor\Rake\DataSource;
 
-use Ramphor\Rake\Constracts\FeedItemBuilder as FeedItemBuilderConstract;
 use PHPHtmlParser\Dom as Document;
+use Ramphor\Rake\Constracts\FeedItemBuilder as FeedItemBuilderConstract;
+use Ramphor\Rake\Facades\Logger;
 
 class FeedItemBuilder implements FeedItemBuilderConstract
 {
@@ -159,9 +160,13 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         if (count($elements) <= 0) {
             return $mappingField->getDefaultValue();
         }
-        $get = $this->methodTransformer($mappingField->getMeta('get', 'text'));
-        if (!in_array($get, ['text', 'attribute', 'innerHtml', 'outerHtml'])) {
-            // Will show warning later
+        $get        = $this->methodTransformer($mappingField->getMeta('get', 'text'));
+        $allowProps = ['text', 'attribute', 'innerHtml', 'outerHtml'];
+        if (!in_array($get, $allowProps)) {
+            Logger::warning('Mapping field call the invalid property', [
+                'called' => $get,
+                'allow_props' => $allowProps,
+            ]);
 
             // Override get type value
             $get = 'text';
@@ -169,8 +174,6 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
         $return = $mappingField->getMeta('return', 'field');
         if (!in_array($return, ['field', 'fields', 'array'])) {
-            // Will show warning later
-
             // Override return type value
             $return = 'field';
         }

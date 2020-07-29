@@ -7,6 +7,7 @@ use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\Crawler;
 use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
 
 abstract class ResourceManager implements ResourceManagerContract
@@ -78,7 +79,7 @@ abstract class ResourceManager implements ResourceManagerContract
             } catch (\Exception $e) {
                 $resource->skip();
 
-                // Will logging and processing later
+                Logger::warning($e->getMessage());
             }
 
             /* After download files via Tooth.
