@@ -32,7 +32,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     public function setMappingFields($mappingFields)
     {
         foreach ($mappingFields as $mapKey => $mapArgs) {
-            if (empty($mapArgs)) {
+            if (empty($mapArgs['type'])) {
                 continue;
             }
             $mapArgs = $mapArgs + [
