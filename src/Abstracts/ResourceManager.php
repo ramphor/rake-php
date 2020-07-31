@@ -15,7 +15,7 @@ abstract class ResourceManager implements ResourceManagerContract
     protected $protocols = ['ftp', 'http', 'https'];
     protected $resources = [];
 
-    public function import()
+    public function import($onlyCreate = false)
     {
         foreach ($this->resources as $resource) {
             $parentId   = 0;
@@ -27,7 +27,7 @@ abstract class ResourceManager implements ResourceManagerContract
                 }
             }
 
-            $resourceId = $resource->save();
+            $resourceId = $resource->save($onlyCreate);
             if ($parentId > 0) {
                 $this->createRelation($resourceId, $parentId);
             }
