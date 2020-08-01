@@ -149,9 +149,9 @@ class Resource
         return DB::query($query);
     }
 
-    public function save()
+    public function save($onlyCreate = false)
     {
-        ($this->findId() > 0)
+        ($onlyCreate === false && $this->findId() > 0)
             ? $this->update()
             : $this->insert();
 

@@ -141,7 +141,7 @@ class Rake
             if ($result->isSuccess()) {
                 // Import resources
                 $resources = Resources::createFromResult($result, $tooth);
-                $resources->import();
+                $resources->import(true);
                 $resources->importCrawlUrls();
 
                 // Transfer the resources are fetched from the feed
