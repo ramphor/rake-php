@@ -10,6 +10,7 @@ use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Facades\Facade;
 use Ramphor\Rake\Facades\Crawler;
 use Ramphor\Rake\Facades\Resources;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Option;
 use Ramphor\Rake\Managers\InstanceManager;
 use Ramphor\Rake\Managers\CrawlerManager;
@@ -88,6 +89,7 @@ class Rake
             // Add the log warning later
             return;
         }
+        Logger::debug(sprintf('The rake "%s" has %d tooths will be executed', $this->getId(), count($this->teeth)));
         foreach ($this->teeth as $tooth) {
             $results = [];
             // Crawl data from the feeds of tooth
