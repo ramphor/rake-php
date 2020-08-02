@@ -28,9 +28,10 @@ class FeedItem
 
     public function __get($name)
     {
-        if (isset($this->$name)) {
+        if (property_exists(__CLASS__, $name)) {
             return $this->$name;
         }
+        return $this->getMeta($name);
     }
 
     public function deleteGuid()
