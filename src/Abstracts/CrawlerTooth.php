@@ -6,6 +6,7 @@ use Ramphor\Rake\Response;
 use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
 use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Sql as QueryBuilder;
 
 abstract class CrawlerTooth extends Tooth
@@ -63,8 +64,13 @@ abstract class CrawlerTooth extends Tooth
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
 
+        Logger::debug(sprintf('Get %d crawl URLs in database', count($crawlDatas)));
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
+                Logger::info(sprintf(
+                    'The URL %s has invalid format',
+                    $crawlData->url
+                ));
                 $response->append($crawlData->url, null, $crawlData->ID, 'skip');
                 continue;
             }
@@ -78,6 +84,7 @@ abstract class CrawlerTooth extends Tooth
                     $response->append($crawlData->url, $html->getBody(), $crawlData->ID);
                 }
             } catch (ClientExceptionInterface $e) {
+                Logger::warning($e->getMessage());
                 if ($e->hasResponse()) {
                     $requestResponse = $e->getResponse();
                     $statusCode      = $requestResponse->getStatusCode();
