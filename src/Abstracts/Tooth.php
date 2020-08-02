@@ -9,10 +9,9 @@ use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Abstracts\Processor;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\DataSource\FeedItemBuilder;
-
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;
 use Ramphor\Rake\Parsers\CSV\Parser as CsvParser;
-
 use Ramphor\Rake\Exceptions\ToothFormatException;
 
 abstract class Tooth implements ToothConstract
@@ -100,13 +99,19 @@ abstract class Tooth implements ToothConstract
 
     public function getParsers()
     {
-        if (empty($this->toothFormat) || empty($this->mappingFields)) {
+        if (empty($this->toothFormat)) {
+            Logger::warning(sprintf('The %s tooth doesn\'t specific data format to processing'));
+            return [];
+        }
+        if (empty($this->mappingFields)) {
+            Logger::warning('The tooth doesn\'t define mapping field rules to build feed item');
             return [];
         }
 
         $parsers = [];
         foreach ($this->getResponses() as $response) {
             if (!($response instanceof Response)) {
+                Logger::warning(sprintf('The response is not instance of %s', Response::class));
                 continue;
             }
             $parser = $this->createParser(
@@ -130,23 +135,37 @@ abstract class Tooth implements ToothConstract
     public function execute()
     {
         if (count($this->getFeeds()) <= 0) {
+            Logger::info(sprintf(
+                'The %s tooth doesn\'t have tooth to execute',
+                $this->getId()
+            ));
             return;
         }
         foreach ($this->getFeeds() as $feed) {
             if (!$feed->valid()) {
+                Logger::debug(sprintf(
+                    'The feed(%s) is invalid. It means this feed is crawled, finished or error',
+                    $feed->getId()
+                ));
                 continue;
             }
 
             if ($feed->hasResponse()) {
+                Logger::debug(sprintf('The feed(%s) has direct response', $feed->getId()));
                 $response = new Response(Response::TYPE_STREAM);
                 $response->setBody($feed->execute());
 
                 array_push($this->responses, $response);
             } else {
+                Logger::debug(sprintf(
+                    'The feed(%s) doesn\'t have direct response. It will be continued processing from Database',
+                    $feed->getId()
+                ));
                 $feed->execute();
             }
 
             // Update feed to get next page, next run
+            Logger::debug('Create the flag to get next page of the feed');
             $feed->next();
         }
     }
