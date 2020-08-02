@@ -12,6 +12,7 @@ abstract class Processor implements ProcessorConstract
     protected $id;
     protected $tooth;
     protected $feedItem;
+    protected $importedId;
 
     protected $crawlLinks = false;
 
@@ -27,6 +28,10 @@ abstract class Processor implements ProcessorConstract
 
     public function setFeedItem(FeedItem &$feedItem)
     {
+        // Reset imported ID on each processing feed item
+        $this->importedId = null;
+
+        // Set feed item to process data
         $this->feedItem = $feedItem;
     }
 
