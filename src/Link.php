@@ -44,7 +44,9 @@ final class Link
 
     public function __toString()
     {
+        $notify = false;
         if (!$this->parsed) {
+            $notify = true;
             $this->parse();
         }
         $suffix = $this->path;
@@ -67,12 +69,17 @@ final class Link
             }
             $prefix .= $account . '@';
         }
+
         $ouputUrl = $prefix . $this->host . $suffix;
-        ;
-        if (empty(static::$callbacks['output'])) {
-            return $ouputUrl;
+        if (!empty(static::$callbacks['output'])) {
+            $ouputUrl = static::callOutputCallbacks($output, $this);
         }
-        return static::callOutputCallbacks($output, $this);
+
+        if ($notify && $ouputUrl !== $this->rawUrl) {
+            Logger::info(sprintf('The URL %s is changed to %s', $outputUrl, $this->rawUrl));
+            $notify = false;
+        }
+        return $ouputUrl;
     }
 
     public function setRawUrl($url)
