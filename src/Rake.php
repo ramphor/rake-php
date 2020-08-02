@@ -102,7 +102,7 @@ class Rake
         foreach ($this->teeth as $tooth) {
             $results = [];
             // Crawl data from the feeds of tooth
-            Logger::debug(sprint('Execute the %s tooth', $tooth->getId()));
+            Logger::debug(sprintf('Execute the %s tooth', $tooth->getId()));
             $tooth->execute();
 
             $processor = $tooth->getProcessor();
