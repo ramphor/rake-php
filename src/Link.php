@@ -1,8 +1,15 @@
 <?php
 namespace Ramphor\Rake;
 
+use Ramphor\Rake\Facades\Logger;
+
 final class Link
 {
+    protected static $callbacks = [
+        'parse' => [],
+        'output' => [],
+    ];
+
     protected $parsed       = false;
     protected $isSameSource = false;
     protected $rawUrl;
@@ -60,7 +67,12 @@ final class Link
             }
             $prefix .= $account . '@';
         }
-        return $prefix . $this->host . $suffix;
+        $ouputUrl = $prefix . $this->host . $suffix;
+        ;
+        if (empty(static::$callbacks['output'])) {
+            return $ouputUrl;
+        }
+        return static::callOutputCallbacks($output, $this);
     }
 
     public function setRawUrl($url)
@@ -96,6 +108,11 @@ final class Link
         if (empty($this->scheme) && isset($parsedSourceUrl['scheme'])) {
             $this->scheme = $parsedSourceUrl['scheme'];
         }
+
+        if (!empty(static::$callbacks['parse'])) {
+            static::callParseCallbacks($this);
+        }
+
         $this->parsed = true;
     }
 
@@ -106,5 +123,32 @@ final class Link
         }
 
         return (bool) $this->isSameSource;
+    }
+
+    public static function addCallback($id, $callable, $hook = 'output')
+    {
+        if (!is_callable($callable)) {
+            Logger::warning(sprintf('Register callback "%s" with param is not callable', $id));
+            return;
+        }
+        if (!isset(static::$callbacks[$hook][$id])) {
+            static::$callbacks[$hook][$id] = $callable;
+        }
+    }
+
+    protected static function callParseCallbacks(&$linkInstance)
+    {
+        foreach (static::$callbacks['parse'] as $callback) {
+            $callback($linkInstance);
+        }
+        return $linkInstance;
+    }
+
+    protected static function callOutputCallbacks($output, $linkInstance)
+    {
+        foreach (static::$callbacks['parse'] as $callback) {
+            $output = $callback($output, $linkInstance);
+        }
+        return $output;
     }
 }
