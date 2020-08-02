@@ -183,4 +183,9 @@ abstract class ResourceManager implements ResourceManagerContract
 
         return $this->findByQuery($query);
     }
+
+    public function getTotalResources()
+    {
+        return count($this->resources);
+    }
 }
