@@ -1,8 +1,17 @@
 <?php
+/**
+ * @package Rake
+ * @author Puleeno Nguyen <puleeno@gmail.com>
+ * @copyright 2020 Ramphor Premium.
+ * @license MIT
+ * @link https://puleeno.com
+ */
+
 namespace Ramphor\Rake;
 
-use Psr\Http\Client\ClientInterface;
+use Iterator;
 use Psr\Log\LoggerInterface;
+use Psr\Http\Client\ClientInterface;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
@@ -86,45 +95,58 @@ class Rake
     public function execute()
     {
         if (empty($this->teeth)) {
-            // Add the log warning later
+            Logger::info('The %s rake doesn\'t have any tooth to execute');
             return;
         }
         Logger::debug(sprintf('The rake "%s" has %d tooths will be executed', $this->getId(), count($this->teeth)));
         foreach ($this->teeth as $tooth) {
             $results = [];
             // Crawl data from the feeds of tooth
+            Logger::debug(sprint('Execute the %s tooth', $tooth->getId()));
             $tooth->execute();
 
             $processor = $tooth->getProcessor();
             $parsers   = $tooth->getParsers();
 
             foreach ($parsers as $feedItems) {
-                if (!($feedItems instanceof \Iterator)) {
+                if (!($feedItems instanceof Iterator)) {
+                    Logger::warning(sprintf('The Rake parser is not instance of %s', Iterator::class), (array)$feedItem);
                     continue;
                 }
 
-                foreach ($feedItems as $feedItem) {
-                    if (!($feedItem instanceof FeedItem)) {
-                        continue;
-                    }
+                if (count($feedItems)) {
+                    foreach ($feedItems as $feedItem) {
+                        if (!($feedItem instanceof FeedItem)) {
+                            Logger::warning(
+                                sprintf('The %s tooth has feed item is not instance of %s', $tooth->getId(), FeedItem::class),
+                                (array)$feedItem
+                            );
+                            continue;
+                        }
 
-                    if (!$feedItem->isValid()) {
-                        $result = ProcessResult::createErrorResult(
-                            sprintf('The feed item "%s" is invalid', $feedItem->guid),
-                            $feedItem->errorType
-                        );
-                    } else {
-                        $processor->setFeedItem($feedItem);
-                        $result = $processor->execute();
-                    }
-                    $result->setFeedItem($feedItem);
-                    $result->setProcessingTooth($tooth);
+                        if (!$feedItem->isValid()) {
+                            Logger::warning('The feed item is invalid then create a error ProcessResult', (array) $feedItem);
+                            $result = ProcessResult::createErrorResult(
+                                sprintf('The feed item "%s" is invalid', $feedItem->guid),
+                                $feedItem->errorType
+                            );
+                        } else {
+                            $processor->setFeedItem($feedItem);
+                            // Execute processor
+                            $result = $processor->execute();
+                        }
+                        $result->setFeedItem($feedItem);
+                        $result->setProcessingTooth($tooth);
 
-                    // Store all results
-                    array_push($results, $result);
+                        // Store all results
+                        array_push($results, $result);
+                    }
+                } else {
+                    Logger::info('The parser doesn\'t found any feed item. It means maybe the Rake run completed.');
                 }
             }
 
+            // Sync results to database
             $this->sync($tooth, $results);
         }
     }
@@ -133,6 +155,7 @@ class Rake
     {
         foreach ($results as $result) {
             if (!($result instanceof ProcessResult)) {
+                Logger::warning(sprintf('The process result is not instance of %s', ProcessResult::class));
                 continue;
             }
             // Sync the crawl URL from ProcessResult
@@ -146,13 +169,17 @@ class Rake
 
                 // Transfer the resources are fetched from the feed
                 if ($tooth->isTransferResources()) {
+                    Logger::debug('Transfer files after process the feed');
                     $resources->transferFiles();
                 }
+            } else {
+                Logger::debug('The rake doesn\'t sync result to database when it is error');
             }
         }
 
         // Transfer the resources are not imported from Database
         if (Option::isAutoTransferFiles()) {
+            Logger::debug('Transfer files from resources in database');
             $resources = Resources::getFilesFromDatabase($tooth);
             $resources->transferFiles();
         }
