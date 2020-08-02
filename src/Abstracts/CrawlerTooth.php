@@ -75,14 +75,19 @@ abstract class CrawlerTooth extends Tooth
                 continue;
             }
             try {
-                $html = Client::request(
+                $requestResponse = Client::request(
                     'GET',
                     $crawlData->url,
                     $this->crawlRequestOptions()
                 );
                 if (!$this->validateResponse || $this->validateRequestResponse($response)) {
-                    $response->append($crawlData->url, $html->getBody(), $crawlData->ID);
+                    $response->append($crawlData->url, $requestResponse->getBody(), $crawlData->ID);
                 }
+                Logger::debug(sprintf(
+                    'Crawl URL %s is successful with status code %d',
+                    $crawlData->url,
+                    $requestResponse->getStatusCode()
+                ));
             } catch (ClientExceptionInterface $e) {
                 Logger::warning($e->getMessage());
                 if ($e->hasResponse()) {
