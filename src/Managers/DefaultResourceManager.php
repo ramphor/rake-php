@@ -8,6 +8,7 @@ use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
+use Ramphor\Rake\Link;
 
 class DefaultResourceManager extends ResourceManager
 {
@@ -39,8 +40,18 @@ class DefaultResourceManager extends ResourceManager
         }
 
         foreach ($resultResources as $resultResource) {
+            if (!$resultResource['guid'] instanceof Link) {
+                Logger::info(sprintf('The %s resource has guid is not instance of %s', Link::class));
+                continue;
+            }
+
             // Parse link to ensure working correctly
             $resultResource['guid']->parse();
+            Logger::debug(sprintf(
+                'Create resources from result %s',
+                $resultResource['type'],
+                $resultResource['guid']->__toString()
+            ));
 
             if ($resultResource['type'] === 'link' && !$this->checkLinkResourceIsOk($resultResource)) {
                 continue;
@@ -103,29 +114,33 @@ class DefaultResourceManager extends ResourceManager
     {
         $this->resources = [];
         $rake            = $tooth->getRake();
-        $filesResources  = $this->queryFileResources(
+        $fileResources  = $this->queryFileResources(
             $rake->getId(),
             $tooth->getId(),
             $tooth->limitQueryResource()
         );
 
-        foreach ($filesResources as $filesResource) {
-            $tooth = $this->findTheTooth($filesResource->rake_id, $filesResource->tooth_id);
+        foreach ($fileResources as $fileResource) {
+            $tooth = $this->findTheTooth($fileResource->rake_id, $fileResource->tooth_id);
             if (is_null($tooth)) {
                 Logger::warning('The resource doesn\'t have a tooth continue processing', [
-                    'ID'       => $filesResource->id,
-                    'type'     => $filesResource->resource_type,
-                    'tooth_id' => $filesResource->tooth_id,
+                    'ID'       => $fileResource->id,
+                    'type'     => $fileResource->resource_type,
+                    'tooth_id' => $fileResource->tooth_id,
                 ]);
                 continue;
             }
 
+            Logger::debug(sprintf('Create a resource from database %s', var_export([
+                'ID'   => $fileResource->id,
+                'type' => $fileResource->resource_type,
+            ], true)));
             $resource = Resource::create(
-                $filesResource->guid,
-                $filesResource->resource_type,
+                $fileResource->guid,
+                $fileResource->resource_type,
                 $tooth
             );
-            $resource = $this->mapFromDB($resource, $filesResource);
+            $resource = $this->mapFromDB($resource, $fileResource);
 
             array_push($this->resources, $resource);
         }
