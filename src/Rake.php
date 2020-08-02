@@ -114,7 +114,7 @@ class Rake
                     continue;
                 }
 
-                if (count($feedItems)) {
+                if (iterator_count($feedItems)) {
                     foreach ($feedItems as $feedItem) {
                         if (!($feedItem instanceof FeedItem)) {
                             Logger::warning(
