@@ -119,8 +119,10 @@ abstract class ResourceManager implements ResourceManagerContract
         if (is_null($rake)) {
             return null;
         }
+        Logger::debug(sprintf('Find the tooth from ID "%s"', $queryResult->tooth_id));
         $tooth = $rake->findTooth($queryResult->tooth_id);
         if (is_null($tooth)) {
+            Logger::warning(sprintf('The tooth has ID %s is not found', $queryResult->tooth_id));
             return null;
         }
 
