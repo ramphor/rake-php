@@ -98,11 +98,11 @@ class Rake
             Logger::info('The %s rake doesn\'t have any tooth to execute');
             return;
         }
-        Logger::debug(sprintf('The rake "%s" has %d tooths will be executed', $this->getId(), count($this->teeth)));
+        Logger::debug(sprintf('The rake "%s" has %d tooths will be executed', $this->getId(), count($this->teeth)), $this->teeth);
         foreach ($this->teeth as $tooth) {
             $results = [];
             // Crawl data from the feeds of tooth
-            Logger::debug(sprintf('Execute the %s tooth', $tooth->getId()));
+            Logger::debug(sprintf('Execute the %s tooth', $tooth->getId()), (array)$tooth);
             $tooth->execute();
 
             $processor = $tooth->getProcessor();
@@ -133,7 +133,28 @@ class Rake
                         } else {
                             $processor->setFeedItem($feedItem);
                             // Execute processor
-                            $result = $processor->execute();
+                            $result      = $processor->execute();
+                            $logFeedItem = var_export([
+                                'guid' => $feedItem->guid,
+                                'title' => $feedItem->title,
+                                'urlDbId' => $feedItem->urlDbId,
+                            ], true);
+
+                            if ($result->isSuccess()) {
+                                Logger::debug(sprintf(
+                                    'Process feed item %s is successful with new GUID is %s - %s',
+                                    $result->getGuid(),
+                                    $result->getNewGuid(),
+                                    $logFeedItem
+                                ));
+                            } else {
+                                Logger::warning(sprintf(
+                                    'The result is %s with message: %s - %s',
+                                    $result->isSkipped() ? 'skipped' : 'error',
+                                    $result->getErrorMessage(),
+                                    $logFeedItem
+                                ));
+                            }
                         }
                         $result->setFeedItem($feedItem);
                         $result->setProcessingTooth($tooth);
@@ -173,14 +194,18 @@ class Rake
                     $resources->transferFiles();
                 }
             } else {
-                Logger::debug('The rake doesn\'t sync result to database when it is error');
+                Logger::debug('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
             }
         }
 
         // Transfer the resources are not imported from Database
         if (Option::isAutoTransferFiles()) {
-            Logger::debug('Transfer files from resources in database');
             $resources = Resources::getFilesFromDatabase($tooth);
+
+            Logger::debug(sprintf(
+                'Transfer %d files from resources in database',
+                $resources->getTotalResources()
+            ));
             $resources->transferFiles();
         }
     }
