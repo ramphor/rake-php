@@ -3,12 +3,12 @@ namespace Ramphor\Rake\Managers;
 
 use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\Link;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
-use Ramphor\Rake\Link;
 
 class DefaultResourceManager extends ResourceManager
 {
