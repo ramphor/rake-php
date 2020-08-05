@@ -99,6 +99,10 @@ class Rake
             return;
         }
         Logger::debug(sprintf('The rake "%s" has %d tooths will be executed', $this->getId(), count($this->teeth)), $this->teeth);
+
+        // Load all options
+        Option::loadAllOptions();
+
         foreach ($this->teeth as $tooth) {
             $results = [];
             // Crawl data from the feeds of tooth

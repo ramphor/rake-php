@@ -5,6 +5,7 @@ use SimpleXMLElement;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Option;
 
 class Sitemap extends Feed
 {
@@ -25,18 +26,21 @@ class Sitemap extends Feed
 
     public function valid()
     {
-        $executed = $this->getOption('executed', false);
+        $optionKey = sprintf('feed_%s_executed', $this->id);
+        $executed  = Option::get($optionKey, false);
 
         return empty($executed);
     }
 
     public function next()
     {
-        $this->updateOption('executed', true);
+        $optionKey = sprintf('feed_%s_executed', $this->id);
+        Option::update($optionKey, true);
     }
 
     public function rewind()
     {
-        $this->updateOption('executed', false);
+        $optionKey = sprintf('feed_%s_executed', $this->id);
+        Option::update($optionKey, false);
     }
 }
