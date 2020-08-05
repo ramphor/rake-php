@@ -167,7 +167,14 @@ class Rake
                         array_push($results, $result);
                     }
                 } else {
-                    Logger::info('The parser doesn\'t found any feed item. It means maybe the Rake run completed.');
+                    $notifiedOptionKey = sprintf('tooth_%s_notified', $tooth->getId());
+                    if (!Option::get($notifiedOptionKey, false)) {
+                        Logger::info(sprintf(
+                            'The parser doesn\'t found any feed item. It means maybe the tooth %s run completed.',
+                            $tooth->getId()
+                        ));
+                        Option::update($notifiedOptionKey, true);
+                    }
                 }
             }
 
