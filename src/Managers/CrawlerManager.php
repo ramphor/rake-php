@@ -3,6 +3,7 @@ namespace Ramphor\Rake\Managers;
 
 use Ramphor\Rake\ProcessResult;
 use Ramphor\Rake\Resource;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Tooth;
 
@@ -18,10 +19,13 @@ class CrawlerManager
 
         $query = sql()->update(DB::table('rake_crawled_urls'));
         if ($result->isSkipped()) {
+            Logger::debug(sprintf('The URL %s will be skipped', $feedItem->guid));
             $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
         } elseif ($result->isSuccess()) {
+            Logger::debug(sprintf('The URL %s is crawled successfully', $feedItem->guid));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } else {
+            Logger::debug(sprintf('The URL %s is crawled failed. It will be retry to re-crawl later', $feedItem->guid));
             $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
         }
         $query = $query->where('ID=?', $feedItem->urlDbId);
@@ -68,13 +72,14 @@ class CrawlerManager
             'NOW()',
             'NOW()'
         );
-
+        Logger::debug(sprintf('Import crawl URL %s to database', $url));
         return DB::insert($query);
     }
 
     public function importFromResource(Resource $resource)
     {
         if ($this->checkIsExists($resource->guid, $resource->tooth)) {
+            Logger::debug(sprintf('The URL %s already exists in database', $resource->guid));
             return;
         }
 
