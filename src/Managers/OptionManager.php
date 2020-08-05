@@ -1,6 +1,8 @@
 <?php
 namespace Ramphor\Rake\Managers;
 
+use Ramphor\Rake\Facades\Logger;
+
 class OptionManager
 {
     protected $options = [
