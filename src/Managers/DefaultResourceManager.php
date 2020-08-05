@@ -25,7 +25,7 @@ class DefaultResourceManager extends ResourceManager
             return preg_match('/^(text|application)\//', $mimeType);
         } catch (RequestExceptionInterface $e) {
             ob_start();
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $errorLogs = ob_get_clean();
             Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs));
         }
