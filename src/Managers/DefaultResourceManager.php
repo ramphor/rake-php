@@ -1,6 +1,7 @@
 <?php
 namespace Ramphor\Rake\Managers;
 
+use Psr\Http\Client\RequestExceptionInterface;
 use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Link;
@@ -17,10 +18,18 @@ class DefaultResourceManager extends ResourceManager
         if (!$resource['guid']->isSameSource()) {
             return false;
         }
-        $response = Client::request('HEAD', (string)$resource['guid']);
-        $mimeType = $response->getHeaderLine('Content-Type');
 
-        return preg_match('/^(text|application)\//', $mimeType);
+        try {
+            $response = Client::request('HEAD', (string)$resource['guid']);
+            $mimeType = $response->getHeaderLine('Content-Type');
+            return preg_match('/^(text|application)\//', $mimeType);
+        } catch (RequestExceptionInterface $e) {
+            ob_start();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+            $errorLogs = ob_get_clean();
+            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs));
+        }
+        return false;
     }
 
     public function createFromResult($result, $tooth = null): ResourceManager
