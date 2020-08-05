@@ -169,7 +169,7 @@ class Rake
                 } else {
                     $notifiedOptionKey = sprintf('tooth_%s_notified', $tooth->getId());
                     if (!Option::get($notifiedOptionKey, false)) {
-                        Logger::info(sprintf(
+                        Logger::notice(sprintf(
                             'The parser doesn\'t found any feed item. It means maybe the tooth %s run completed.',
                             $tooth->getId()
                         ));
