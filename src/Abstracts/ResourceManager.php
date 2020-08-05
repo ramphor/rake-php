@@ -80,7 +80,10 @@ abstract class ResourceManager implements ResourceManagerContract
                 $resource = $tooth->downloadResource($resource);
             } catch (Exception | Error $e) {
                 $resource->skip();
-                Logger::warning($e->getMessage());
+                ob_start();
+                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+                $errorLogs = ob_get_clean();
+                Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs));
             }
 
             /* After download files via Tooth.

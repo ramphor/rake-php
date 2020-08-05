@@ -52,7 +52,10 @@ abstract class Processor implements ProcessorConstract
             $response = Client::request('HEAD', $imageUrl, ['http_errors' => false, 'allow_redirects' => true]);
             return $response->getStatusCode() < 400;
         } catch (\Exception $e) {
-            Logger::warning($e->getMessage(), [
+            ob_start();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+            $errorLogs = ob_get_clean();
+            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), [
                 'image_url' => $imageUrl,
             ]);
         }
