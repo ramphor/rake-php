@@ -2,6 +2,8 @@
 
 namespace Ramphor\Rake\Abstracts;
 
+use Error;
+use Exception;
 use Ramphor\Sql as QueryBuilder;
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
@@ -76,9 +78,8 @@ abstract class ResourceManager implements ResourceManagerContract
             $tooth    = $resource->getTooth();
             try {
                 $resource = $tooth->downloadResource($resource);
-            } catch (\Exception $e) {
+            } catch (Exception | Error $e) {
                 $resource->skip();
-
                 Logger::warning($e->getMessage());
             }
 

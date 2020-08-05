@@ -4,6 +4,7 @@ namespace Ramphor\Rake;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\Tooth;
 use PHPHtmlParser\Dom as Document;
+use Ramphor\Rake\Facades\Logger;
 
 class ProcessResult
 {
@@ -157,6 +158,7 @@ class ProcessResult
                 ]);
             }
         }
+        Logger::debug(sprintf('The Rake founded %d cover and gallery images from the feed', count($resources)));
 
         // Freeup memory
         unset($processor);
@@ -182,10 +184,10 @@ class ProcessResult
             ]);
             $image->setAttribute('src', (string)$imageLink);
         }
+        Logger::debug(sprintf('The Rake founded %d images from content', count($resources)));
 
         // Freeup memory
         unset($processor, $images);
-
         return $resources;
     }
 
@@ -209,6 +211,7 @@ class ProcessResult
             ]);
             $link->setAttribute('href', (string)$url);
         }
+        Logger::debug(sprintf('The Rake founded %d links from content', count($resources)));
 
         return $resources;
     }

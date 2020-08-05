@@ -28,9 +28,12 @@ class OptionManager
     public function get($optionName, $defaultValue = null)
     {
         if (isset($this->options[$optionName]['value'])) {
-            return $this->options[$optionName]['value'];
+            $value = $this->options[$optionName]['value'];
+            Logger::debug(sprintf('The %s option is return the value is %s', $optionName, $value));
+            return $value;
         }
 
+        Logger::debug(sprintf('The %s option is not exists so the default value will be returned', $optionName));
         return $defaultValue;
     }
 
