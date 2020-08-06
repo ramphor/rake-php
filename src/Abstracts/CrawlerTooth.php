@@ -1,11 +1,11 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Psr\Http\Client\ClientExceptionInterface;
+use Http\Client\Exception as HttpException;
 use Ramphor\Rake\Response;
 use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
-use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Sql as QueryBuilder;
 
@@ -75,7 +75,7 @@ abstract class CrawlerTooth extends Tooth
                 continue;
             }
             try {
-                $requestResponse = Client::request(
+                $requestResponse = Request::sendRequest(
                     'GET',
                     $crawlData->url,
                     $this->crawlRequestOptions()
@@ -88,7 +88,7 @@ abstract class CrawlerTooth extends Tooth
                     $crawlData->url,
                     $requestResponse->getStatusCode()
                 ));
-            } catch (ClientExceptionInterface $e) {
+            } catch (HttpException $e) {
                 ob_start();
                 debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
                 $errorLogs = ob_get_clean();

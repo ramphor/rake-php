@@ -49,7 +49,7 @@ abstract class Processor implements ProcessorConstract
     protected function checkImageIsFound($imageUrl)
     {
         try {
-            $response = Client::request('HEAD', $imageUrl, ['http_errors' => false, 'allow_redirects' => true]);
+            $response = Request::sendRequest('HEAD', $imageUrl, ['http_errors' => false, 'allow_redirects' => true]);
             return $response->getStatusCode() < 400;
         } catch (\Exception $e) {
             ob_start();
