@@ -21,6 +21,7 @@ class Resource
     protected $newGuid;
     protected $skipped;
     protected $tooth;
+    protected $retry;
 
     // Parent resource
     protected $parent;
@@ -82,6 +83,11 @@ class Resource
     public function setNewGuid($newGuid)
     {
         $this->newGuid = $newGuid;
+    }
+
+    public function setRetry($retry)
+    {
+        $this->retry = $retry;
     }
 
     public function imported()
