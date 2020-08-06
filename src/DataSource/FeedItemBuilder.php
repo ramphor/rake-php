@@ -81,7 +81,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                     $this->document = new Document();
 
                     // Create HTML Document from original HTML
-                    $this->document->load((string)$data['body']);
+                    $this->document->loadStr((string)$data['body']);
                 }
             } else {
                 $this->feedItem->setError($data['status']);
