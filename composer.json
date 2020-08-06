@@ -16,7 +16,7 @@
         "psr/http-client": "1.0",
         "psr/log": "^1.0.1",
         "ramphor/sql": "1.0.0",
-        "ramphor/php-html-parser": "dev-master"
+        "ramphor/php-html-parser": "3.0.1"
     },
     "autoload": {
         "psr-4": {
