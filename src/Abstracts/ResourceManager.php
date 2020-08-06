@@ -102,6 +102,7 @@ abstract class ResourceManager implements ResourceManagerContract
         $resource->setNewGuid($dbResource->new_guid);
         $resource->setNewType($dbResource->new_type);
         $resource->setContent($dbResource->content_text);
+        $resource->setRetry($dbResource->retry);
 
         $resource->mapOthers([
             'init_hash' => $dbResource->init_hash,
