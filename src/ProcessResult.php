@@ -181,6 +181,20 @@ class ProcessResult
         $images    = $this->content->find('img');
         foreach ($images as $image) {
             $imageSrc     = static::callContentImageCallbacks($image->getAttribute('src'), $image);
+            if (is_null($imageSrc)) {
+                Logger::notice(sprintf(
+                    'Could not find the src of the image of %s(#%d): %s',
+                    $this->getNewType(),
+                    $this->getNewGuid(),
+                    $image->innerHtml
+                ), [
+                    'guid'     => $this->getGuid(),
+                    'new_guid' => $this->getNewGuid(),
+                    'new_type' => $this->getNewType(),
+                    'tooth'    => $this->tooth->getId()
+                ]);
+                continue;
+            }
             $convertedUrl = $processor->convertImageUrl($imageSrc);
             $imageLink    = Link::create($convertedUrl, $this->feedItem->guid);
             array_push($resources, [
