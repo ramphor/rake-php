@@ -263,8 +263,9 @@ class ProcessResult
         }
         try {
             $outputSrc = $src;
-            foreach ($contentImageCallbacks as $id => $callback) {
-                $outputSrc = call_user_func($callable, $outputSrc, $imageDom);
+            foreach (static::$contentImageCallbacks as $id => $callback) {
+                Logger::debug(sprintf('Call the callback %s', $id));
+                $outputSrc = call_user_func($callback, $outputSrc, $imageDom);
             }
             return $outputSrc;
         } catch (Exception | Error $e) {
