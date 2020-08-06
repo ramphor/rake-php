@@ -138,10 +138,10 @@ class DefaultResourceManager extends ResourceManager
                     'Not found any resource of the  %s tooth. It means the process resource maybe completed.',
                     $tooth->getId()
                 ));
-                Option::update($notified, true);
+                Option::update($notifiedKey, true);
             }
         } elseif ($notified) {
-            Option::update($notified, false);
+            Option::update($notifiedKey, false);
         }
 
         foreach ($fileResources as $fileResource) {

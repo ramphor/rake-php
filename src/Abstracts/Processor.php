@@ -137,7 +137,7 @@ abstract class Processor implements ProcessorConstract
         }
 
         $document = new Dom();
-        $document->load((string)$content);
+        $document->loadStr((string)$content);
 
         // Convert common stylesheet
         $document = $this->convertStylesheets($document);
