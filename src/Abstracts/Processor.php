@@ -3,7 +3,7 @@ namespace Ramphor\Rake\Abstracts;
 
 use Ramphor\Rake\Link;
 use PHPHtmlParser\Dom;
-use PHPHtmlParser\Dom\HtmlNode;
+use PHPHtmlParser\Dom\Node\HtmlNode;
 use PHPHtmlParser\Dom\Tag;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\Facades\Client;
