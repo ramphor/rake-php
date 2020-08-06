@@ -198,7 +198,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         if (empty($attribue)) {
             return $attribue->getDefaultValue();
         }
-        return $element->getAttribute($attribue);
+        return $element->getAttribute((string)$attribue);
     }
 
     public function getRegexValue($pattern, $mappingField)
