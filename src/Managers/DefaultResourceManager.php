@@ -10,6 +10,7 @@ use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
+use Ramphor\Rake\Facades\Option;
 
 class DefaultResourceManager extends ResourceManager
 {
@@ -128,6 +129,20 @@ class DefaultResourceManager extends ResourceManager
             $tooth->getId(),
             $tooth->limitQueryResource()
         );
+
+        $notifiedKey = sprintf('tooth_%s_notified', $tooth->getId());
+        $notified    = Option::get($notifiedKey, false);
+        if (count($fileResources) <= 0) {
+            if (!$notified) {
+                Logger::notice(sprintf(
+                    'Not found any resource of the  %s tooth. It means the process resource maybe completed.',
+                    $tooth->getId()
+                ));
+                Option::update($notified, true);
+            }
+        } elseif ($notified) {
+            Option::update($notified, false);
+        }
 
         foreach ($fileResources as $fileResource) {
             $tooth = $this->findTheTooth($fileResource->rake_id, $fileResource->tooth_id);
