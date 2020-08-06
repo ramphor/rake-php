@@ -4,14 +4,14 @@ namespace Ramphor\Rake\Feeds\Sitemap;
 use SimpleXMLElement;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Abstracts\Feed;
-use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Option;
 
 class Sitemap extends Feed
 {
     public function execute()
     {
-        $response = Client::request('GET', $this->id);
+        $response = Request::sendRequest('GET', $this->id);
         $xml_sitemap = new SimpleXMLElement($response->getBody());
 
         foreach ($xml_sitemap->url as $url) {

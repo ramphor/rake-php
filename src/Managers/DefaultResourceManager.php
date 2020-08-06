@@ -7,7 +7,7 @@ use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Link;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\DB;
-use Ramphor\Rake\Facades\Client;
+use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
 use Ramphor\Rake\Facades\Option;
@@ -21,7 +21,7 @@ class DefaultResourceManager extends ResourceManager
         }
 
         try {
-            $response = Client::request('HEAD', (string)$resource['guid']);
+            $response = Request::sendRequest('HEAD', (string)$resource['guid']);
             $mimeType = $response->getHeaderLine('Content-Type');
             return preg_match('/^(text|application)\//', $mimeType);
         } catch (HttpExcepton $e) {

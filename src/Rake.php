@@ -23,6 +23,7 @@ use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Option;
 use Ramphor\Rake\Managers\InstanceManager;
 use Ramphor\Rake\Managers\CrawlerManager;
+use Ramphor\Rake\Managers\RequestManager;
 use Ramphor\Rake\Managers\OptionManager;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Exceptions\RuntimeException;
@@ -45,7 +46,7 @@ class Rake
             static::$app->bind('db', $driver);
         }
         if (!is_null($client)) {
-            static::$app->bind('http', $client);
+            static::$app->bind('request', RequestManager::createRequest($client));
         }
         if (!is_null($logger)) {
             static::$app->bind('logger', $logger);
