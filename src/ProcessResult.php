@@ -1,6 +1,8 @@
 <?php
 namespace Ramphor\Rake;
 
+use Exception;
+use Error;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\Tooth;
 use PHPHtmlParser\Dom as Document;
@@ -18,6 +20,8 @@ class ProcessResult
     protected $tooth;
 
     protected $errors = [];
+
+    protected static $contentImageCallbacks = [];
 
     public function __construct($guid)
     {
@@ -176,7 +180,8 @@ class ProcessResult
         $processor = $this->tooth->getProcessor();
         $images    = $this->content->find('img');
         foreach ($images as $image) {
-            $convertedUrl = $processor->convertImageUrl($image->getAttribute('src'));
+            $imageSrc     = static::callContentImageCallbacks($image->getAttribute('src'), $image);
+            $convertedUrl = $processor->convertImageUrl($imageSrc);
             $imageLink    = Link::create($convertedUrl, $this->feedItem->guid);
             array_push($resources, [
                 'guid' => $imageLink,
@@ -223,5 +228,38 @@ class ProcessResult
             $this->getContentImageResources(),
             $this->getContentLinkResources(),
         );
+    }
+
+    public static function addContentImageCallback($id, $callable)
+    {
+        if (isset(static::$contentImageCallbacks[$id])) {
+            Logger::notice(sprintf('The callback "%s" is already exists.', $id));
+            return;
+        } elseif (isset(static::$contentImageCallbacks[$id])) {
+            Logger::notice(sprintf('The callback of "%s" is not callable.', $id));
+            return;
+        }
+        static::$contentImageCallbacks[$id] = $callable;
+    }
+
+    protected static function callContentImageCallbacks($src, $imageDom)
+    {
+        if (empty(static::$contentImageCallbacks)) {
+            return $src;
+        }
+        try {
+            $outputSrc = $src;
+            foreach ($contentImageCallbacks as $id => $callback) {
+                $outputSrc = call_user_func($callable, $outputSrc, $imageDom);
+            }
+            return $outputSrc;
+        } catch (Exception | Error $e) {
+            Logger::error(sprintf(
+                '%s\n%s',
+                $e->getMessage(),
+                var_export(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 2), true)
+            ));
+        }
+        return $src;
     }
 }
