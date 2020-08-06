@@ -97,7 +97,7 @@ class ProcessResult
         $this->feedItem = $feedItem;
         $this->content  = new Document();
 
-        $this->content->load((string)$feedItem->content);
+        $this->content->loadStr((string)$feedItem->content);
     }
 
     public function getFeedItem()
