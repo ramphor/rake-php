@@ -1,7 +1,7 @@
 <?php
 namespace Ramphor\Rake\Managers;
 
-use Psr\Http\Client\RequestExceptionInterface;
+use Http\Client\Exception as HttpExcepton;
 use Ramphor\Rake\Abstracts\ResourceManager;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Link;
@@ -24,7 +24,7 @@ class DefaultResourceManager extends ResourceManager
             $response = Client::request('HEAD', (string)$resource['guid']);
             $mimeType = $response->getHeaderLine('Content-Type');
             return preg_match('/^(text|application)\//', $mimeType);
-        } catch (RequestExceptionInterface $e) {
+        } catch (HttpExcepton $e) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $errorLogs = ob_get_clean();

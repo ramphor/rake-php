@@ -11,7 +11,7 @@ namespace Ramphor\Rake;
 
 use Iterator;
 use Psr\Log\LoggerInterface;
-use Psr\Http\Client\ClientInterface;
+use Http\Client\HttpClient;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
@@ -36,7 +36,7 @@ class Rake
 
     protected $options = [];
 
-    public function __construct(string $rakeId, Driver $driver = null, ClientInterface $client = null, LoggerInterface $logger = null)
+    public function __construct(string $rakeId, Driver $driver = null, HttpClient $client = null, LoggerInterface $logger = null)
     {
         static::$app = App::instance();
         $this->id    = $rakeId;
