@@ -106,10 +106,10 @@ class OptionManager
         if ($optionId > 0) {
             $query = $query->update(DB::table('rake_options'))
                 ->set([
-                    'option_name'  => $optionName,
                     'option_value' => serialize($optionValue),
                     'autoload'     => (int)$autoload
-                ]);
+                ])
+                ->where('ID=?', $optionId);
         } else {
             $query = $query->insertInto(DB::table('rake_options'), ['option_name', 'option_value', 'autoload'])
                 ->values(
