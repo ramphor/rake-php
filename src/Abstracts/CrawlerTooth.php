@@ -1,7 +1,8 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use GuzzleHttp\Exception\RequestException;
+use Http\Client\Exception;
+use GuzzleHttp\Exception\GuzzleException;
 use Ramphor\Rake\Response;
 use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
@@ -88,12 +89,12 @@ abstract class CrawlerTooth extends Tooth
                     $crawlData->url,
                     $requestResponse->getStatusCode()
                 ));
-            } catch (RequestException $e) {
+            } catch (Exception $e) {
                 ob_start();
                 debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
                 $errorLogs = ob_get_clean();
                 Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), $crawlData);
-                if ($e->hasResponse()) {
+                if (($e instanceof GuzzleException) && $e->hasResponse()) {
                     $requestResponse = $e->getResponse();
                     $statusCode      = $requestResponse->getStatusCode();
 
