@@ -179,7 +179,10 @@ abstract class ResourceManager implements ResourceManagerContract
             ->on('res.ID = rel.parent_id')
             ->where('rel.resource_id=?', $childId);
 
-        return $this->findByQuery($query);
+        $parent = $this->findByQuery($query);
+        Logger::debug(sprintf('Find the parent resource from child #%s', $childId), (array)$parent);
+        
+        return $parent;
     }
 
     public function getTotalResources()
