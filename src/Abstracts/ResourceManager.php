@@ -2,8 +2,6 @@
 
 namespace Ramphor\Rake\Abstracts;
 
-use Error;
-use Exception;
 use Ramphor\Sql as QueryBuilder;
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
@@ -76,15 +74,7 @@ abstract class ResourceManager implements ResourceManagerContract
         }
         foreach ($this->resources as $resource) {
             $tooth    = $resource->getTooth();
-            try {
-                $resource = $tooth->downloadResource($resource);
-            } catch (Exception | Error $e) {
-                $resource->skip();
-                ob_start();
-                debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-                $errorLogs = ob_get_clean();
-                Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs));
-            }
+            $resource = $tooth->downloadResource($resource);
 
             /* After download files via Tooth.
             * Rake will be update resource to database with new GUID and Type
