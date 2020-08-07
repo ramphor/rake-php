@@ -1,10 +1,11 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use Ramphor\Rake\Link;
+use Http\Client\Exception;
 use PHPHtmlParser\Dom;
-use PHPHtmlParser\Dom\Node\HtmlNode;
 use PHPHtmlParser\Dom\Tag;
+use PHPHtmlParser\Dom\Node\HtmlNode;
+use Ramphor\Rake\Link;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Logger;
@@ -51,7 +52,7 @@ abstract class Processor implements ProcessorConstract
         try {
             $response = Request::sendRequest('HEAD', $imageUrl, ['http_errors' => false, 'allow_redirects' => true]);
             return $response->getStatusCode() < 400;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $errorLogs = ob_get_clean();

@@ -3,8 +3,10 @@ namespace Ramphor\Rake\Managers;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Exception\GuzzleException;
 use Http\Client\HttpClient;
 use Http\Adapter\Guzzle6\Client as HttpAdapter;
+use Ramphor\Rake\Facades\Logger;
 
 class RequestManager
 {
