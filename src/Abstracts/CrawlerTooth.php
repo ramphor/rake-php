@@ -92,7 +92,7 @@ abstract class CrawlerTooth extends Tooth
                 ob_start();
                 debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
                 $errorLogs = ob_get_clean();
-                Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs));
+                Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), $crawlData);
                 if ($e->hasResponse()) {
                     $requestResponse = $e->getResponse();
                     $statusCode      = $requestResponse->getStatusCode();
