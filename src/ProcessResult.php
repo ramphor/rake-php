@@ -1,8 +1,7 @@
 <?php
 namespace Ramphor\Rake;
 
-use Exception;
-use Error;
+use Throwable;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\Tooth;
 use PHPHtmlParser\Dom as Document;
@@ -268,7 +267,7 @@ class ProcessResult
                 $outputSrc = call_user_func($callback, $outputSrc, $imageDom);
             }
             return $outputSrc;
-        } catch (Exception | Error $e) {
+        } catch (Throwable $e) {
             Logger::error(sprintf(
                 '%s\n%s',
                 $e->getMessage(),
