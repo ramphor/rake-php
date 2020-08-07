@@ -5,7 +5,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
 use Http\Adapter\Guzzle6\Client as HttpAdapter;
-use Ramphor\Rake\Facades\Logger;
 
 class RequestManager
 {
@@ -33,15 +32,10 @@ class RequestManager
             $this->clientOptions = $options;
         }
 
-        try {
-            die
-            $request = new Request($method, $url);
-            return call_user_func(
-                [$this->httpAdapter, 'sendRequest'],
-                $request
-            );
-        } catch(ConnectException $e) {
-            var_dump($e);die;
-        }
+        $request = new Request($method, $url);
+        return call_user_func(
+            [$this->httpAdapter, 'sendRequest'],
+            $request
+        );
     }
 }
