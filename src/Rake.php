@@ -11,7 +11,6 @@ namespace Ramphor\Rake;
 
 use Iterator;
 use Psr\Log\LoggerInterface;
-use Http\Client\HttpClient;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
@@ -37,16 +36,13 @@ class Rake
 
     protected $options = [];
 
-    public function __construct(string $rakeId, Driver $driver = null, HttpClient $client = null, LoggerInterface $logger = null)
+    public function __construct(string $rakeId, Driver $driver = null, LoggerInterface $logger = null)
     {
         static::$app = App::instance();
         $this->id    = $rakeId;
 
         if (!is_null($driver)) {
             static::$app->bind('db', $driver);
-        }
-        if (!is_null($client)) {
-            static::$app->bind('request', RequestManager::createRequest($client));
         }
         if (!is_null($logger)) {
             static::$app->bind('logger', $logger);
@@ -58,6 +54,7 @@ class Rake
             return new OptionManager();
         });
 
+        static::$app->bind('request', RequestManager::createRequest());
         static::$app->bind('instances', new InstanceManager());
         static::$app->resolve('instances')->add($this);
         Facade::setFacadeApplication(static::$app);

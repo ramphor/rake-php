@@ -1,34 +1,38 @@
 <?php
 namespace Ramphor\Rake\Managers;
 
-use Psr\Http\Message\RequestInterface;
-use Http\Client\HttpClient;
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
+use Http\Client\HttpClient;
+use Http\Adapter\Guzzle6\Client as HttpAdapter;
 
 class RequestManager
 {
     protected $httpAdapter;
+    protected $clientOptions;
 
-    private function __construct()
+    private function __construct(HttpClient $adapter)
     {
+        $this->httpAdapter = $adapter;
     }
 
-    public static function createRequest(HttpClient $httpAdapter)
+    public static function createRequest()
     {
-        $request = new static();
-        $request->setAdapter($httpAdapter);
-
-        return $request;
-    }
-
-    protected function setAdapter(HttpClient $httpAdapter)
-    {
-        $this->httpAdapter = $httpAdapter;
+        $httpAdapter = new HttpAdapter(
+            new Client()
+        );
+        return new self($httpAdapter);
     }
 
     public function sendRequest($method, $url, $options = [])
     {
-        $request = new Request($method, $url, $options);
+        if ($options !== $this->clientOptions) {
+            $client              = new Client($options);
+            $this->httpAdapter   = new HttpAdapter($client);
+            $this->clientOptions = $options;
+        }
+
+        $request = new Request($method, $url);
         return call_user_func(
             [$this->httpAdapter, 'sendRequest'],
             $request
