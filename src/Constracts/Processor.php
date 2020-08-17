@@ -6,5 +6,10 @@ use Ramphor\Rake\ProcessResult;
 
 interface Processor
 {
-    public function execute(): ProcessResult;
+    /**
+     * Execute the processor to get the ProcessResult or null
+     *
+     * @return \Ramphor\Rake\ProcessResult
+     */
+    public function execute();
 }
