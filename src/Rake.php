@@ -116,59 +116,7 @@ class Rake
                     continue;
                 }
 
-                if (iterator_count($feedItems)) {
-                    foreach ($feedItems as $feedItem) {
-                        if (!($feedItem instanceof FeedItem)) {
-                            Logger::warning(
-                                sprintf('The %s tooth has feed item is not instance of %s', $tooth->getId(), FeedItem::class),
-                                (array)$feedItem
-                            );
-                            continue;
-                        }
-
-                        if (!$feedItem->isValid()) {
-                            Logger::warning(
-                                'The feed item is invalid then create a error ProcessResult',
-                                is_wp_error($feedItem) ? $feedItem->get_error_messages() : (array) $feedItem
-                            );
-
-                            $result = ProcessResult::createErrorResult(
-                                sprintf('The feed item "%s" is invalid', $feedItem->guid),
-                                $feedItem->errorType
-                            );
-                        } else {
-                            $processor->setFeedItem($feedItem);
-                            // Execute processor
-                            $result      = $processor->execute();
-                            $logFeedItem = var_export([
-                                'guid' => $feedItem->guid,
-                                'title' => $feedItem->title,
-                                'urlDbId' => $feedItem->urlDbId,
-                            ], true);
-
-                            if ($result->isSuccess()) {
-                                Logger::debug(sprintf(
-                                    'Process feed item %s is successful with new GUID is %s - %s',
-                                    $result->getGuid(),
-                                    $result->getNewGuid(),
-                                    $logFeedItem
-                                ));
-                            } else {
-                                Logger::warning(sprintf(
-                                    'The result is %s with message: %s - %s',
-                                    $result->isSkipped() ? 'skipped' : 'error',
-                                    $result->getErrorMessage(),
-                                    $logFeedItem
-                                ));
-                            }
-                        }
-                        $result->setFeedItem($feedItem);
-                        $result->setProcessingTooth($tooth);
-
-                        // Store all results
-                        array_push($results, $result);
-                    }
-                } else {
+                if (!iterator_count($feedItems)) {
                     $notifiedOptionKey = sprintf('tooth_%s_notified', $tooth->getId());
                     if (!Option::get($notifiedOptionKey, false)) {
                         Logger::notice(sprintf(
@@ -177,6 +125,71 @@ class Rake
                         ));
                         Option::update($notifiedOptionKey, true);
                     }
+                    continue;
+                }
+
+                foreach ($feedItems as $feedItem) {
+                    if (!($feedItem instanceof FeedItem)) {
+                        Logger::warning(
+                            sprintf('The %s tooth has feed item is not instance of %s', $tooth->getId(), FeedItem::class),
+                            (array)$feedItem
+                        );
+                        continue;
+                    }
+
+                    if (!$feedItem->isValid()) {
+                        Logger::warning(
+                            'The feed item is invalid then create a error ProcessResult',
+                            is_wp_error($feedItem) ? $feedItem->get_error_messages() : (array) $feedItem
+                        );
+
+                        $result = ProcessResult::createErrorResult(
+                            sprintf('The feed item "%s" is invalid', $feedItem->guid),
+                            $feedItem->errorType
+                        );
+                    } else {
+                        Logger::debug(sprintf('Set feed item "%s" to processor', $feedItem->guid));
+                        $processor->setFeedItem($feedItem);
+                        // Execute processor
+                        $result      = $processor->execute();
+                        $logFeedItem = var_export([
+                            'guid' => $feedItem->guid,
+                            'title' => $feedItem->title,
+                            'urlDbId' => $feedItem->urlDbId,
+                        ], true);
+
+                        if ($result->isSuccess()) {
+                            Logger::debug(sprintf(
+                                'Process feed item %s is successful with new GUID is %s - %s',
+                                $result->getGuid(),
+                                $result->getNewGuid(),
+                                $logFeedItem
+                            ));
+                        } else {
+                            Logger::warning(sprintf(
+                                'The result is %s with message: %s - %s',
+                                $result->isSkipped() ? 'skipped' : 'error',
+                                $result->getErrorMessage(),
+                                $logFeedItem
+                            ));
+                        }
+                    }
+                    $result->setFeedItem($feedItem);
+                    $result->setProcessingTooth($tooth);
+
+                    if (is_null($result)) {
+                        Logger::warning(
+                            sprintf(
+                                'The feed item "%s" can not create the process result',
+                                $feedItem->guid
+                            ),
+                            (array)$feedItem
+                        );
+                        continue;
+                    }
+
+                    // Store all results
+                    array_push($results, $result);
                 }
             }
 
