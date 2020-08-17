@@ -127,7 +127,11 @@ class Rake
                         }
 
                         if (!$feedItem->isValid()) {
-                            Logger::warning('The feed item is invalid then create a error ProcessResult', (array) $feedItem);
+                            Logger::warning(
+                                'The feed item is invalid then create a error ProcessResult',
+                                is_wp_error($feedItem) ? $feedItem->get_error_messages() : (array) $feedItem
+                            );
+
                             $result = ProcessResult::createErrorResult(
                                 sprintf('The feed item "%s" is invalid', $feedItem->guid),
                                 $feedItem->errorType
