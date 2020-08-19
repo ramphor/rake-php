@@ -49,7 +49,7 @@ final class Link
             $notify = true;
             $this->parse();
         }
-        $suffix = $this->path;
+        $suffix = trim($this->path);
         if ($this->query) {
             $suffix .= '?' . $this->query;
         }
