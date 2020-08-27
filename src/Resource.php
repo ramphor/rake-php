@@ -10,6 +10,7 @@ use Ramphor\Rake\Facades\Resources;
 class Resource
 {
     protected $contentChanged = false;
+    protected $createFlag     = false;
 
     protected $id;
     protected $guid;
@@ -67,7 +68,7 @@ class Resource
         }
         $rake = $this->tooth->getRake();
 
-        $query = sql()->select('ID')
+        $query = sql()->select('ID, imported')
             ->from(DB::table('rake_resources'))
             ->where(
                 'guid = ? AND resource_type = ? AND rake_id = ? AND tooth_id =?',
@@ -76,8 +77,16 @@ class Resource
                 $rake->getId(),
                 $this->tooth->getId()
             );
+        $row   = DB::row($query);
+        if (empty($row)) {
+            $this->createFlag = true;
+            return 0;
+        }
 
-        return $this->id = (int)DB::var($query);
+        // When the resource is imported create new resource
+        $this->createFlag = (bool)$row->imported;
+
+        return $this->id = (int) $row->ID;
     }
 
     public function setNewGuid($newGuid)
@@ -158,7 +167,10 @@ class Resource
     public function save($createFlow = false)
     {
         if ($createFlow) {
-            $this->insert();
+            $id = $this->findId();
+            if ($this->createFlag || $id < 0) {
+                $this->insert();
+            }
         } elseif ($this->findId() <= 0) {
             $this->insert();
         } else {
