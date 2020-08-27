@@ -39,25 +39,42 @@ class CrawlerManager
         $query = sql()->select('ID')->from(DB::table('rake_crawled_urls'));
         if ($tooth->isSkipCheckTooth()) {
             $query = $query->where(
-                'url=? AND rake_id=? AND tooth_id IS NULL',
+                'url=? AND rake_id=? AND tooth_id IS NULL AND crawled=?',
                 $url,
-                $rake->getId()
+                $rake->getId(),
+                0
             );
         } else {
             $query = $query->where(
-                'url=? AND rake_id=? AND tooth_id=?',
+                'url=? AND rake_id=? AND tooth_id=? AND crawled=?',
                 $url,
                 $rake->getId(),
-                $tooth->getId()
+                $tooth->getId(),
+                0
             );
         }
+        $query->limit(1);
 
-        return DB::var($query) > 0;
+        return (int) DB::var($query);
     }
 
     public function import($url, Tooth &$tooth)
     {
         $rake = $tooth->getRake();
+        $existingId = $this->checkIsExists($resource->guid, $resource->tooth);
+
+        /**
+         * When in table has URLs is not imported yet
+         * Use this URL ID to create a relationship
+         */
+        if ($existingId > 0) {
+            Logger::debug(sprintf('The URL %s already exists in database', $resource->guid));
+            return $existingId;
+        }
+
+        /**
+         * Insert new crawled URL
+         */
         $query = sql()->insertInto(
             DB::table('rake_crawled_urls'),
             ['url', 'rake_id', 'tooth_id', 'crawled', 'skipped', 'retry', 'created_at', 'updated_at']
@@ -76,11 +93,10 @@ class CrawlerManager
         return DB::insert($query);
     }
 
-    public function importFromResource(Resource $resource)
+    public function importFromResource($resource)
     {
-        if ($this->checkIsExists($resource->guid, $resource->tooth)) {
-            Logger::debug(sprintf('The URL %s already exists in database', $resource->guid));
-            return;
+        if (!is_a($tooth, Tooth::class)) {
+            Logger::warning(sprintf('The Tooth must an instanceof %s', Tooth::class));
         }
 
         return $this->import($resource->guid, $resource->tooth);
