@@ -9,6 +9,7 @@ use Ramphor\Rake\Facades\Crawler;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
+use Ramphor\Rake\Tooth;
 
 abstract class ResourceManager implements ResourceManagerContract
 {
@@ -181,12 +182,36 @@ abstract class ResourceManager implements ResourceManagerContract
 
         $parent = $this->findByQuery($query);
         Logger::debug(sprintf('Find the parent resource from child #%s', $childId), (array)$parent);
-        
+
         return $parent;
     }
 
     public function getTotalResources()
     {
         return count($this->resources);
+    }
+
+    public function skipLinkByUrl($url, $tooth)
+    {
+        if (!is_a($tooth, Tooth::class)) {
+            Logger::warning(sprintf('The tooth must be an instance of %s', Tooth::class));
+            return;
+        }
+        $rake = $tooth->getRake();
+        $query = sql()->update(DB::table('rake_resources'))
+            ->set(array(
+                'skipped' => 1,
+                '@updated_at' => 'NOW()',
+            ))
+            ->where(
+                'guid=? AND imported=? AND tooth_id=? AND rake_id=? AND resource_type=?',
+                $url,
+                0,
+                $tooth->getId(),
+                $rake->getId(),
+                'link'
+            );
+
+        return DB::query($query);
     }
 }
