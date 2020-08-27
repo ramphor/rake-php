@@ -157,9 +157,13 @@ class Resource
 
     public function save($createFlow = false)
     {
-        ($createFlow === false && $this->findId() > 0)
-            ? $this->update()
-            : $this->insert();
+        if ($createFlow) {
+            $this->insert();
+        } elseif ($this->findId() <= 0) {
+            $this->insert();
+        } else {
+            $this->update();
+        }
 
         if ($this->imported && $this->tooth->validateSystemResource($this->newGuid, $this->newType)) {
             if ($this->type === 'link') {
