@@ -5,6 +5,7 @@ use Ramphor\Rake\ProcessResult;
 use Ramphor\Rake\Resource;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\DB;
+use Ramphor\Rake\Facades\Resources;
 use Ramphor\Rake\Abstracts\Tooth;
 
 class CrawlerManager
@@ -19,13 +20,13 @@ class CrawlerManager
 
         $query = sql()->update(DB::table('rake_crawled_urls'));
         if ($result->isSkipped()) {
-            Logger::debug(sprintf('The URL %s will be skipped', $feedItem->guid));
             $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
+            Resources::skipLinkByUrl($result->getGuid());
         } elseif ($result->isSuccess()) {
-            Logger::debug(sprintf('The URL %s is crawled successfully', $feedItem->guid));
+            Logger::debug(sprintf('The URL %s is crawled successfully', $result->getGuid()));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } else {
-            Logger::debug(sprintf('The URL %s is crawled failed. It will be retry to re-crawl later', $feedItem->guid));
+            Logger::debug(sprintf('The URL %s is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
             $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
         }
         $query = $query->where('ID=?', $feedItem->urlDbId);
