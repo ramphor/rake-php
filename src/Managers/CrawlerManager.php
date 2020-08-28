@@ -21,7 +21,7 @@ class CrawlerManager
         $query = sql()->update(DB::table('rake_crawled_urls'));
         if ($result->isSkipped()) {
             $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
-            Resources::skipLinkByUrl($result->getGuid());
+            Resources::skipLinkByUrl($result->getGuid(), $result->getTooth());
         } elseif ($result->isSuccess()) {
             Logger::debug(sprintf('The URL %s is crawled successfully', $result->getGuid()));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
