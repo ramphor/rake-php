@@ -17,6 +17,7 @@ class FeedItem
     protected $galleryImages;
     protected $status;
     protected $metas;
+    protected $slug;
 
     protected $errorType;
 
