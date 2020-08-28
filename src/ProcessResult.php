@@ -9,6 +9,10 @@ use Ramphor\Rake\Facades\Logger;
 
 class ProcessResult
 {
+    const SUCCESS_RESULT_TYPE = 'success';
+    const SKIP_RESULT_TYPE = 'skip';
+    const ERROR_RESULT_TYPE = 'error';
+
     protected $guid;
     protected $content;
     protected $resultType;
