@@ -34,8 +34,11 @@ class CrawlerManager
         return DB::query($query);
     }
 
-    public function checkIsExists($url, Tooth &$tooth)
+    public function checkIsExists($url, &$tooth)
     {
+        if (!is_a($tooth, Tooth::class)) {
+            return;
+        }
         $rake = $tooth->getRake();
         $query = sql()->select('ID')->from(DB::table('rake_crawled_urls'));
         if ($tooth->isSkipCheckTooth()) {
@@ -59,10 +62,14 @@ class CrawlerManager
         return (int) DB::var($query);
     }
 
-    public function import($url, Tooth &$tooth)
+    public function import($url, &$tooth)
     {
+        if (!is_a($tooth, Tooth::class)) {
+            Logger::warning(sprintf('The tooth must be instance of %s', Tooth::class));
+            return;
+        }
         $rake = $tooth->getRake();
-        $existingId = $this->checkIsExists($resource->guid, $resource->tooth);
+        $existingId = $this->checkIsExists($url, $tooth);
 
         /**
          * When in table has URLs is not imported yet
