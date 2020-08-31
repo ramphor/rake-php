@@ -70,16 +70,16 @@ final class Link
             $prefix .= $account . '@';
         }
 
-        $ouputUrl = $prefix . $this->host . $suffix;
+        $outputUrl = $prefix . $this->host . $suffix;
         if (!empty(static::$callbacks['output'])) {
-            $ouputUrl = static::callOutputCallbacks($output, $this);
+            $outputUrl = static::callOutputCallbacks($output, $this);
         }
 
-        if ($notify && $ouputUrl !== $this->rawUrl) {
+        if ($notify && $outputUrl !== $this->rawUrl) {
             Logger::info(sprintf('The URL %s is changed to %s', $outputUrl, $this->rawUrl));
             $notify = false;
         }
-        return $ouputUrl;
+        return $outputUrl;
     }
 
     public function setRawUrl($url)
