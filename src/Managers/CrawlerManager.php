@@ -103,10 +103,10 @@ class CrawlerManager
 
     public function importFromResource($resource)
     {
-        if (!is_a($tooth, Tooth::class)) {
-            Logger::warning(sprintf('The Tooth must an instanceof %s', Tooth::class));
+        if (!is_a($resource, Resource::class)) {
+            Logger::warning(sprintf('The resource must an instanceof %s', Resource::class));
+            return;
         }
-
         return $this->import($resource->guid, $resource->tooth);
     }
 }
