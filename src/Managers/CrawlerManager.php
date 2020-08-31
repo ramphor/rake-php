@@ -76,7 +76,7 @@ class CrawlerManager
          * Use this URL ID to create a relationship
          */
         if ($existingId > 0) {
-            Logger::debug(sprintf('The URL %s already exists in database', $resource->guid));
+            Logger::debug(sprintf('The URL %s already exists in database', $url));
             return $existingId;
         }
 
