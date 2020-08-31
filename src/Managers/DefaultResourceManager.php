@@ -152,7 +152,7 @@ class DefaultResourceManager extends ResourceManager
             $tooth = $this->findTheTooth($fileResource->rake_id, $fileResource->tooth_id);
             if (is_null($tooth)) {
                 Logger::warning('The resource doesn\'t have a tooth continue processing', [
-                    'ID'       => $fileResource->id,
+                    'ID'       => $fileResource->ID,
                     'type'     => $fileResource->resource_type,
                     'tooth_id' => $fileResource->tooth_id,
                 ]);
@@ -160,7 +160,7 @@ class DefaultResourceManager extends ResourceManager
             }
 
             Logger::debug(sprintf('Create a resource from database %s', var_export([
-                'ID'   => $fileResource->id,
+                'ID'   => $fileResource->ID,
                 'type' => $fileResource->resource_type,
             ], true)));
             $resource = Resource::create(
