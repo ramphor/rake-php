@@ -11,7 +11,9 @@ class Sitemap extends Feed
 {
     public function execute()
     {
-        $response = Request::sendRequest('GET', $this->id);
+        $response = Request::sendRequest('GET', $this->id, array(
+            'verify' => false,
+        ));
         $xml_sitemap = new SimpleXMLElement($response->getBody());
 
         foreach ($xml_sitemap->url as $url) {

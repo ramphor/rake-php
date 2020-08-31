@@ -32,6 +32,8 @@ class RequestManager
             $this->clientOptions = $options;
         }
 
+
+
         $request = new Request($method, $url);
         return call_user_func(
             [$this->httpAdapter, 'sendRequest'],
