@@ -16,7 +16,9 @@ abstract class CrawlerTooth extends Tooth
 
     public function crawlRequestOptions()
     {
-        return [];
+        return [
+            'verify' => false,
+        ];
     }
 
     abstract protected function validateURL($url);

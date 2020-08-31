@@ -21,14 +21,18 @@ class DefaultResourceManager extends ResourceManager
         }
 
         try {
-            $response = Request::sendRequest('HEAD', (string)$resource['guid']);
+            $response = Request::sendRequest(
+                'HEAD',
+                (string)$resource['guid'],
+                array('verify' => false)
+            );
             $mimeType = $response->getHeaderLine('Content-Type');
             return preg_match('/^(text|application)\//', $mimeType);
         } catch (Exception $e) {
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $errorLogs = ob_get_clean();
-            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs));
+            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), $resource);
         }
         return false;
     }
