@@ -240,11 +240,12 @@ class ProcessResult
 
     public function getResources()
     {
-        return array_merge(
+        $resources = array_merge(
             $this->getFeedImagesResources(),
             $this->getContentImageResources(),
-            $this->getContentLinkResources(),
         );
+
+        return $resources;
     }
 
     public static function addContentImageCallback($id, $callable)
