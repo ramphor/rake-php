@@ -5,6 +5,7 @@ use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Link;
+use Ramphor\Rake\Facades\Option;
 use Ramphor\Rake\Constracts\Feed as FeedConstract;
 
 abstract class Feed implements FeedConstract
@@ -87,7 +88,7 @@ abstract class Feed implements FeedConstract
 
     protected function getAllOptions()
     {
-        return $this->options = get_option(
+        return $this->options = Option::get(
             sprintf('rake_feed_%s_options', $this->id),
             array()
         );
@@ -112,7 +113,8 @@ abstract class Feed implements FeedConstract
         }
 
         $this->options[$name] = $value;
-        return update_option(
+
+        return Option::update(
             sprintf('rake_feed_%s_options', $this->id),
             $this->options
         );
