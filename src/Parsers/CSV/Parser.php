@@ -48,20 +48,6 @@ class Parser extends AbstractParser
 
     public function current(): FeedItem
     {
-        $row = fgetcsv(
-            $this->data,
-            $this->contentSize,
-            $this->delimeter,
-            $this->enclosure,
-            $this->escape
-        );
-
-        if (!is_array($this->header) || count($this->header) <= 0) {
-            $this->currentRow = $row;
-        } else {
-            $this->currentRow = array_combine($this->header, $row);
-        }
-
         $this->feedBuilder->newItem($this->currentRow);
         $this->feedBuilder->build();
 
@@ -70,10 +56,23 @@ class Parser extends AbstractParser
 
     public function next()
     {
-        if (is_resource($this->data)) {
-            return !feof($this->data);
+        $row = fgetcsv(
+            $this->data,
+            $this->contentSize,
+            $this->delimeter,
+            $this->enclosure,
+            $this->escape
+        );
+
+        if ($row) {
+            if (!is_array($this->header) || count($this->header) <= 0) {
+                $this->currentRow = $row;
+            } else {
+                $this->currentRow = array_combine($this->header, $row);
+            }
+        } else {
+            $this->currentRow = false;
         }
-        return false;
     }
 
     public function rewind()
@@ -100,6 +99,6 @@ class Parser extends AbstractParser
 
     public function valid()
     {
-        return !feof($this->data);
+        return $this->currentRow !== false;
     }
 }
