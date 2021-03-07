@@ -9,6 +9,13 @@ use Ramphor\Rake\Facades\Option;
 
 class Sitemap extends Feed
 {
+    const NAME = 'sitemap';
+
+    public function get_name()
+    {
+        return static::NAME;
+    }
+
     public function execute()
     {
         $response = Request::sendRequest('GET', $this->id, array(

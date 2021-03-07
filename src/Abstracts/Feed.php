@@ -84,4 +84,37 @@ abstract class Feed implements FeedConstract
     {
         return (bool)$this->hasResponse;
     }
+
+    protected function getAllOptions()
+    {
+        return $this->options = get_option(
+            sprintf('rake_feed_%s_options', $this->id),
+            array()
+        );
+    }
+
+    public function getOption($name, $defaultValue = null)
+    {
+        if (is_null($this->options)) {
+            $this->getAllOptions();
+        }
+
+        if (isset($this->options[$name])) {
+            return $this->options[$name];
+        }
+        return $defaultValue;
+    }
+
+    public function updateOption($name, $value)
+    {
+        if (is_null($this->options)) {
+            $this->getAllOptions();
+        }
+
+        $this->options[$name] = $value;
+        return update_option(
+            sprintf('rake_feed_%s_options', $this->id),
+            $this->options
+        );
+    }
 }
