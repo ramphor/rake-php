@@ -6,6 +6,9 @@ use Ramphor\Rake\DataSource\FeedItem;
 
 class Parser extends AbstractParser
 {
+    protected $data;
+    protected $feedBuilder;
+
     protected $delimeter = ',';
     protected $enclosure = '"';
     protected $escape    = '\\';
@@ -14,7 +17,6 @@ class Parser extends AbstractParser
 
     protected $contentSize;
     protected $currentRow;
-    protected $feedBuilder;
 
     public function setDelimeter(string $delimeter = ',')
     {
@@ -63,6 +65,7 @@ class Parser extends AbstractParser
             $this->enclosure,
             $this->escape
         );
+        $this->rowCounter += 1;
 
         if ($row) {
             if (!is_array($this->header) || count($this->header) <= 0) {
@@ -94,6 +97,7 @@ class Parser extends AbstractParser
         }
 
         $this->rowCounter  = 0;
+        $this->currentRow  = null;
         $this->contentSize = fstat($this->data)['size'];
     }
 

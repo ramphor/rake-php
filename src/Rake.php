@@ -128,7 +128,7 @@ class Rake
                     continue;
                 }
 
-                foreach ($feedItems as $feedItem) {
+                foreach ($feedItems as $index => $feedItem) {
                     if (!($feedItem instanceof FeedItem)) {
                         Logger::warning(
                             sprintf('The %s tooth has feed item is not instance of %s', $tooth->getId(), FeedItem::class),
