@@ -7,8 +7,9 @@ The spider/crawler framework written in PHP
 
 ```
 $rake  = new Rake( 'rake_id', new Your_DB_Driver(), new Your_HTTP_Client() );
-$tooth = new Your_Tooth_Class( $rake, 'cp_products' );
-$feed  = new Sitemap( $tooth, 'site_map_url' );
+$tooth = new Your_Tooth_Class( 'cp_products', $rake );
+$feed  = new Sitemap( 'site_map_url' );
+$feed->setTooth( $tooth );
 
 $tooth->registerProcessor( new Your_Processor() );
 $tooth->setFormat( Tooth::FORMAT_HTML );
