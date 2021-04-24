@@ -72,4 +72,8 @@ class Initialize
             DB::raw_query($query);
         }
     }
+
+    public function removeDbTables()
+    {
+    }
 }
