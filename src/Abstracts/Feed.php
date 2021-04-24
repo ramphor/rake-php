@@ -16,10 +16,13 @@ abstract class Feed implements FeedConstract
     protected $tooth;
     protected $options;
 
-    public function __construct(Tooth $tooth, string $feedId)
+    public function __construct(string $feedId, Tooth $tooth = null)
     {
         $this->setId($feedId);
-        $this->setTooth($tooth);
+
+        if (!is_null($tooth)) {
+            $this->setTooth($tooth);
+        }
     }
 
     public function setId(string $id)
