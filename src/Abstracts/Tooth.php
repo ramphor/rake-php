@@ -33,10 +33,17 @@ abstract class Tooth implements ToothConstract
     protected $parser;
     protected $processor;
 
-    public function __construct(Rake $rake, string $toothId)
+    public function __construct(string $toothId, Rake $rake = null)
     {
         $this->id = $toothId;
-        $this->rake    = $rake;
+        if (!is_null($rake)) {
+            $this->setRake($rake);
+        }
+    }
+
+    public function setRake(Rake $rake)
+    {
+        $this->rake = $rake;
     }
 
     public function getId()
