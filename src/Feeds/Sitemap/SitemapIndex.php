@@ -11,4 +11,20 @@ class SitemapIndex extends Feed
     {
         return static::NAME;
     }
+
+    public function execute()
+    {
+    }
+
+    public function valid()
+    {
+    }
+
+    public function next()
+    {
+    }
+
+    public function rewind()
+    {
+    }
 }
