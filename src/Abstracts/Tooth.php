@@ -105,6 +105,21 @@ abstract class Tooth implements ToothConstract
         return new $parsers[$this->toothFormat]($resource, $parserOptions);
     }
 
+    public function addMappingField($fieldName, $args)
+    {
+        if (!is_array($args)) {
+            return;
+        }
+        $args = wp_parse_args($args, array(
+            'type' => '',
+            'pattern' => '',
+        ));
+
+        if ($args['type'] && $args['pattern']) {
+            $this->mappingFields[$fieldName] = $args;
+        }
+    }
+
     public function getParsers()
     {
         if (empty($this->toothFormat)) {
