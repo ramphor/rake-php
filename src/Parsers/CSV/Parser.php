@@ -85,7 +85,7 @@ class Parser extends AbstractParser
         if ($this->hasHeader) {
             $header = fgetcsv(
                 $this->data,
-                $this->contentSize,
+                0,
                 $this->delimeter,
                 $this->enclosure,
                 $this->escape
@@ -96,8 +96,16 @@ class Parser extends AbstractParser
             }
         }
 
+        $firstRow = fgetcsv(
+            $this->data,
+            $this->contentSize,
+            $this->delimeter,
+            $this->enclosure,
+            $this->escape
+        );
+
         $this->rowCounter  = 0;
-        $this->currentRow  = null;
+        $this->currentRow  = $this->header ? array_combine($this->header, $firstRow) : $firstRow;
         $this->contentSize = fstat($this->data)['size'];
     }
 

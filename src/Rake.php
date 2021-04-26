@@ -111,6 +111,11 @@ class Rake
             $parsers   = $tooth->getParsers();
 
             foreach ($parsers as $feedItems) {
+                $parserBootstrapCallback = array($tooth, 'parserBootstrap');
+                if (is_callable($parserBootstrapCallback)) {
+                    call_user_func($parserBootstrapCallback, $feedItems);
+                }
+
                 if (!($feedItems instanceof Iterator)) {
                     Logger::warning(sprintf('The Rake parser is not instance of %s', Iterator::class), (array)$feedItem);
                     continue;

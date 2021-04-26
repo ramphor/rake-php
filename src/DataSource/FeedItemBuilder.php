@@ -71,6 +71,9 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
     public function newItem($data)
     {
+        var_dump($data);
+        die;
+
         $this->document     = null;
         // $data['body'] is exists when call `append()` method of Response object
         if (isset($data['body'])) {

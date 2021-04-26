@@ -123,7 +123,7 @@ abstract class Tooth implements ToothConstract
     public function getParsers()
     {
         if (empty($this->toothFormat)) {
-            Logger::warning(sprintf('The %s tooth doesn\'t specific data format to processing'));
+            Logger::warning(sprintf('The %s tooth doesn\'t specific data format to processing', $this->toothFormat));
             return [];
         }
         if (empty($this->mappingFields)) {

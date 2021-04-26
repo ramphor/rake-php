@@ -47,7 +47,7 @@ class FieldMapping
     {
         $sourceType = strtolower(trim($sourceType));
         if (!in_array($sourceType, self::$supportedSourceTypes)) {
-            throw new \Exception("Invalid resource type");
+            throw new \Exception("Invalid source type");
         }
         $this->sourceType = $sourceType;
     }
