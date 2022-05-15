@@ -32,6 +32,7 @@ class Rake
     protected static $app;
 
     protected $id;
+
     protected $teeth;
 
     protected $options = [];
@@ -142,7 +143,7 @@ class Rake
                         continue;
                     }
 
-                    if (!$feedItem->isValid()) {
+                    if (is_wp_error($feedItem) || !$feedItem->isValid()) {
                         Logger::warning(
                             'The feed item is invalid then create a error ProcessResult',
                             is_wp_error($feedItem) ? $feedItem->get_error_messages() : (array) $feedItem
