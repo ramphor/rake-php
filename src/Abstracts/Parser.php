@@ -1,10 +1,10 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use TypeError;
 use Ramphor\Rake\Constracts\Parser as ParserConstract;
 use Ramphor\Rake\DataSource\FeedItemBuilder;
 use Psr\Http\Message\StreamInterface;
+use Ramphor\Rake\Response;
 
 abstract class Parser implements ParserConstract
 {
@@ -13,7 +13,7 @@ abstract class Parser implements ParserConstract
 
     public function __construct($response, $parserOptions = null)
     {
-        if ($response->getType() === $response::TYPE_STREAM) {
+        if ($response->getType() === Response::TYPE_STREAM) {
             $body = $response->getBody();
             $this->data = is_resource($body)
                 ? $body
@@ -21,6 +21,7 @@ abstract class Parser implements ParserConstract
                     ($body instanceof StreamInterface) ? $body->getContents() : $body
                 );
         } else {
+            // This case data type is array or other
             $this->data = $response->getBody();
         }
 

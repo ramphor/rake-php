@@ -19,6 +19,9 @@ abstract class Tooth implements ToothConstract
     public const FORMAT_CSV  = 'csv';
     public const FORMAT_HTML = 'html';
 
+    /**
+     * @var \Ramphor\Rake\Abstracts\Feed[]
+     */
     protected $feeds              = [];
     protected $responses          = [];
     protected $mappingFields      = [];
@@ -32,6 +35,8 @@ abstract class Tooth implements ToothConstract
     protected $toothFormat;
     protected $parser;
     protected $processor;
+
+    protected $urlValidator = true;
 
     public function __construct(string $toothId, Rake $rake = null)
     {
@@ -141,6 +146,7 @@ abstract class Tooth implements ToothConstract
                 $response,
                 $this->parserOptions()
             );
+
             $feedItemBuilder = new FeedItemBuilder(
                 $this->mappingFields,
                 $this->toothFormat
@@ -164,6 +170,7 @@ abstract class Tooth implements ToothConstract
             ));
             return;
         }
+
         foreach ($this->getFeeds() as $feed) {
             if (!$feed->valid()) {
                 Logger::debug(sprintf(
@@ -215,5 +222,15 @@ abstract class Tooth implements ToothConstract
     public function isTransferResources()
     {
         return (bool) $this->transferResources;
+    }
+
+    public function setUrlValidator($urlValidator)
+    {
+        $this->urlValidator = $urlValidator;
+    }
+
+    public function getUrlValidator()
+    {
+        return $this->urlValidator;
     }
 }

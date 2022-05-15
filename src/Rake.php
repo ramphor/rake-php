@@ -9,6 +9,7 @@
 
 namespace Ramphor\Rake;
 
+use Exception;
 use Iterator;
 use Psr\Log\LoggerInterface;
 use Ramphor\Rake\App;
@@ -26,6 +27,7 @@ use Ramphor\Rake\Managers\RequestManager;
 use Ramphor\Rake\Managers\OptionManager;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Exceptions\RuntimeException;
+use TypeError;
 
 class Rake
 {
@@ -33,6 +35,9 @@ class Rake
 
     protected $id;
 
+    /**
+     * @var \Ramphor\Rake\Abstracts\Tooth[]
+     */
     protected $teeth;
 
     protected $options = [];
@@ -158,6 +163,12 @@ class Rake
                         $processor->setFeedItem($feedItem);
                         // Execute processor
                         $result      = $processor->execute();
+                        if (!$result instanceof ProcessResult) {
+                            throw new Exception(sprintf(
+                                'The result must be instance of %s',
+                                ProcessResult::class
+                            ));
+                        }
                         $logFeedItem = var_export([
                             'guid' => $feedItem->guid,
                             'title' => $feedItem->title,

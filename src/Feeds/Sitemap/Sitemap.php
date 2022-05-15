@@ -18,7 +18,7 @@ class Sitemap extends Feed
 
     public function execute()
     {
-        $response = Request::sendRequest('GET', $this->id, array(
+        $response = Request::sendRequest('GET', $this->url, array(
             'verify' => false,
         ));
         $xml_sitemap = new SimpleXMLElement($response->getBody());
@@ -51,5 +51,10 @@ class Sitemap extends Feed
     {
         $optionKey = sprintf('feed_%s_executed', $this->id);
         Option::update($optionKey, false);
+    }
+
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 }

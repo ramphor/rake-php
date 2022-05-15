@@ -7,6 +7,9 @@ use Ramphor\Rake\Facades\Logger;
 
 class FeedItemBuilder implements FeedItemBuilderConstract
 {
+    /**
+     * @var \Ramphor\Rake\DataSource\FieldMapping[]
+     */
     protected $mappingFields = [];
 
     protected $originalData;
@@ -31,6 +34,8 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
     public function setMappingFields($mappingFields)
     {
+        var_dump($mappingFields);
+        die;
         foreach ($mappingFields as $mapKey => $mapArgs) {
             if (empty($mapArgs['type'])) {
                 continue;
@@ -117,6 +122,11 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                 );
             } elseif ($mappingField->getSourceType() === 'attribute') {
                 $value = $this->getAttributeValue(
+                    $mappingField->getSource(),
+                    $mappingField
+                );
+            } elseif ($mappingField->getSourceType() === 'guid') {
+                $value = $this->getGuideValue(
                     $mappingField->getSource(),
                     $mappingField
                 );
@@ -233,5 +243,12 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         }
 
         return $value;
+    }
+
+
+    public function getGuideValue($attribute, $mappingField)
+    {
+        var_dump($this->originalData);
+        die;
     }
 }
