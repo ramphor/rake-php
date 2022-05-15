@@ -29,7 +29,7 @@ class FeedItem
 
     public function __get($name)
     {
-        if (property_exists(__CLASS__, $name)) {
+        if (property_exists($this, $name)) {
             return $this->$name;
         }
         return $this->getMeta($name);
@@ -37,7 +37,7 @@ class FeedItem
 
     public function deleteGuid()
     {
-        unset($this->guid);
+        $this->guid = null;
     }
 
     public function isValid()

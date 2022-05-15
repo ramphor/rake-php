@@ -12,6 +12,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
      */
     protected $mappingFields = [];
 
+    protected $guid;
     protected $originalData;
     protected $feedItem;
     protected $dataType;
@@ -34,8 +35,6 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
     public function setMappingFields($mappingFields)
     {
-        var_dump($mappingFields);
-        die;
         foreach ($mappingFields as $mapKey => $mapArgs) {
             if (empty($mapArgs['type'])) {
                 continue;
@@ -78,6 +77,12 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     {
         $this->document     = null;
         // $data['body'] is exists when call `append()` method of Response object
+
+        // Set GUID for feed item builder
+        if (isset($data['guid'])) {
+            $this->setGuid($data['guid']);
+        }
+
         if (isset($data['body'])) {
             $this->feedItem     =  new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
             $this->originalData = $data['body'];
@@ -126,7 +131,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                     $mappingField
                 );
             } elseif ($mappingField->getSourceType() === 'guid') {
-                $value = $this->getGuideValue(
+                $value = $this->getGuidValue(
                     $mappingField->getSource(),
                     $mappingField
                 );
@@ -245,10 +250,14 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         return $value;
     }
 
-
-    public function getGuideValue($attribute, $mappingField)
+    public function setGuid($guid)
     {
-        var_dump($this->originalData);
-        die;
+        $this->guid = $guid;
+    }
+
+
+    public function getGuidValue($attribute, $mappingField)
+    {
+        return $this->guid;
     }
 }
