@@ -11,6 +11,7 @@ class FieldMapping
 
     protected $isRequired   = false;
     protected $defaultValue = null;
+    protected $callback = null;
     protected $metas        = [];
     protected $callbacks    = [];
 

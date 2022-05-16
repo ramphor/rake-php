@@ -113,8 +113,10 @@ abstract class Processor implements ProcessorConstract
      * Remove the attributes in HTML of the post content
      *
      * @link https://stackoverflow.com/questions/3026096/remove-all-attributes-from-an-html-tag
-     * @param string $html
-     * @return string
+     *
+     * @param \PHPHtmlParser\Dom $document
+     *
+     * @return \PHPHtmlParser\Dom
      */
     public function removeContentAttributes($document)
     {
@@ -150,5 +152,10 @@ abstract class Processor implements ProcessorConstract
 
         // Return the clean content
         return $document->innerHtml;
+    }
+
+    public function feedItemHasProperty($propertyName)
+    {
+        return !is_null($this->feedItem->$propertyName);
     }
 }

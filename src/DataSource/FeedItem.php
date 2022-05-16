@@ -19,6 +19,13 @@ class FeedItem
     protected $metas;
     protected $slug;
 
+    /**
+     * Product properties
+     */
+    protected $productName;
+
+    protected $pageTitle;
+
     protected $errorType;
 
     public function __construct($guid = null, $urlDbId = null)

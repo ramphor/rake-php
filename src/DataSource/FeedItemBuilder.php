@@ -51,6 +51,10 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                 $mapArgs['default_value']
             );
 
+            // Setup callbacks
+            if (isset($mapArgs['callback']) && is_callable($mapArgs['callback'])) {
+                $fieldMapping->addCallback($mapArgs['callback']);
+            }
             if (isset($mapArgs['callbacks'])) {
                 $fieldMapping->createCallbacksFromArray($mapArgs['callbacks']);
             }
@@ -82,6 +86,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         if (isset($data['guid'])) {
             $this->setGuid($data['guid']);
         }
+
 
         if (isset($data['body'])) {
             $this->feedItem     =  new FeedItem($data['guid'], isset($data['urlID']) ? $data['urlID'] : null);
