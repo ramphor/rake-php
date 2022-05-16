@@ -97,12 +97,6 @@ class FieldMapping
 
     public function createCallbacksFromArray($callbacks)
     {
-        // The parameter is callable
-        if (is_callable($callbacks)) {
-            $this->addCallback($callbacks);
-            return;
-        }
-
         if (!is_array($callbacks)) {
             return;
         }
