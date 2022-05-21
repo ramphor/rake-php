@@ -11,6 +11,11 @@ class Sitemap extends Feed
 {
     const NAME = 'sitemap';
 
+    /**
+     * @var boolean
+     */
+    protected $trimLastSplashURL = false;
+
     public function get_name()
     {
         return static::NAME;
@@ -28,7 +33,7 @@ class Sitemap extends Feed
                 continue;
             }
 
-            $link = new Link((string)$url->loc);
+            $link = new Link((string)$url->loc, null, $this->trimLastSplashURL);
             $this->insertCrawlUrl($link);
         }
     }

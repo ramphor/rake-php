@@ -10,8 +10,9 @@ final class Link
         'output' => [],
     ];
 
-    protected $parsed       = false;
-    protected $isSameSource = false;
+    protected $parsed        = false;
+    protected $isSameSource  = false;
+    protected $trimLastSlash = true;
     protected $rawUrl;
     protected $sourceUrl;
 
@@ -24,13 +25,15 @@ final class Link
     protected $query;
     protected $fragment;
 
-    public static function create($url, $sourceUrl = null)
+    public static function create($url, $sourceUrl = null, $trimLastSlash = true)
     {
-        return new static($url, $sourceUrl);
+        return new static($url, $sourceUrl, $trimLastSlash);
     }
 
-    public function __construct($url, $sourceUrl = null)
+    public function __construct($url, $sourceUrl = null, $trimLastSlash = true)
     {
+        $this->trimLastSlash = boolval($trimLastSlash);
+
         $this->setRawUrl($url);
         $this->setSourceUrl($sourceUrl);
     }
@@ -72,7 +75,7 @@ final class Link
 
         $outputUrl = $prefix . $this->host . $suffix;
         if (!empty(static::$callbacks['output'])) {
-            $outputUrl = static::callOutputCallbacks($output, $this);
+            $outputUrl = static::callOutputCallbacks($outputUrl, $this);
         }
 
         if ($notify && $outputUrl !== $this->rawUrl) {
@@ -84,7 +87,11 @@ final class Link
 
     public function setRawUrl($url)
     {
-        $this->rawUrl = rtrim($url, '/');
+        if ($this->trimLastSlash) {
+            $this->rawUrl = rtrim($url, '/');
+        } else {
+            $this->rawUrl = $url;
+        }
     }
 
     public function setSourceUrl($sourceUrl)

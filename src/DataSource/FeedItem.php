@@ -3,18 +3,46 @@ namespace Ramphor\Rake\DataSource;
 
 class FeedItem
 {
+    /**
+     * @var string
+     */
     protected $guid;
+    protected $originalId;
+
+    /**
+     * @var int
+     */
     protected $urlDbId;
 
+    /**
+     * @var string
+     */
     protected $title;
     protected $content;
     protected $createdAt;
     protected $publishedAt;
     protected $updatedAt;
+
+    /**
+     * @var string[]
+     */
     protected $categories;
+
+    /**
+     * @var string[]
+     */
     protected $tags;
+
+    /**
+     * @var string
+     */
     protected $coverImage;
+
+    /**
+     * @var string[]
+     */
     protected $galleryImages;
+
     protected $status;
     protected $metas;
     protected $slug;
@@ -23,6 +51,13 @@ class FeedItem
      * Product properties
      */
     protected $productName;
+    protected $productCategories;
+    protected $productPrice;
+
+    protected $productCategoryName;
+    protected $productCategoryDesc;
+    protected $productCategoryShortDesc;
+
 
     protected $pageTitle;
 

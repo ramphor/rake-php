@@ -10,7 +10,8 @@ use Ramphor\Rake\Constracts\Feed as FeedConstract;
 
 abstract class Feed implements FeedConstract
 {
-    protected $hasResponse = false;
+    protected $hasResponse           = false;
+    protected $trimLastSplashURL     = true;
 
     protected $id;
     protected $tooth;

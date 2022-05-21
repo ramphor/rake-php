@@ -29,6 +29,7 @@ abstract class Tooth implements ToothConstract
     protected $skipCheckTooth     = false;
     protected $transferResources  = false;
     protected $limitQueryResource = 10;
+    protected $urlUseLastSplash   = false;
 
     protected $id;
     protected $rake;
@@ -232,5 +233,15 @@ abstract class Tooth implements ToothConstract
     public function getUrlValidator()
     {
         return $this->urlValidator;
+    }
+
+    public function setUrlUseLastSplash($used = false)
+    {
+        $this->urlUseLastSplash = boolval($used);
+    }
+
+    public function urlUseLastSplash()
+    {
+        return $this->urlUseLastSplash;
     }
 }

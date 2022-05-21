@@ -20,6 +20,10 @@ class ProcessResult
     protected $newGuid;
     protected $newType;
     protected $feedItem;
+
+    /**
+     * @var \Ramphor\Rake\Abstracts\Tooth
+     */
     protected $tooth;
 
     protected $errors = [];
@@ -226,7 +230,12 @@ class ProcessResult
                 continue;
             }
 
-            $url = Link::create($link->getAttribute('href'), $this->feedItem->guid);
+            $url = Link::create(
+                $link->getAttribute('href'),
+                $this->feedItem->guid,
+                $this->tooth->urlUseLastSplash()
+            );
+
             array_push($resources, [
                 'guid' => $url,
                 'type' => 'link',
