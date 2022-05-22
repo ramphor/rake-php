@@ -62,9 +62,9 @@ class DefaultResourceManager extends ResourceManager
             // Parse link to ensure working correctly
             $resultResource['guid']->parse();
             Logger::debug(sprintf(
-                'Create resources from result %s',
+                'Create a %s resource from result with GUID is "%s"',
                 $resultResource['type'],
-                $resultResource['guid']->__toString()
+                $resultResource['guid']->__toString(),
             ));
 
             if ($resultResource['type'] === 'link' && !$this->checkLinkResourceIsOk($resultResource)) {

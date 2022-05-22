@@ -181,7 +181,7 @@ class Rake
 
                         if ($result->isSuccess()) {
                             Logger::info(sprintf(
-                                'Process feed item %s is successful with new GUID is %s - %s',
+                                'Process feed item "%s" is successful with new GUID is #%s - %s',
                                 $result->getGuid(),
                                 $result->getNewGuid(),
                                 $logFeedItem

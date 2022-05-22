@@ -23,10 +23,10 @@ class CrawlerManager
             $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
             Resources::skipLinkByUrl($result->getGuid(), $result->getTooth());
         } elseif ($result->isSuccess()) {
-            Logger::debug(sprintf('The URL %s is crawled successfully', $result->getGuid()));
+            Logger::debug(sprintf('The URL "%s" is crawled successfully', $result->getGuid()));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } else {
-            Logger::debug(sprintf('The URL %s is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
+            Logger::debug(sprintf('The URL" %s" is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
             $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
         }
         $query = $query->where('ID=?', $feedItem->urlDbId);

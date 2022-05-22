@@ -94,7 +94,7 @@ final class Link
         }
 
         if ($notify && $outputUrl !== $this->rawUrl) {
-            Logger::info(sprintf('The URL %s is changed to %s', $outputUrl, $this->rawUrl));
+            Logger::info(sprintf('The URL "%s" is changed to "%s"', $outputUrl, $this->rawUrl));
             $notify = false;
         }
         return $outputUrl;
