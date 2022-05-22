@@ -12,6 +12,7 @@ namespace Ramphor\Rake;
 use Exception;
 use Iterator;
 use Psr\Log\LoggerInterface;
+use Ramphor\Logger\Logger as LoggerLogger;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;
@@ -116,6 +117,9 @@ class Rake
             $processor = $tooth->getProcessor();
             $parsers   = $tooth->getParsers();
 
+            // Set the tooth for Processor
+            $processor->setTooth($tooth);
+
             foreach ($parsers as $feedItems) {
                 $parserBootstrapCallback = array($tooth, 'parserBootstrap');
                 if (is_callable($parserBootstrapCallback)) {
@@ -176,7 +180,7 @@ class Rake
                         ], true);
 
                         if ($result->isSuccess()) {
-                            Logger::debug(sprintf(
+                            Logger::info(sprintf(
                                 'Process feed item %s is successful with new GUID is %s - %s',
                                 $result->getGuid(),
                                 $result->getNewGuid(),

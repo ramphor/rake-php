@@ -142,15 +142,14 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                 );
             }
 
-            if ($mappingField->isRequired() && is_null($value)) {
-                $this->feedItem->deleteGuid();
-                break;
-            }
-
             $this->feedItem->setProperty(
                 $mappingField->getDestination(),
-                $mappingField->callCallbacks($value)
+                $mappingField->callCallbacks($value, $this->feedItem)
             );
+
+            if ($mappingField->isRequired() && is_null($value)) {
+                $this->feedItem->deleteGuid();
+            }
         }
     }
 
@@ -183,10 +182,10 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         $get        = $this->methodTransformer($mappingField->getMeta('get', 'text'));
         $allowProps = ['text', 'attribute', 'innerHtml', 'outerHtml'];
         if (!in_array($get, $allowProps)) {
-            Logger::warning('Mapping field call the invalid property', [
+            Logger::warning('Mapping field call the invalid property: ' . var_export([
                 'called' => $get,
                 'allow_props' => $allowProps,
-            ]);
+            ]));
 
             // Override get type value
             $get = 'text';
@@ -236,6 +235,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     {
         $attributeKeys = explode('.', $attribute);
         $value         = $this->originalData;
+
         foreach ($attributeKeys as $attributeKey) {
             if (is_array($value)) {
                 if (!isset($value[$attributeKey])) {

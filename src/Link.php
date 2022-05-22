@@ -78,6 +78,21 @@ final class Link
             $outputUrl = static::callOutputCallbacks($outputUrl, $this);
         }
 
+        // Encode URL
+        if (strpos($outputUrl, '%') !== false) {
+            $outputUrl = urlencode($outputUrl);
+            $outputUrl = str_replace(
+                array('%2F','%3F','%3D','%26', '%3A'),
+                array('/','?','=','&', ':'),
+                $outputUrl
+            );
+        }
+
+        // Decode existing encoded URL
+        if (strpos($outputUrl, '%25') !== false) {
+            $outputUrl = urldecode($outputUrl);
+        }
+
         if ($notify && $outputUrl !== $this->rawUrl) {
             Logger::info(sprintf('The URL %s is changed to %s', $outputUrl, $this->rawUrl));
             $notify = false;

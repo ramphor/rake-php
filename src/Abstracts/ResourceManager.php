@@ -194,7 +194,7 @@ abstract class ResourceManager implements ResourceManagerContract
     public function skipLinkByUrl($url, $tooth)
     {
         if (!is_a($tooth, Tooth::class)) {
-            Logger::warning(sprintf('The tooth must be an instance of %s', Tooth::class));
+            Logger::warning(sprintf('The tooth must be an instance of %: %s', Tooth::class, $url));
             return;
         }
         $rake = $tooth->getRake();

@@ -16,6 +16,10 @@ abstract class Processor implements ProcessorConstract
     protected $id;
     protected $tooth;
     protected $feedItem;
+
+    /**
+     * @var integer|\WP_Error
+     */
     protected $importedId;
 
     protected $cleanContentAttributes = true;
@@ -36,6 +40,16 @@ abstract class Processor implements ProcessorConstract
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setTooth(Tooth $tooth)
+    {
+        $this->tooth = $tooth;
+    }
+
+    public function getTooth()
+    {
+        return $this->tooth;
     }
 
     public function setFeedItem(FeedItem &$feedItem)

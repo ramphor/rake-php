@@ -53,6 +53,7 @@ class FeedItem
     protected $productName;
     protected $productCategories;
     protected $productPrice;
+    protected $productImages;
 
     protected $productCategoryName;
     protected $productCategoryDesc;
@@ -60,6 +61,9 @@ class FeedItem
 
 
     protected $pageTitle;
+    protected $pageContent;
+
+    protected $breadcrumb;
 
     protected $errorType;
 

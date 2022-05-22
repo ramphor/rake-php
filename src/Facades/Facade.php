@@ -39,7 +39,6 @@ abstract class Facade
         if (isset(static::$resolvedInstance[$name])) {
             return static::$resolvedInstance[$name];
         }
-
         if (static::$app) {
             return static::$resolvedInstance[$name] = static::$app->resolve($name);
         }
