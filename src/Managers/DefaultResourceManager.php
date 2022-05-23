@@ -134,7 +134,7 @@ class DefaultResourceManager extends ResourceManager
             $tooth->limitQueryResource()
         );
 
-        $notifiedKey = sprintf('tooth_%s_notified', $tooth->getId());
+        $notifiedKey = sprintf('tooth_%s_resources_notified', $tooth->getId());
         $notified    = Option::get($notifiedKey, false);
         if (count($fileResources) <= 0) {
             if (!$notified) {

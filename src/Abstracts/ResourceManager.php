@@ -132,7 +132,7 @@ abstract class ResourceManager implements ResourceManagerContract
         return $callback($resource, $queryResult);
     }
 
-    public function find(int $resouceId): ? Resource
+    public function find(int $resourceId): ? Resource
     {
         $query = sql()->select("*")
             ->from(DB::table('rake_resources'))
@@ -143,7 +143,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     public function generateHash($data, $type)
     {
-        if (in_array($type, ['content_image', 'gallary_image', 'cover_image'])) {
+        if (in_array($type, ['content_image', 'gallery_image', 'cover_image'])) {
             return hash_file('sha256', $data);
         }
         return hash('sha256', $data);

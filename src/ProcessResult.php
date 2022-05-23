@@ -165,7 +165,7 @@ class ProcessResult
                 $convertedUrl = $processor->convertImageUrl($imageUrl);
                 array_push($resources, [
                     'guid' => Link::create($convertedUrl, $this->feedItem->guid),
-                    'type' => 'gallary_image',
+                    'type' => 'gallery_image',
                 ]);
             }
         }
