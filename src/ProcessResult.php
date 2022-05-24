@@ -162,6 +162,8 @@ class ProcessResult
         }
 
         if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
+            Logger::debug("[%s] Found %d gallery images", $this->tooth->getId(), count($this->feedItem->galleryImages));
+
             foreach ($this->feedItem->galleryImages as $imageUrl) {
                 $convertedUrl = $processor->convertImageUrl($imageUrl);
                 array_push($resources, [
