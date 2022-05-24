@@ -12,7 +12,6 @@ namespace Ramphor\Rake;
 use Exception;
 use Iterator;
 use Psr\Log\LoggerInterface;
-use Ramphor\Logger\Logger as LoggerLogger;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
 use Ramphor\Rake\Abstracts\Tooth;

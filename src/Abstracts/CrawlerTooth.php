@@ -3,7 +3,6 @@ namespace Ramphor\Rake\Abstracts;
 
 use Http\Client\Exception\RequestException;
 use Ramphor\Rake\Response;
-use Ramphor\Sql;
 use Ramphor\Rake\Facades\Db;
 use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;

@@ -1,13 +1,11 @@
 <?php
 namespace Ramphor\Rake\Abstracts;
 
-use TypeError;
 use Ramphor\Rake\Rake;
 use Ramphor\Rake\Response;
 use Ramphor\Rake\Constracts\Tooth as ToothConstract;
 use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Abstracts\Processor;
-use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\DataSource\FeedItemBuilder;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Parsers\HTML\Parser as HtmlParser;

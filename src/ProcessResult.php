@@ -160,6 +160,7 @@ class ProcessResult
                 'type' => 'cover_image'
             ]);
         }
+
         if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
             foreach ($this->feedItem->galleryImages as $imageUrl) {
                 $convertedUrl = $processor->convertImageUrl($imageUrl);
@@ -169,7 +170,7 @@ class ProcessResult
                 ]);
             }
         }
-        Logger::debug(sprintf('The Rake founded %d cover and gallery images from the feed', count($resources)));
+        Logger::info(sprintf('The Rake founded %d cover and gallery images from the feed', count($resources)));
 
         // Freeup memory
         unset($processor);
