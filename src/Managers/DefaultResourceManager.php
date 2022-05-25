@@ -136,8 +136,6 @@ class DefaultResourceManager extends ResourceManager
 
         $totalResources = count($fileResources);
 
-        Logger::info(sprintf('[%s]Load %d resources for downloading', $tooth->getId(), $totalResources));
-
         $notifiedKey = sprintf('tooth_%s_resources_notified', $tooth->getId());
         $notified    = Option::get($notifiedKey, false);
         if ($totalResources <= 0) {
@@ -148,8 +146,8 @@ class DefaultResourceManager extends ResourceManager
                 ));
                 Option::update($notifiedKey, true);
             }
-        } elseif ($notified) {
-            Option::update($notifiedKey, false);
+
+            return $this;
         }
 
         foreach ($fileResources as $fileResource) {
