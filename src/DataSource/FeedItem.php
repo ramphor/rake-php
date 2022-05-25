@@ -55,6 +55,10 @@ class FeedItem
     protected $productPrice;
     protected $productImages;
 
+    // The keys for product short description
+    protected $productShortDesc;
+    protected $productShortDescription;
+
     protected $productCategoryName;
     protected $productCategoryDesc;
     protected $productCategoryShortDesc;
