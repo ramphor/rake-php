@@ -135,6 +135,11 @@ class FeedItemBuilder implements FeedItemBuilderConstract
                     $mappingField->getSource(),
                     $mappingField
                 );
+            } elseif ($mappingField->getSourceType() === 'custom') {
+                $value = $this->getCustomValue(
+                    $mappingField->getSource(),
+                    $mappingField
+                );
             } elseif ($mappingField->getSourceType() === 'guid') {
                 $value = $this->getGuidValue(
                     $mappingField->getSource(),
@@ -258,6 +263,14 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     public function setGuid($guid)
     {
         $this->guid = $guid;
+    }
+
+    /**
+     * @var \Ramphor\Rake\DataSource\FieldMapping $mappingField
+     */
+    public function getCustomValue($attribute, $mappingField)
+    {
+        return $mappingField->getDefaultValue();
     }
 
 

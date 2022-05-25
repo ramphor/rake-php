@@ -119,7 +119,7 @@ abstract class Tooth implements ToothConstract
             'pattern' => '',
         ));
 
-        if ($args['type'] && (($args['type'] != 'guid' && $args['pattern']) || $args['type'] == 'guid')) {
+        if ($args['type'] && (!empty($args['pattern']) || in_array($args['type'], array('guid', 'custom')))) {
             $this->mappingFields[$fieldName] = $args;
         }
     }

@@ -3,7 +3,7 @@ namespace Ramphor\Rake\DataSource;
 
 class FieldMapping
 {
-    protected static $supportedSourceTypes = ["xpath", "dom", "regex", "attribute", "guid"];
+    protected static $supportedSourceTypes = ['xpath', 'dom', 'regex', 'attribute', 'guid', 'custom'];
 
     protected $sourceField;
     protected $destField;
