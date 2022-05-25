@@ -134,11 +134,15 @@ class DefaultResourceManager extends ResourceManager
             $tooth->limitQueryResource()
         );
 
+        $totalResources = count($fileResources);
+
+        Logger::info(sprintf('[%s]Load %d resources for downloading', $tooth->getId(), $totalResources));
+
         $notifiedKey = sprintf('tooth_%s_resources_notified', $tooth->getId());
         $notified    = Option::get($notifiedKey, false);
-        if (count($fileResources) <= 0) {
+        if ($totalResources <= 0) {
             if (!$notified) {
-                Logger::notice(sprintf(
+                Logger::alert(sprintf(
                     'Not found any resource of the  %s tooth. It means the process resource maybe completed.',
                     $tooth->getId()
                 ));
@@ -151,7 +155,7 @@ class DefaultResourceManager extends ResourceManager
         foreach ($fileResources as $fileResource) {
             $tooth = $this->findTheTooth($fileResource->rake_id, $fileResource->tooth_id);
             if (is_null($tooth)) {
-                Logger::warning('The resource doesn\'t have a tooth continue processing', [
+                Logger::alert('The resource doesn\'t have a tooth continue processing', [
                     'ID'       => $fileResource->ID,
                     'type'     => $fileResource->resource_type,
                     'tooth_id' => $fileResource->tooth_id,
