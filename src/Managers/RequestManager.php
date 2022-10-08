@@ -34,10 +34,9 @@ class RequestManager
 
 
 
-        $request = new Request($method, $url);
-        return call_user_func(
-            [$this->httpAdapter, 'sendRequest'],
-            $request
-        );
+        $request  = new Request($method, $url);
+        $response = $this->httpAdapter->sendRequest($request);
+
+        return $response;
     }
 }
