@@ -8,7 +8,8 @@ The spider/crawler framework written in PHP
 ```
 $rake  = new Rake( 'rake_id', new Your_DB_Driver(), new Your_HTTP_Client() );
 $tooth = new Your_Tooth_Class( 'cp_products', $rake );
-$feed  = new Sitemap( 'site_map_url' );
+$feed  = new Sitemap( 'feed_id' );
+$feed->setUrl('https://site_map_url.com');
 $feed->setTooth( $tooth );
 
 $tooth->registerProcessor( new Your_Processor() );
