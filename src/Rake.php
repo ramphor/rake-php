@@ -218,6 +218,10 @@ class Rake
         }
     }
 
+    /**
+     * @param \Ramphor\Rake\Constracts\Tooth $tooth
+     * @param \Ramphor\Rake\ProcessResult[] $results
+     */
     public function sync($tooth, $results)
     {
         foreach ($results as $result) {
@@ -232,7 +236,10 @@ class Rake
                 // Import resources
                 $resources = Resources::createFromResult($result, $tooth);
                 $resources->import(true);
-                $resources->importCrawlUrls();
+
+                if ($tooth->isCrawlUrlInContent()) {
+                    $resources->importCrawlUrls();
+                }
 
                 // Transfer the resources are fetched from the feed
                 if ($tooth->isTransferResources()) {

@@ -19,6 +19,8 @@ interface Tooth
 
     public function addFeed(Feed $feed);
 
+    public function isTransferResources();
+
     public function downloadResource(Resource &$resource): Resource;
 
     public function validateSystemResource($newGuid, $newType): bool;
