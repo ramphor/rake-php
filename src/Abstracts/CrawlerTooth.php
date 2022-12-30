@@ -13,6 +13,8 @@ abstract class CrawlerTooth extends Tooth
     protected $validateResponse = false;
     protected $limitQueryUrls = 10;
 
+    protected $isCrawlUrlInContent = true;
+
     public function crawlRequestOptions()
     {
         return [
@@ -117,5 +119,10 @@ abstract class CrawlerTooth extends Tooth
 
         // Create a responses list to integrate with Rake structure
         return [$response];
+    }
+
+    public function isCrawlUrlInContent()
+    {
+        return boolval($this->isCrawlUrlInContent);
     }
 }

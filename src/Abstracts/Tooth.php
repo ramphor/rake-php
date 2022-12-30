@@ -242,4 +242,9 @@ abstract class Tooth implements ToothConstract
     {
         return $this->urlUseLastSplash;
     }
+
+    public function isCrawlUrlInContent()
+    {
+        return true;
+    }
 }

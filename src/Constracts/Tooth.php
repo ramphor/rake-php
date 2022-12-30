@@ -26,4 +26,6 @@ interface Tooth
     public function updatePostResource(Resource $resource);
 
     public function updateSystemResource(Resource $resource, Resource $parentResource);
+
+    public function isCrawlUrlInContent();
 }
