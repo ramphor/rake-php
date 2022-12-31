@@ -27,13 +27,20 @@ class Sitemap extends Feed
             'verify' => false,
         ));
         $xml_sitemap = new SimpleXMLElement($response->getBody());
+        $parsedUrl   = parse_url($this->url);
 
         foreach ($xml_sitemap->url as $url) {
+
             if (empty($url->loc) || !($url->loc instanceof SimpleXMLElement)) {
                 continue;
             }
-
-            $link = new Link((string)$url->loc, null, $this->trimLastSplashURL);
+            // fix domain
+            $sitemapUrl = $url->loc;
+            $parsedSitemapUrl = parse_url($sitemapUrl);
+            if ($parsedSitemapUrl['host'] != $parsedUrl['host']) {
+                $sitemapUrl = str_replace($parsedSitemapUrl['host'], $parsedUrl['host'], $sitemapUrl);
+            }
+            $link = new Link($sitemapUrl, null, $this->trimLastSplashURL);
             $this->insertCrawlUrl($link);
         }
     }
