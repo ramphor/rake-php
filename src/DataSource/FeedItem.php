@@ -70,6 +70,8 @@ class FeedItem
     protected $breadcrumb;
 
     protected $errorType;
+    protected $errorContext;
+    protected $errorMessage = '';
 
     public function __construct($guid = null, $urlDbId = null)
     {
@@ -100,6 +102,21 @@ class FeedItem
         $this->errorType = $type;
     }
 
+    public function setErrorContext($errorContext)
+    {
+        $this->errorContext = $errorContext;
+    }
+
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+    }
+
+    public function getErrorContext()
+    {
+        return $this->errorContext;
+    }
+
     public function isSkipped()
     {
         return $this->errorType === 'skip';
@@ -126,5 +143,10 @@ class FeedItem
         }
 
         return $defaultValue;
+    }
+
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
     }
 }

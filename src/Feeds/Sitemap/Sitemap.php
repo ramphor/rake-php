@@ -30,7 +30,6 @@ class Sitemap extends Feed
         $parsedUrl   = parse_url($this->url);
 
         foreach ($xml_sitemap->url as $url) {
-
             if (empty($url->loc) || !($url->loc instanceof SimpleXMLElement)) {
                 continue;
             }

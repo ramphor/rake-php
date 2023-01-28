@@ -159,10 +159,10 @@ class Rake
                         continue;
                     }
 
-                    if (is_wp_error($feedItem) || !$feedItem->isValid()) {
+                    if (!$feedItem->isValid()) {
                         Logger::warning(
                             'The feed item is invalid then create a error ProcessResult',
-                            is_wp_error($feedItem) ? $feedItem->get_error_messages() : (array) $feedItem
+                            $feedItem->getErrorMessage()
                         );
 
                         $result = ProcessResult::createErrorResult(
