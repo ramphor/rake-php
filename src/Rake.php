@@ -137,7 +137,15 @@ class Rake
                             'The parser doesn\'t found any feed item. It means maybe the tooth %s run completed.',
                             $tooth->getId()
                         ));
+                    }
+
+                    if (is_null($tooth->getFeedItemsEmptyAction())) {
                         Option::update($notifiedOptionKey, true);
+                    } else {
+                        call_user_func_array(
+                            $tooth->getFeedItemsEmptyAction(),
+                            $tooth->getFeedItemsEmptyActionArgs()
+                        );
                     }
                     continue;
                 }

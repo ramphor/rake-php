@@ -16,6 +16,12 @@ class Parser extends AbstractParser
     protected $header    = [];
 
     protected $contentSize;
+    protected $rowCounter;
+
+    /**
+     * The current row processing
+     * @var int
+     */
     protected $currentRow;
 
     public function setDelimeter(string $delimeter = ',')
@@ -56,7 +62,7 @@ class Parser extends AbstractParser
         return $this->feedBuilder->getFeedItem();
     }
 
-    public function next()
+    public function next(): void
     {
         $row = fgetcsv(
             $this->data,
@@ -78,7 +84,7 @@ class Parser extends AbstractParser
         }
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         rewind($this->data);
 
@@ -105,11 +111,16 @@ class Parser extends AbstractParser
         );
 
         $this->rowCounter  = 0;
-        $this->currentRow  = $this->header ? array_combine($this->header, $firstRow) : $firstRow;
+
+        if ($firstRow) {
+            $this->currentRow  = $this->header ? array_combine($this->header, $firstRow) : $firstRow;
+        } else {
+            $this->currentRow = false;
+        }
         $this->contentSize = fstat($this->data)['size'];
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->currentRow !== false;
     }

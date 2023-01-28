@@ -37,6 +37,17 @@ abstract class Tooth implements ToothConstract
 
     protected $urlValidator = true;
 
+    /**
+     * When feed items is empty and the action is assign to tooth. The action will be called
+     * @var callable
+     */
+    protected $feedItemsEmptyAction = null;
+
+    /**
+     * @var array
+     */
+    protected $feedItemsEmptyActionArgs = [];
+
     public function __construct(string $toothId, Rake $rake = null)
     {
         $this->id = $toothId;
@@ -246,5 +257,35 @@ abstract class Tooth implements ToothConstract
     public function isCrawlUrlInContent()
     {
         return true;
+    }
+
+    /**
+     * @param callable|\Closure $callable
+     */
+    public function setFeedItemsEmptyAction($callable)
+    {
+        if (is_callable($callable)) {
+            $this->feedItemsEmptyAction = $callable;
+        }
+    }
+
+     /**
+     * @return callable|\Closure|null
+     */
+    public function getFeedItemsEmptyAction()
+    {
+        return $this->feedItemsEmptyAction;
+    }
+
+    public function setFeedItemsEmptyActionArgs($args)
+    {
+        if (is_array($args)) {
+            $this->feedItemsEmptyActionArgs = $args;
+        }
+    }
+
+    public function getFeedItemsEmptyActionArgs()
+    {
+        return $this->feedItemsEmptyActionArgs;
     }
 }

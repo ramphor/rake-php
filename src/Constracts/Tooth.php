@@ -30,4 +30,25 @@ interface Tooth
     public function updateSystemResource(Resource $resource, Resource $parentResource);
 
     public function isCrawlUrlInContent();
+
+
+    /**
+     * @param callable|\Closure $callable
+     */
+    public function setFeedItemsEmptyAction($callable);
+
+     /**
+     * @return callable|\Closure
+     */
+    public function getFeedItemsEmptyAction();
+
+    /**
+     * @return array
+     */
+    public function setFeedItemsEmptyActionArgs($args);
+
+    /**
+     * @return array
+     */
+    public function getFeedItemsEmptyActionArgs();
 }
