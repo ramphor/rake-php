@@ -12,6 +12,7 @@ class ProcessResult
     const SUCCESS_RESULT_TYPE = 'success';
     const SKIP_RESULT_TYPE = 'skip';
     const ERROR_RESULT_TYPE = 'error';
+    const ERROR_DUPLICATE_DATA = 'duplicate';
 
     protected $guid;
     protected $content;
