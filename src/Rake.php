@@ -14,23 +14,26 @@ use Iterator;
 use Psr\Log\LoggerInterface;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
-use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Abstracts\ResourceManager;
-use Ramphor\Rake\Facades\Facade;
+use Ramphor\Rake\Abstracts\Tooth;
+use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Facades\Crawler;
-use Ramphor\Rake\Facades\Resources;
+use Ramphor\Rake\Facades\Facade;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Option;
-use Ramphor\Rake\Managers\InstanceManager;
+use Ramphor\Rake\Facades\Resources;
 use Ramphor\Rake\Managers\CrawlerManager;
-use Ramphor\Rake\Managers\RequestManager;
+use Ramphor\Rake\Managers\InstanceManager;
 use Ramphor\Rake\Managers\OptionManager;
-use Ramphor\Rake\DataSource\FeedItem;
-use Ramphor\Rake\Exceptions\RuntimeException;
-use TypeError;
+use Ramphor\Rake\Managers\RequestManager;
 
 class Rake
 {
+    /**
+     * Kill the process code
+     */
+    const STOP_CURRENT_PROCSSESS = 444;
+
     protected static $app;
 
     protected $id;
@@ -126,7 +129,7 @@ class Rake
                 }
 
                 if (!($feedItems instanceof Iterator)) {
-                    Logger::warning(sprintf('The Rake parser is not instance of %s', Iterator::class), (array)$feedItem);
+                    Logger::warning(sprintf('The Rake parser is not instance of %s', Iterator::class), (array) $feedItems);
                     continue;
                 }
 
@@ -180,6 +183,22 @@ class Rake
                                 ProcessResult::class
                             ));
                         }
+
+                        if ($result->isDuplicate()) {
+                            $args = $tooth->getDuplicateActionArgs();
+
+                            // Push feed item to last parameter of duplicate action
+                            array_push($args, $feedItem);
+
+                            $code = call_user_func_array($tooth->getDuplicateAction(), $args);
+
+                            // Stop current process when duplicate action return 444
+                            if ($code === static::STOP_CURRENT_PROCSSESS) {
+                                Logger::debug(sprintf('The tooth "%s" is stopped', $tooth->getId()));
+                                break;
+                            }
+                        }
+
                         $logFeedItem = var_export([
                             'guid' => $feedItem->guid,
                             'title' => $feedItem->title,
@@ -202,6 +221,7 @@ class Rake
                             ));
                         }
                     }
+
                     $result->setFeedItem($feedItem);
                     $result->setProcessingTooth($tooth);
 

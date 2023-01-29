@@ -66,19 +66,23 @@ class ProcessResult
 
     public function isSuccess()
     {
-        return $this->resultType === 'success';
+        return $this->resultType === static::SUCCESS_RESULT_TYPE;
     }
 
     public function isError()
     {
-        return $this->resultType === 'error';
+        return $this->resultType === static::ERROR_RESULT_TYPE;
     }
 
     public function isSkipped()
     {
-        return $this->resultType === 'skip';
+        return $this->resultType === static::SKIP_RESULT_TYPE;
     }
 
+    public function isDuplicate()
+    {
+        return $this->resultType === static::ERROR_DUPLICATE_DATA;
+    }
 
     public function setNewGuid($newGuid)
     {

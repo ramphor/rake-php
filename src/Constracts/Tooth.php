@@ -51,4 +51,25 @@ interface Tooth
      * @return array
      */
     public function getFeedItemsEmptyActionArgs();
+
+    /**
+     * @param callable $callable
+     */
+    public function setDuplicateAction($callable);
+
+    /**
+     * @return callable|null
+     */
+    public function getDuplicateAction();
+
+
+    /**
+     * @param array $callable
+     */
+    public function setDuplicateActionArgs($args);
+
+    /**
+     * @return array
+     */
+    public function getDuplicateActionArgs();
 }

@@ -25,6 +25,9 @@ class CrawlerManager
         } elseif ($result->isSuccess()) {
             Logger::debug(sprintf('The URL "%s" is crawled successfully', $result->getGuid()));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
+        } elseif ($result->isDuplicate()) {
+            Logger::debug(sprintf('The URL "%s" is crawled before', $result->getGuid()));
+            $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } else {
             Logger::debug(sprintf('The URL" %s" is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
             $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);

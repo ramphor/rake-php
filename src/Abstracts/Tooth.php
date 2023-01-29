@@ -48,6 +48,16 @@ abstract class Tooth implements ToothConstract
      */
     protected $feedItemsEmptyActionArgs = [];
 
+    /**
+     * @var callable|null
+     */
+    protected $duplicateAction = null;
+
+    /**
+     * @var array
+     */
+    protected $duplicateActionArgs = [];
+
     public function __construct(string $toothId, Rake $rake = null)
     {
         $this->id = $toothId;
@@ -287,5 +297,44 @@ abstract class Tooth implements ToothConstract
     public function getFeedItemsEmptyActionArgs()
     {
         return $this->feedItemsEmptyActionArgs;
+    }
+
+    /**
+     * @param callable $callable
+     * @return static
+     */
+    public function setDuplicateAction($callable)
+    {
+        if (is_callable($callable)) {
+            $this->duplicateAction = $callable;
+        }
+        return $this;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getDuplicateAction()
+    {
+        return $this->duplicateAction;
+    }
+
+    /**
+     * @param array $callable
+     */
+    public function setDuplicateActionArgs($args)
+    {
+        if (is_array($args)) {
+            $this->duplicateActionArgs = $args;
+        }
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDuplicateActionArgs()
+    {
+        return $this->duplicateActionArgs;
     }
 }
