@@ -22,6 +22,11 @@ abstract class CrawlerTooth extends Tooth
         ];
     }
 
+    /**
+     * @param string $url The URL need to validate
+     *
+     * @return boolean
+     */
     abstract protected function validateURL($url);
 
     protected function validateRequestResponse($response): bool
