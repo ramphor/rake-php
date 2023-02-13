@@ -3,7 +3,7 @@ namespace Ramphor\Rake\Feeds;
 
 use Ramphor\Rake\Abstracts\Feed;
 
-class CsvFile extends Feed
+class CsvFileFeed extends Feed
 {
     const FEED_NAME = 'csv_file';
 

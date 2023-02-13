@@ -16,6 +16,9 @@ class RequestManager
         $this->httpAdapter = $adapter;
     }
 
+    /**
+     * @return \Psr\Http\Client\ClientInterface
+     */
     public static function createRequest()
     {
         $httpAdapter = new HttpAdapter(
@@ -31,7 +34,6 @@ class RequestManager
             $this->httpAdapter   = new HttpAdapter($client);
             $this->clientOptions = $options;
         }
-
 
 
         $request  = new Request($method, $url);

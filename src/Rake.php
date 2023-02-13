@@ -11,6 +11,7 @@ namespace Ramphor\Rake;
 
 use Exception;
 use Iterator;
+use Psr\Http\Client\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Ramphor\Rake\App;
 use Ramphor\Rake\Abstracts\Driver;
@@ -45,8 +46,12 @@ class Rake
 
     protected $options = [];
 
-    public function __construct(string $rakeId, Driver $driver = null, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        string $rakeId,
+        Driver $driver = null,
+        LoggerInterface $logger = null,
+        ClientInterface $httpClient = null
+    ) {
         static::$app = App::instance();
         $this->id    = $rakeId;
 
@@ -63,7 +68,11 @@ class Rake
             return new OptionManager();
         });
 
-        static::$app->bind('request', RequestManager::createRequest());
+        if (is_null($httpClient)) {
+            $httpClient = RequestManager::createRequest();
+        }
+
+        static::$app->bind('request', $httpClient);
         static::$app->bind('instances', new InstanceManager());
         static::$app->resolve('instances')->add($this);
         Facade::setFacadeApplication(static::$app);

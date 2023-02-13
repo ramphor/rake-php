@@ -7,7 +7,7 @@ use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Option;
 
-class Sitemap extends Feed
+class SitemapFeed extends Feed
 {
     const NAME = 'sitemap';
 

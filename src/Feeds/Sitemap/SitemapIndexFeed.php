@@ -3,7 +3,7 @@ namespace Ramphor\Rake\Feeds\Sitemap;
 
 use Ramphor\Rake\Abstracts\Feed;
 
-class SitemapIndex extends Feed
+class SitemapIndexFeed extends Feed
 {
     const NAME = 'sitemap_index';
 
