@@ -14,7 +14,7 @@
         "php": ">=7.1",
         "psr/log": "^1.0.1",
         "php-http/httplug": "^2.1",
-        "guzzlehttp/psr7": "^1.6",
+        "guzzlehttp/psr7": "^2.7.0",
         "ramphor/sql": "1.0.0",
         "ramphor/php-html-parser": "3.0.1",
         "ramphor/httplug-guzzle6-adapter": "^2.0.2"
