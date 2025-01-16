@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Facades;
 
 use Ramphor\Rake\Rake;

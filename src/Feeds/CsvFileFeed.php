@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Feeds;
 
 use Ramphor\Rake\Abstracts\Feed;

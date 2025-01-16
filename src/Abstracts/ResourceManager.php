@@ -105,7 +105,7 @@ abstract class ResourceManager implements ResourceManagerContract
         return $resource;
     }
 
-    public function findByQuery(QueryBuilder $query, callable $callback = null): ? Resource
+    public function findByQuery(QueryBuilder $query, callable $callback = null): ?Resource
     {
         $queryResult = DB::row($query);
         if (empty($queryResult)) {
@@ -132,7 +132,7 @@ abstract class ResourceManager implements ResourceManagerContract
         return $callback($resource, $queryResult);
     }
 
-    public function find(int $resourceId): ? Resource
+    public function find(int $resourceId): ?Resource
     {
         $query = sql()->select("*")
             ->from(DB::table('rake_resources'))
@@ -149,7 +149,7 @@ abstract class ResourceManager implements ResourceManagerContract
         return hash('sha256', $data);
     }
 
-    public function getFromHash($hash, $type): ? Resource
+    public function getFromHash($hash, $type): ?Resource
     {
         $query = sql()->select("s.*, h.new_guid as map_guid, h.new_type as map_type")
             ->from(DB::table('rake_resources') . ' s')

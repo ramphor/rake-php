@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Facades;
 
 class Option extends Facade

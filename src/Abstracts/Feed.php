@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Abstracts;
 
 use Ramphor\Rake\Abstracts\Driver;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Abstracts;
 
 use Ramphor\Rake\Rake;
@@ -76,7 +77,7 @@ abstract class Tooth implements ToothConstract
         return $this->id;
     }
 
-    public function getRake():Rake
+    public function getRake(): Rake
     {
         return $this->rake;
     }
@@ -119,7 +120,7 @@ abstract class Tooth implements ToothConstract
         return $this->feeds;
     }
 
-    public function createParser($resource, $parserOptions = null):Parser
+    public function createParser($resource, $parserOptions = null): Parser
     {
         $parsers = [
             self::FORMAT_CSV => CsvParser::class,

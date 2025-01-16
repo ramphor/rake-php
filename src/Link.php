@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake;
 
 use Ramphor\Rake\Facades\Logger;

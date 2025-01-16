@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\DataSource;
 
 use PHPHtmlParser\Dom as Document;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Managers;
 
 use Ramphor\Rake\ProcessResult;

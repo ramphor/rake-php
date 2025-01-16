@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Parsers\HTML;
 
 use Ramphor\Rake\Abstracts\Parser as AbstractParser;

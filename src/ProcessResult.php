@@ -1,7 +1,8 @@
 <?php
+
 namespace Ramphor\Rake;
 
-use \Throwable;
+use Throwable;
 use Ramphor\Rake\DataSource\FeedItem;
 use Ramphor\Rake\Abstracts\Tooth;
 use PHPHtmlParser\Dom as Document;

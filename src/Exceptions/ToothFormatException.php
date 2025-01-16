@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\Exceptions;
 
 use Exception;

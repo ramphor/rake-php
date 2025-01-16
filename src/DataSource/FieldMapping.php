@@ -1,4 +1,5 @@
 <?php
+
 namespace Ramphor\Rake\DataSource;
 
 class FieldMapping

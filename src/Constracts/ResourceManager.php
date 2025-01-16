@@ -13,5 +13,5 @@ interface ResourceManager
 
     public function getFilesFromDatabase(Tooth $tooth): ResourceManagerAbstract;
 
-    public function find(int $resouceId): ? Resource;
+    public function find(int $resouceId): ?Resource;
 }
