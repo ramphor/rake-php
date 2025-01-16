@@ -58,3 +58,7 @@ $rake->execute();
 - Có cơ chế retry khi lỗi
 
 
+# Adapter to working with your CMS/Framework
+
+- WordPress: https://github.com/puleeno/rake-wordpress-adapter
+- Laravel: https://github.com/puleeno/rake-laravel-adapter
