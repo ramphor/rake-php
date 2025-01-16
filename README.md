@@ -35,6 +35,9 @@ $rake->execute();
 - Resource: Quản lý tài nguyên (ảnh, file...)
 - Parser: Xử lý dữ liệu thô thành FeedItem
 
+![class-diagram](https://github.com/user-attachments/assets/c2a4f042-3692-41ab-8883-e8d455a1378a)
+
+
 # Luồng xử lý:
 - Khởi tạo Rake instance
 - Thêm các Tooth để xử lý dữ liệu
@@ -43,6 +46,9 @@ $rake->execute();
 - Processor xử lý FeedItem
 = Resource Manager quản lý tài nguyên
 
+![work-flow excalidraw](https://github.com/user-attachments/assets/08469dd6-7eef-4f73-9518-fe19a0b8c9a7)
+
+
 # Các tính năng:
 
 - Hỗ trợ nhiều loại feed (CSV, HTML, Sitemap)
@@ -50,3 +56,5 @@ $rake->execute();
 - Lưu trữ dữ liệu vào database
 - Có hệ thống logging
 - Có cơ chế retry khi lỗi
+
+
