@@ -124,7 +124,7 @@ class Rake
             $results = [];
             // Crawl data from the feeds of tooth
             Logger::debug(sprintf('Execute the %s tooth with %d feed(s)', $tooth->getId(), count($this->teeth)));
-            $tooth->execute();
+            $tooth->collect();
 
             $processor = $tooth->getProcessor();
             $parsers   = $tooth->getParsers();

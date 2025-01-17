@@ -73,4 +73,6 @@ interface Tooth
      * @return array
      */
     public function getDuplicateActionArgs();
+
+    public function collect();
 }

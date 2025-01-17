@@ -6,7 +6,7 @@ interface Feed
 {
     public function get_name();
 
-    public function execute();
+    public function fetch();
 
     public function valid();
 

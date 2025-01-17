@@ -56,7 +56,7 @@ class App implements Iterator
     /**
      * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->resolvedInstance[$this->key()]);
     }
@@ -64,7 +64,7 @@ class App implements Iterator
     /**
      * @return void
      */
-    public function next()
+    public function next(): void
     {
         $this->currentKey += 1;
     }

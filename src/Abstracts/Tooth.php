@@ -182,7 +182,7 @@ abstract class Tooth implements ToothConstract
         return $parsers;
     }
 
-    public function execute()
+    public function collect()
     {
         if (count($this->getFeeds()) <= 0) {
             Logger::info(sprintf(
@@ -204,7 +204,7 @@ abstract class Tooth implements ToothConstract
             if ($feed->hasResponse()) {
                 Logger::debug(sprintf('The feed(%s) has direct response', $feed->getId()));
                 $response = new Response(Response::TYPE_STREAM);
-                $response->setBody($feed->execute());
+                $response->setBody($feed->fetch());
 
                 array_push($this->responses, $response);
             } else {
@@ -212,7 +212,7 @@ abstract class Tooth implements ToothConstract
                     'The feed(%s) doesn\'t have direct response. It will be continued processing from Database',
                     $feed->getId()
                 ));
-                $feed->execute();
+                $feed->fetch();
             }
 
             // Update feed to get next page, next run
