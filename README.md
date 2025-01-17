@@ -46,7 +46,7 @@ $rake->execute();
 - Processor xử lý FeedItem
 = Resource Manager quản lý tài nguyên
 
-![work-flow excalidraw](https://github.com/user-attachments/assets/08469dd6-7eef-4f73-9518-fe19a0b8c9a7)
+![Image](https://github.com/user-attachments/assets/ca8fc7c1-9cd8-4293-ae22-8d452a630608)
 
 
 # Các tính năng:
