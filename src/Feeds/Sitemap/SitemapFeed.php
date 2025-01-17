@@ -12,6 +12,8 @@ class SitemapFeed extends Feed
 {
     const NAME = 'sitemap';
 
+    protected $url;
+
     /**
      * @var boolean
      */
