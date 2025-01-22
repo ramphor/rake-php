@@ -109,7 +109,7 @@ class Rake
         static::$app->bind('resources', $manager);
     }
 
-    public function execute()
+    public function gather()
     {
         if (empty($this->teeth)) {
             Logger::info('The %s rake doesn\'t have any tooth to execute');
@@ -124,14 +124,14 @@ class Rake
             $results = [];
             // Crawl data from the feeds of tooth
             Logger::debug(sprintf('Execute the %s tooth with %d feed(s)', $tooth->getId(), count($this->teeth)));
+
             $tooth->collect();
 
             $processor = $tooth->getProcessor();
-            $parsers   = $tooth->getParsers();
-
             // Set the tooth for Processor
             $processor->setTooth($tooth);
 
+            $parsers   = $tooth->getParsers();
             foreach ($parsers as $feedItems) {
                 $parserBootstrapCallback = array($tooth, 'parserBootstrap');
                 if (is_callable($parserBootstrapCallback)) {
@@ -299,5 +299,14 @@ class Rake
             ));
             $resources->transferFiles();
         }
+    }
+
+    /**
+     * Alias of method execute
+     * @return void
+     */
+    public function execute()
+    {
+        return $this->gather();
     }
 }

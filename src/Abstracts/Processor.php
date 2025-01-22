@@ -6,7 +6,6 @@ use Http\Client\Exception;
 use PHPHtmlParser\Dom;
 use PHPHtmlParser\Dom\Tag;
 use PHPHtmlParser\Dom\Node\HtmlNode;
-use Ramphor\Rake\Link;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
 use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Logger;
@@ -172,5 +171,14 @@ abstract class Processor implements ProcessorConstract
     public function feedItemHasProperty($propertyName)
     {
         return !is_null($this->feedItem->$propertyName);
+    }
+
+
+    /**
+     * @return \Ramphor\Rake\ProcessResult
+     */
+    public function execute()
+    {
+        return $this->process();
     }
 }

@@ -14,4 +14,14 @@ interface PaginationFeedConstract extends Feed
     public function setPaginationFormat(string $format);
 
     public function setPagedType(PagedType $type);
+
+    public function setPagedParamName($paramName): self;
+
+    public function setLinkItemsSelector($selector): self;
+
+    public function getLinkItemsSelector(): string;
+
+    public function setLinkItemValueAttribute($attribute): self;
+
+    public function getLinkItemValueAttribute(): string;
 }

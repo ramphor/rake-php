@@ -3,7 +3,6 @@
 namespace Ramphor\Rake;
 
 use Iterator;
-use Ramphor\Logger\Logger;
 use Ramphor\Rake\Managers\DefaultResourceManager;
 
 class App implements Iterator
@@ -106,11 +105,6 @@ class App implements Iterator
             return $this->resolve($name);
         }
 
-        if ($name === 'logger') {
-            $this->resolvedInstance[$name] = function () {
-                return Logger::instance();
-            };
-            return $this->resolve($name);
-        }
+        return $this->resolve($name);
     }
 }

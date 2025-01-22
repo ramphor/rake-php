@@ -3,13 +3,14 @@
 namespace Ramphor\Rake\Abstracts;
 
 use Http\Client\Exception\RequestException;
+use Ramphor\Rake\Constracts\Tooth\CrawlerToothConstract;
 use Ramphor\Rake\Response;
 use Ramphor\Rake\Facades\Db;
 use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Sql as QueryBuilder;
 
-abstract class CrawlerTooth extends Tooth
+abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
 {
     protected $validateResponse = false;
     protected $limitQueryUrls = 10;
@@ -60,13 +61,24 @@ abstract class CrawlerTooth extends Tooth
         }
         $sql = $this->crawlUrlsQuery($sql);
 
-        return DB::get($sql);
+        $results = DB::get($sql);
+
+        var_dump($results);
+        die;
+
+        if (empty($results)) {
+            return [];
+        }
+        return $results;
     }
 
     public function getResponses()
     {
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
+
+        var_dump($crawlDatas);
+        die;
 
         Logger::debug(sprintf('Get %d crawl URLs in database', count($crawlDatas)));
         foreach ($crawlDatas as $crawlData) {

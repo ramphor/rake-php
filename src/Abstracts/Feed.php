@@ -125,4 +125,9 @@ abstract class Feed implements FeedConstract
             $this->options
         );
     }
+
+    public function execute()
+    {
+        return $this->fetch();
+    }
 }

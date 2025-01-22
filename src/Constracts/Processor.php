@@ -2,6 +2,8 @@
 
 namespace Ramphor\Rake\Constracts;
 
+use Ramphor\Rake\ProcessResult;
+
 interface Processor
 {
     /**
@@ -9,5 +11,5 @@ interface Processor
      *
      * @return \Ramphor\Rake\ProcessResult
      */
-    public function execute();
+    public function process(): ProcessResult;
 }

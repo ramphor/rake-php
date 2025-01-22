@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
 use Http\Adapter\Guzzle6\Client as HttpAdapter;
+use Psr\Http\Message\ResponseInterface;
 
 class RequestManager
 {
@@ -28,7 +29,7 @@ class RequestManager
         return new self($httpAdapter);
     }
 
-    public function sendRequest($method, $url, $options = [])
+    public function sendRequest($method, $url, $options = []): ResponseInterface
     {
         if ($options !== $this->clientOptions) {
             $client              = new Client($options);

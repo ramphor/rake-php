@@ -13,7 +13,7 @@ class SitemapIndexFeed extends Feed
         return static::NAME;
     }
 
-    public function execute()
+    public function fetch()
     {
     }
 

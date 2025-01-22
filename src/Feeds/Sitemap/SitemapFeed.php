@@ -24,7 +24,7 @@ class SitemapFeed extends Feed
         return static::NAME;
     }
 
-    public function execute()
+    public function fetch()
     {
         $response = Request::sendRequest('GET', $this->url, array(
             'verify' => false,
