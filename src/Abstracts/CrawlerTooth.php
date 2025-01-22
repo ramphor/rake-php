@@ -8,6 +8,7 @@ use Ramphor\Rake\Response;
 use Ramphor\Rake\Facades\Db;
 use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;
+use Ramphor\Rake\Types\CrawledUrl;
 use Ramphor\Sql as QueryBuilder;
 
 abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
@@ -61,10 +62,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         }
         $sql = $this->crawlUrlsQuery($sql);
 
-        $results = DB::get($sql);
-
-        var_dump($results);
-        die;
+        $results = DB::get($sql, CrawledUrl::class);
 
         if (empty($results)) {
             return [];
@@ -76,9 +74,6 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
     {
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
-
-        var_dump($crawlDatas);
-        die;
 
         Logger::debug(sprintf('Get %d crawl URLs in database', count($crawlDatas)));
         foreach ($crawlDatas as $crawlData) {

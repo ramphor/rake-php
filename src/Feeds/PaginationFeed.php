@@ -100,6 +100,14 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
         // delete query
         unset($parsedUrl['query']);
 
+        $feedId = sprintf('feed_%s_executed', $this->id);
+
+        $feedOptions = Option::get($feedId, []);
+
+        // var_dump($feedOptions);die;
+
+        // $this->setCurrentPage();
+
         $params[$this->queryParamName] = $this->currentPage;
 
         return sprintf('%s://%s%s?%s', $parsedUrl['scheme'], $parsedUrl['host'], $parsedUrl['path'], http_build_query($params));
@@ -137,8 +145,6 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
             $linkItemValue = $linkItem->getAttribute($this->linkItemValueAttribute);
             $this->insertCrawlUrl(new Link($linkItemValue, $currentUrl, $this->trimLastSplashURL));
         }
-
-        $this->currentPage++;
     }
 
     public function setCurrentPage(int $page)

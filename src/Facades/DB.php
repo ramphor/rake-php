@@ -8,7 +8,7 @@ use Ramphor\Sql as SqlBuilder;
  * @method static string name()
  * @method static string prefix()
  * @method static mixed query(SqlBuilder $query)
- * @method static array get(SqlBuilder $query)
+ * @method static array get(SqlBuilder $query, string $classToMap = null)
  * @method static mixed var(SqlBuilder $query)
  * @method static object|array row(SqlBuilder $query)
  * @method static bool exists(SqlBuilder $query)
