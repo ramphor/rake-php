@@ -5,20 +5,47 @@ namespace Ramphor\Rake\Feeds;
 use Ramphor\Rake\Abstracts\Feed;
 use Ramphor\Rake\Constracts\Feeds\PaginationFeedConstract;
 use Ramphor\Rake\Facades\Request;
-use Ramphor\Rake\Link;
 use Ramphor\Rake\Types\PagedType;
+use PHPHtmlParser\Dom;
+use Ramphor\Rake\Facades\Option;
+use Ramphor\Rake\Link;
 
 class PaginationFeed extends Feed implements PaginationFeedConstract
 {
     const NAME = 'pagination';
 
+    protected $pagedURL;
+
+    protected $queryParamName;
     protected $currentPage = 1;
     protected $dataSource;
     protected $pagedType;
 
-    public function __construct()
+    /**
+     * from this block started setting for pagination format is path based.
+     */
+    protected $paginationFormat;
+
+
+    /**
+     * from this block started setting for loop content
+     */
+    protected $linkItemsSelector;
+
+    // Default link attribute value is `href`. Commonly used for <a> tag
+    protected $linkItemValueAttribute = 'href';
+
+    /**
+     * from this block started setting for DOM object
+     */
+    protected $responseDOM;
+
+
+    public function __construct($pagedURL)
     {
         $this->pagedType = PagedType::QUERY();
+
+        $this->pagedURL = $pagedURL;
     }
 
     /**
@@ -30,6 +57,16 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
     public function setPagedType(PagedType $type): self
     {
         $this->pagedType = $type;
+        return $this;
+    }
+
+    public function setPagedParamName($paramName): self
+    {
+        if ($this->pagedType->equals(PagedType::PATH())) {
+            throw new \Exception('Cannot set query param name for path based pagination');
+        }
+        $this->queryParamName = $paramName;
+
         return $this;
     }
 
@@ -54,14 +91,18 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
         return $itemNodes->length === 0;
     }
 
-    protected function buildPageUrl($page): string
+    protected function buildPageUrl($url): string
     {
-        $url = $this->dataSource->full_url;
+        $parsedUrl = parse_url($url);
 
-        if ($this->pagedType->equals(PagedType::QUERY())) {
-            return $this->buildQueryUrl($url, $page);
-        }
-        return $this->buildPathUrl($url, $page);
+        parse_str($parsedUrl['query'], $params);
+
+        // delete query
+        unset($parsedUrl['query']);
+
+        $params[$this->queryParamName] = $this->currentPage;
+
+        return sprintf('%s://%s%s?%s', $parsedUrl['scheme'], $parsedUrl['host'], $parsedUrl['path'], http_build_query($params));
     }
 
     private function buildQueryUrl(string $url, int $page): string
@@ -75,41 +116,29 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
         return rtrim($url, '/') . '/' . $this->dataSource->page_param . '/' . $page;
     }
 
-    public function fetch(): FeedResult
+    public function hasResponse()
     {
-        $result = new FeedResult();
+        return true;
+    }
 
+    public function fetch()
+    {
         // Get current page URL
-        $currentUrl = $this->buildPageUrl($this->currentPage);
+        $currentUrl = $this->buildPageUrl($this->pagedURL);
 
-        // Fetch content
-        $response = $this->request($currentUrl);
-        $content = $response->getBody()->getContents();
+        $response = Request::sendRequest('GET', $currentUrl);
 
-        // Check if page is empty
-        if ($this->isEmptyPage($content)) {
-            return $result;
+        $this->responseDOM = new Dom();
+        $this->responseDOM->loadStr($response->getBody()->getContents());
+
+        $linkItems = $this->responseDOM->find($this->linkItemsSelector);
+
+        foreach ($linkItems as $linkItem) {
+            $linkItemValue = $linkItem->getAttribute($this->linkItemValueAttribute);
+            $this->insertCrawlUrl(new Link($linkItemValue, $currentUrl, $this->trimLastSplashURL));
         }
 
-        // Add current page content to result
-        $result->setContent($content);
-
-        // Add next page URL
-        $nextPage = $this->currentPage + 1;
-        $nextUrl = $this->buildPageUrl($nextPage);
-        $result->addLink(new Link($nextUrl));
-
-        // Add previous page URL if not first page
-        if ($this->currentPage > 1) {
-            $prevPage = $this->currentPage - 1;
-            $prevUrl = $this->buildPageUrl($prevPage);
-            $result->addLink(new Link($prevUrl));
-        }
-
-        // Increment current page
         $this->currentPage++;
-
-        return $result;
     }
 
     public function setCurrentPage(int $page)
@@ -144,13 +173,66 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
 
     public function valid()
     {
+        return true;
     }
 
     public function next()
     {
+        $optionKey = sprintf('feed_%s_executed', $this->id);
+        Option::update($optionKey, [
+            'current_page' => $this->currentPage,
+            'next_page' => $this->currentPage + 1,
+            'last_imported_page' => $this->currentPage,
+        ]);
     }
 
     public function rewind()
     {
+        $optionKey = sprintf('feed_%s_executed', $this->id);
+        Option::update($optionKey, [
+            'current_page' => 1,
+            'next_page' => 1,
+            'last_imported_page' => 1,
+        ]);
+    }
+
+    public function pageHasContent($content): bool
+    {
+        return true;
+    }
+
+    public function setContentCheckerCallback(callable $callback): self
+    {
+        return $this;
+    }
+
+    public function setPaginationFormat(string $format): self
+    {
+        $this->paginationFormat = $format;
+
+        return $this;
+    }
+
+    public function setLinkItemsSelector($selector): self
+    {
+        $this->linkItemsSelector = $selector;
+        return $this;
+    }
+
+    public function getLinkItemsSelector(): string
+    {
+        return $this->linkItemsSelector;
+    }
+
+
+    public function setLinkItemValueAttribute($attribute): self
+    {
+        $this->linkItemValueAttribute = $attribute;
+        return $this;
+    }
+
+    public function getLinkItemValueAttribute(): string
+    {
+        return $this->linkItemValueAttribute;
     }
 }
