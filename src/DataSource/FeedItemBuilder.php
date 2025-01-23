@@ -186,7 +186,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
             return $mappingField->getDefaultValue();
         }
         $get        = $this->methodTransformer($mappingField->getMeta('get', 'text'));
-        $allowProps = ['text', 'attribute', 'innerHtml', 'outerHtml'];
+        $allowProps = ['text', 'attribute', 'innerHtml', 'outerHtml', 'dom_object'];
         if (!in_array($get, $allowProps)) {
             Logger::warning('Mapping field call the invalid property: ' . var_export([
                 'called' => $get,
@@ -216,6 +216,9 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
     public function getValueFromDomElement($element, $content_type, $mappingField)
     {
+        if ($content_type === 'dom_object') {
+            return $element;
+        }
         if ($content_type !== 'attribute') {
             return $element->$content_type;
         }

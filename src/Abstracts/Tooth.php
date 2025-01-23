@@ -65,6 +65,9 @@ abstract class Tooth implements ToothConstract
         if (!is_null($rake)) {
             $this->setRake($rake);
         }
+
+        // Register custom callback for feed item builder
+        $this->registerFeedItemCallbacks();
     }
 
     public function setRake(Rake $rake)
@@ -337,5 +340,10 @@ abstract class Tooth implements ToothConstract
     public function getDuplicateActionArgs()
     {
         return $this->duplicateActionArgs;
+    }
+
+    public function registerFeedItemCallbacks()
+    {
+        // Register callbacks for feed item
     }
 }

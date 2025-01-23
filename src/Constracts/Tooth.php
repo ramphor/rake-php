@@ -75,4 +75,6 @@ interface Tooth
     public function getDuplicateActionArgs();
 
     public function collect();
+
+    public function registerFeedItemCallbacks();
 }
