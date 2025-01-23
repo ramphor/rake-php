@@ -41,8 +41,10 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
     protected $responseDOM;
 
 
-    public function __construct($pagedURL)
+    public function __construct($feedId, $pagedURL)
     {
+        $this->id = $feedId;
+
         $this->pagedType = PagedType::QUERY();
 
         $this->pagedURL = $pagedURL;
