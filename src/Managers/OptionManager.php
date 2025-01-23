@@ -97,6 +97,7 @@ class OptionManager
     {
         $query = sql()->select('ID')->from(DB::table('rake_options'))
             ->where('option_name=?', $optionName);
+
         return (int) DB::var($query);
     }
 

@@ -7,6 +7,7 @@ use Ramphor\Rake\Constracts\Feeds\PaginationFeedConstract;
 use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Types\PagedType;
 use PHPHtmlParser\Dom;
+use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Option;
 use Ramphor\Rake\Link;
 
@@ -105,25 +106,21 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
         $feedId = sprintf('feed_%s_executed', $this->id);
 
         $feedOptions = Option::get($feedId, []);
+        $lastImportedPage = array_key_exists('last_imported_page', $feedOptions)
+            ? $feedOptions['last_imported_page']
+            : 0;
+        $lastImportedPage = $feedOptions['last_imported_page'] ?? 0;
 
-        // var_dump($feedOptions);die;
-
-        // $this->setCurrentPage();
+        $this->setCurrentPage($lastImportedPage + 1);
 
         $params[$this->queryParamName] = $this->currentPage;
 
-        return sprintf('%s://%s%s?%s', $parsedUrl['scheme'], $parsedUrl['host'], $parsedUrl['path'], http_build_query($params));
-    }
-
-    private function buildQueryUrl(string $url, int $page): string
-    {
-        $separator = parse_url($url, PHP_URL_QUERY) ? '&' : '?';
-        return $url . $separator . $this->dataSource->page_param . '=' . $page;
-    }
-
-    private function buildPathUrl(string $url, int $page): string
-    {
-        return rtrim($url, '/') . '/' . $this->dataSource->page_param . '/' . $page;
+        return sprintf('%s://%s%s?%s',
+            $parsedUrl['scheme'],
+            $parsedUrl['host'],
+            $parsedUrl['path'],
+            http_build_query($params)
+        );
     }
 
     public function hasResponse()
@@ -135,6 +132,7 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
     {
         // Get current page URL
         $currentUrl = $this->buildPageUrl($this->pagedURL);
+        Logger::DEBUG('Fetching page', ['url' => $currentUrl]);
 
         $response = Request::sendRequest('GET', $currentUrl);
 
@@ -196,12 +194,6 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
 
     public function rewind()
     {
-        $optionKey = sprintf('feed_%s_executed', $this->id);
-        Option::update($optionKey, [
-            'current_page' => 1,
-            'next_page' => 1,
-            'last_imported_page' => 1,
-        ]);
     }
 
     public function pageHasContent($content): bool
