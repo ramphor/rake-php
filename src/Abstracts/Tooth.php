@@ -139,10 +139,10 @@ abstract class Tooth implements ToothConstract
         if (!is_array($args)) {
             return;
         }
-        $args = wp_parse_args($args, array(
+        $args = array_merge([
             'type' => '',
             'pattern' => '',
-        ));
+        ], $args);
 
         if ($args['type'] && (!empty($args['pattern']) || in_array($args['type'], array('guid', 'custom')))) {
             $this->mappingFields[$fieldName] = $args;
