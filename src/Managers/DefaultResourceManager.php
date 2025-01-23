@@ -163,7 +163,7 @@ class DefaultResourceManager extends ResourceManager
             }
 
             Logger::debug(sprintf('Create a resource from database %s', var_export([
-                'ID'   => $fileResource->ID,
+                'ID'   => $fileResource->id,
                 'type' => $fileResource->resource_type,
             ], true)));
             $resource = Resource::create(

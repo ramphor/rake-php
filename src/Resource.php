@@ -2,7 +2,6 @@
 
 namespace Ramphor\Rake;
 
-use Ramphor\Rake\ProcessResult;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Facades\Logger;

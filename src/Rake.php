@@ -28,6 +28,7 @@ use Ramphor\Rake\Managers\CrawlerManager;
 use Ramphor\Rake\Managers\InstanceManager;
 use Ramphor\Rake\Managers\OptionManager;
 use Ramphor\Rake\Managers\RequestManager;
+use Throwable;
 
 class Rake
 {
@@ -262,42 +263,47 @@ class Rake
      */
     public function sync($tooth, $results)
     {
-        foreach ($results as $result) {
-            if (!($result instanceof ProcessResult)) {
-                Logger::warning(sprintf('The process result is not instance of %s', ProcessResult::class));
-                continue;
-            }
-            // Sync the crawl URL from ProcessResult
-            Crawler::syncFromResult($result);
-
-            if ($result->isSuccess()) {
-                // Import resources
-                $resources = Resources::createFromResult($result, $tooth);
-                $resources->import(true);
-
-                if ($tooth->isCrawlUrlInContent()) {
-                    $resources->importCrawlUrls();
+        try {
+            foreach ($results as $result) {
+                if (!($result instanceof ProcessResult)) {
+                    Logger::warning(sprintf('The process result is not instance of %s', ProcessResult::class));
+                    continue;
                 }
+                // Sync the crawl URL from ProcessResult
+                Crawler::syncFromResult($result);
 
-                // Transfer the resources are fetched from the feed
-                if ($tooth->isTransferResources()) {
-                    Logger::debug('Transfer files after process the feed');
-                    $resources->transferFiles();
+                if ($result->isSuccess()) {
+                    // Import resources
+                    $resources = Resources::createFromResult($result, $tooth);
+                    $resources->import(true);
+
+                    if ($tooth->isCrawlUrlInContent()) {
+                        $resources->importCrawlUrls();
+                    }
+
+                    // Transfer the resources are fetched from the feed
+                    if ($tooth->isTransferResources()) {
+                        Logger::debug('Transfer files after process the feed');
+                        $resources->transferFiles();
+                    }
+                } else {
+                    Logger::debug('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
                 }
-            } else {
-                Logger::debug('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
             }
-        }
 
         // Transfer the resources are not imported from Database
-        if (Option::isAutoTransferFiles()) {
-            $resources = Resources::getFilesFromDatabase($tooth);
+            if (Option::isAutoTransferFiles()) {
+                $resources = Resources::getFilesFromDatabase($tooth);
 
-            Logger::debug(sprintf(
-                'Transfer %d files from resources in database',
-                $resources->getTotalResources()
-            ));
-            $resources->transferFiles();
+                Logger::debug(sprintf(
+                    'Transfer %d files from resources in database',
+                    $resources->getTotalResources()
+                ));
+                $resources->transferFiles();
+            }
+        } catch (Throwable $e) {
+            Logger::error('The rake sync failed: ' . $e->getMessage());
+            Logger::debug($e->getTraceAsString());
         }
     }
 
