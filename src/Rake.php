@@ -133,6 +133,7 @@ class Rake
             $processor->setTooth($tooth);
 
             $parsers   = $tooth->getParsers();
+
             foreach ($parsers as $feedItems) {
                 $parserBootstrapCallback = array($tooth, 'parserBootstrap');
                 if (is_callable($parserBootstrapCallback)) {
@@ -260,6 +261,7 @@ class Rake
     /**
      * @param \Ramphor\Rake\Constracts\Tooth $tooth
      * @param \Ramphor\Rake\ProcessResult[] $results
+     * @param \Throwable $exception
      */
     public function sync($tooth, $results)
     {
@@ -288,10 +290,14 @@ class Rake
                     }
                 } else {
                     Logger::debug('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
+                    $exception = $result->getException();
+                    if (!is_null($exception)) {
+                        Logger::debug($exception->getTraceAsString());
+                    }
                 }
             }
 
-        // Transfer the resources are not imported from Database
+            // Transfer the resources are not imported from Database
             if (Option::isAutoTransferFiles()) {
                 $resources = Resources::getFilesFromDatabase($tooth);
 

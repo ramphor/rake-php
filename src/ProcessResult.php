@@ -30,6 +30,8 @@ class ProcessResult
 
     protected $errors = [];
 
+    protected $exception;
+
     protected static $contentImageCallbacks = [];
 
     public function __construct($guid)
@@ -37,19 +39,25 @@ class ProcessResult
         $this->guid = $guid;
     }
 
-    public static function createSuccessResult($guid, $newGuid, $newType): self
+    public static function createSuccessResult($guid, $newGuid, $newType, $exception = null): self
     {
         $result = new static($guid);
         $result->setNewGuid($newGuid);
         $result->setNewType($newType);
+        if (!is_null($exception)) {
+            $result->setException($exception);
+        }
 
         return $result->setResultType('success');
     }
 
-    public static function createErrorResult($errorMessage, $errorType = 'skip'): self
+    public static function createErrorResult($errorMessage, $errorType = 'skip', $exception = null): self
     {
         $result = new static(null);
         $result->addErrorMessage($errorMessage);
+        if (!is_null($exception)) {
+            $result->setException($exception);
+        }
 
         return $result->setResultType($errorType);
     }
@@ -298,5 +306,16 @@ class ProcessResult
             ));
         }
         return $src;
+    }
+
+    public function setException($exception)
+    {
+        $this->exception = $exception;
+        return $this;
+    }
+
+    public function getException()
+    {
+        return $this->exception;
     }
 }
