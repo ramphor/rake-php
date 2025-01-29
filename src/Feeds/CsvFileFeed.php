@@ -23,7 +23,7 @@ class CsvFileFeed extends Feed
         }
     }
 
-    public function execute()
+    public function fetch()
     {
         if (!$this->csvFilePath) {
             return;

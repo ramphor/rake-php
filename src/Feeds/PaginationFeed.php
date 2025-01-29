@@ -115,7 +115,8 @@ class PaginationFeed extends Feed implements PaginationFeedConstract
 
         $params[$this->queryParamName] = $this->currentPage;
 
-        return sprintf('%s://%s%s?%s',
+        return sprintf(
+            '%s://%s%s?%s',
             $parsedUrl['scheme'],
             $parsedUrl['host'],
             $parsedUrl['path'],

@@ -4,6 +4,7 @@ namespace Ramphor\Rake;
 
 use Iterator;
 use Ramphor\Rake\Managers\DefaultResourceManager;
+use RuntimeException;
 
 class App implements Iterator
 {
@@ -105,6 +106,6 @@ class App implements Iterator
             return $this->resolve($name);
         }
 
-        return $this->resolve($name);
+        throw new RuntimeException(sprintf('Instance %s not found', $name));
     }
 }
