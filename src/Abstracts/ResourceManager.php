@@ -86,7 +86,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     protected function mapFromDB(Resource &$resource, $dbResource)
     {
-        $resource->setId($dbResource->id);
+        $resource->setId(isset($dbResource->ID) ? $dbResource->ID : $dbResource->id);
         if ((bool)$dbResource->imported) {
             $resource->imported();
         }
