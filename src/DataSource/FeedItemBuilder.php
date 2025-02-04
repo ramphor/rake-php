@@ -150,7 +150,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
             $this->feedItem->setProperty(
                 $mappingField->getDestination(),
-                $mappingField->callCallbacks($value, $this->feedItem)
+                $mappingField->callCallbacks($value, $this->feedItem, $this->originalData)
             );
 
             if ($mappingField->isRequired() && is_null($value)) {

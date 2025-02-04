@@ -43,6 +43,7 @@ class Initialize
                 `tooth_id` VARCHAR(255) NULL,
                 `guid` text NOT NULL,
                 `resource_type` VARCHAR(255) NOT NULL,
+                `original_content` LONGTEXT NULL COMMENT 'The original content of the resource',
                 `content_text` LONGTEXT NULL,
                 `init_hash` varchar(64) NULL,
                 `new_guid` text,

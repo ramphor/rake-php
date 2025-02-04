@@ -143,7 +143,7 @@ class FieldMapping
         }
     }
 
-    protected function buildCallbackArguments($args, $currentValue, $feedItem)
+    protected function buildCallbackArguments($args, $currentValue, $feedItem, $originData = null)
     {
         $argumentIndex = array_search("%%argument%%", $args);
         if ($argumentIndex !== false) {
@@ -155,13 +155,21 @@ class FieldMapping
         $feedItemIndex = array_search("%%feed_item%%", $args);
         if ($feedItemIndex !== false) {
             $args[$feedItemIndex] = $feedItem;
-        } elseif (!$argumentIndex) {
+        } elseif (!$feedItemIndex) {
             array_push($args, $feedItem);
         }
+
+        $originDataIndex = array_search("%%origin_data%%", $args);
+        if ($originDataIndex !== false) {
+            $args[$originDataIndex] = $originData;
+        } elseif (!$originDataIndex) {
+            array_push($args, $originData);
+        }
+
         return $args;
     }
 
-    public function callCallbacks($value, $feedItem)
+    public function callCallbacks($value, $feedItem, $originalData = null)
     {
         if (empty($this->callbacks)) {
             return $value;
@@ -174,7 +182,7 @@ class FieldMapping
         foreach ($this->callbacks as $callback) {
             $value = call_user_func_array(
                 $callback['func'],
-                $this->buildCallbackArguments($callback['args'], $value, $feedItem)
+                $this->buildCallbackArguments($callback['args'], $value, $feedItem, $originalData)
             );
         }
         return $value;
