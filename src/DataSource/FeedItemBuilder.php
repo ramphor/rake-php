@@ -188,10 +188,10 @@ class FeedItemBuilder implements FeedItemBuilderConstract
         $get        = $this->methodTransformer($mappingField->getMeta('get', 'text'));
         $allowProps = ['text', 'attribute', 'innerHtml', 'outerHtml', 'dom_object'];
         if (!in_array($get, $allowProps)) {
-            Logger::warning('Mapping field call the invalid property: ' . var_export([
+            Logger::warning(sprintf('Mapping field call the invalid property: %s', var_export([
                 'called' => $get,
                 'allow_props' => $allowProps,
-            ]));
+            ],  true)));
 
             // Override get type value
             $get = 'text';

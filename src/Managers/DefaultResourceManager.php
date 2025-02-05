@@ -33,7 +33,7 @@ class DefaultResourceManager extends ResourceManager
             ob_start();
             debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
             $errorLogs = ob_get_clean();
-            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), $resource);
+            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), (array)$resource);
         }
         return false;
     }

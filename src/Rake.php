@@ -177,7 +177,7 @@ class Rake
                     if (!$feedItem->isValid()) {
                         Logger::warning(
                             'The feed item is invalid then create a error ProcessResult',
-                            $feedItem->getErrorMessage()
+                            [$feedItem->getErrorMessage()]
                         );
 
                         $result = ProcessResult::createErrorResult(

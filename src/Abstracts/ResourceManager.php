@@ -9,7 +9,7 @@ use Ramphor\Rake\Facades\Crawler;
 use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
-use Ramphor\Rake\Tooth;
+use Ramphor\Rake\Abstracts\Tooth;
 
 abstract class ResourceManager implements ResourceManagerContract
 {
