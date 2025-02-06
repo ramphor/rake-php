@@ -33,7 +33,7 @@ class CrawlerManager
             Logger::debug(sprintf('The URL" %s" is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
             $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
         }
-        $query = $query->where('ID=?', $feedItem->urlDbId);
+        $query = $query->where('id=?', $feedItem->urlDbId);
 
         return DB::query($query);
     }
@@ -44,7 +44,7 @@ class CrawlerManager
             return;
         }
         $rake = $tooth->getRake();
-        $query = sql()->select('ID')->from(DB::table('rake_crawled_urls'));
+        $query = sql()->select('id')->from(DB::table('rake_crawled_urls'));
         if ($tooth->isSkipCheckTooth()) {
             $query = $query->where(
                 'url=? AND rake_id=? AND tooth_id IS NULL AND crawled=?',

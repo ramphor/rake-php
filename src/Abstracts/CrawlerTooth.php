@@ -35,7 +35,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
     public function crawlUrlsQuery(QueryBuilder $query): QueryBuilder
     {
         return $query
-            ->orderBy('retry ASC, updated_at ASC, ID ASC')
+            ->orderBy('retry ASC, updated_at ASC, id ASC')
             ->limit($this->limitQueryUrls);
     }
 
@@ -82,7 +82,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
                     'The URL %s has invalid format',
                     $crawlData->url
                 ));
-                $response->append($crawlData->url, null, $crawlData->ID, 'skip');
+                $response->append($crawlData->url, null, $crawlData->id, 'skip');
                 continue;
             }
             try {
@@ -92,7 +92,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
                     $this->crawlRequestOptions()
                 );
                 if (!$this->validateResponse || $this->validateRequestResponse($response)) {
-                    $response->append($crawlData->url, $requestResponse->getBody(), $crawlData->ID);
+                    $response->append($crawlData->url, $requestResponse->getBody(), $crawlData->id);
                 }
                 Logger::debug(sprintf(
                     'Crawl URL %s is successful with status code %d',
@@ -111,14 +111,14 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
                     $response->append(
                         $crawlData->url,
                         null,
-                        $crawlData->ID,
+                        $crawlData->id,
                         $statusCode >= 500 ? 'error' : 'skip'
                     );
                 } else {
                     $response->append(
                         $crawlData->url,
                         null,
-                        $crawlData->ID,
+                        $crawlData->id,
                         (int)$crawlData->retry < 20 ? 'error' : 'skip'
                     );
                 }

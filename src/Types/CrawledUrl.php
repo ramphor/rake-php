@@ -7,7 +7,7 @@ class CrawledUrl
     /**
      * @var int
      */
-    protected $ID;
+    protected $id;
 
     /**
      * @var string

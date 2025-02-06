@@ -12,6 +12,7 @@ use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Facades\Instances;
 use Ramphor\Rake\Facades\Option;
+use Ramphor\Rake\Facades\Resources;
 
 class DefaultResourceManager extends ResourceManager
 {
@@ -104,7 +105,7 @@ class DefaultResourceManager extends ResourceManager
                 0,
                 0,
                 'link'
-            )->orderBy('retry ASC, updated_at ASC, created_at ASC, ID ASC')
+            )->orderBy('retry ASC, updated_at ASC, created_at ASC, id ASC')
             ->limit($limit);
         $rows = DB::get($query);
 
@@ -155,17 +156,23 @@ class DefaultResourceManager extends ResourceManager
             $tooth = $this->findTheTooth($fileResource->rake_id, $fileResource->tooth_id);
             if (is_null($tooth)) {
                 Logger::alert('The resource doesn\'t have a tooth continue processing', [
-                    'ID'       => $fileResource->ID,
+                    'id'       => $fileResource->id,
                     'type'     => $fileResource->resource_type,
                     'tooth_id' => $fileResource->tooth_id,
                 ]);
                 continue;
             }
 
+            $fileResourceId = $fileResource->id;
+            $parentResource = Resources::findParent($fileResourceId);
+            $parentResourceId = $parentResource->id;
+
             Logger::debug(sprintf('Create a resource from database %s', var_export([
-                'ID'   => isset($fileResource->ID) ? $fileResource->ID : $fileResource->id,
+                'id'   => $fileResourceId,
                 'type' => $fileResource->resource_type,
+                'parent' => $parentResourceId
             ], true)));
+
             $resource = Resource::create(
                 $fileResource->guid,
                 $fileResource->resource_type,

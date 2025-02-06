@@ -86,7 +86,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     protected function mapFromDB(Resource &$resource, $dbResource)
     {
-        $resource->setId(isset($dbResource->ID) ? $dbResource->ID : $dbResource->id);
+        $resource->setId(isset($dbResource->id) ? $dbResource->id : $dbResource->id);
         if ((bool)$dbResource->imported) {
             $resource->imported();
         }
@@ -135,7 +135,7 @@ abstract class ResourceManager implements ResourceManagerContract
     {
         $query = sql()->select("*")
             ->from(DB::table('rake_resources'))
-            ->where('ID=?', $resourceId);
+            ->where('id=?', $resourceId);
 
         return $this->findByQuery($query);
     }
@@ -153,7 +153,7 @@ abstract class ResourceManager implements ResourceManagerContract
         $query = sql()->select("s.*, h.new_guid as map_guid, h.new_type as map_type")
             ->from(DB::table('rake_resources') . ' s')
             ->innerJoin(DB::table('rake_hash_maps') . ' h')
-            ->on('s.ID = h.resource_id')
+            ->on('s.id = h.resource_id')
             ->where('h.sha256 = ? AND h.new_type=?', $hash, $type);
 
         return $this->findByQuery($query, function ($resource, $queryResult) {
@@ -176,7 +176,7 @@ abstract class ResourceManager implements ResourceManagerContract
     {
         $query = sql()->select("res.*")->from(DB::table('rake_resources res'))
             ->innerJoin(DB::table('rake_relations rel'))
-            ->on('res.ID = rel.parent_id')
+            ->on('res.id = rel.parent_id')
             ->where('rel.resource_id=?', $childId);
 
         $parent = $this->findByQuery($query);

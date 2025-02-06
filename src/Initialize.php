@@ -24,7 +24,7 @@ class Initialize
     public function setUpDb()
     {
         $tables = [
-            'rake_crawled_urls' => "`ID` bigint(20) NOT NULL AUTO_INCREMENT,
+            'rake_crawled_urls' => "`id` bigint(20) NOT NULL AUTO_INCREMENT,
                 `url` text NOT NULL,
                 `rake_id` VARCHAR(255) NOT NULL,
                 `tooth_id` VARCHAR(255) NULL,
@@ -33,12 +33,12 @@ class Initialize
                 `retry` tinyint(4) NOT NULL DEFAULT 0,
                 `created_at` timestamp NULL DEFAULT NULL,
                 `updated_at` timestamp NULL DEFAULT NULL,
-                PRIMARY KEY (`ID`)",
-            'rake_relations' => "`ID` INT NOT NULL AUTO_INCREMENT,
+                PRIMARY KEY (`id`)",
+            'rake_relations' => "`id` INT NOT NULL AUTO_INCREMENT,
                 `resource_id` bigint(20) NOT NULL,
                 `parent_id` bigint(20) NOT NULL COMMENT 'The resource #ID contain resource_id',
-                PRIMARY KEY (`ID`)",
-            'rake_resources' => "`ID` bigint(20) NOT NULL AUTO_INCREMENT,
+                PRIMARY KEY (`id`)",
+            'rake_resources' => "`id` bigint(20) NOT NULL AUTO_INCREMENT,
                 `rake_id` VARCHAR(255) NOT NULL,
                 `tooth_id` VARCHAR(255) NULL,
                 `guid` text NOT NULL,
@@ -53,19 +53,19 @@ class Initialize
                 `retry` int(11) NOT NULL DEFAULT 0,
                 `created_at` timestamp NULL DEFAULT NULL,
                 `updated_at` timestamp NULL DEFAULT NULL,
-                PRIMARY KEY (`ID`)",
-            'rake_hash_maps' => '`ID` bigint(20) NOT NULL AUTO_INCREMENT,
+                PRIMARY KEY (`id`)",
+            'rake_hash_maps' => '`id` bigint(20) NOT NULL AUTO_INCREMENT,
                 `sha256` varchar(64) NOT NULL,
                 `resource_id` bigint(20) NOT NULL,
                 `new_guid` text NOT NULL,
                 `new_type` varchar(255) DEFAULT NULL,
                 `created_at` timestamp NULL DEFAULT NULL,
-                PRIMARY KEY (`ID`)',
-            'rake_options' => "`ID` int(11) NOT NULL AUTO_INCREMENT,
+                PRIMARY KEY (`id`)',
+            'rake_options' => "`id` int(11) NOT NULL AUTO_INCREMENT,
                 `option_name` VARCHAR(255) NULL,
                 `option_value` longtext NOT NULL,
                 `autoload` tinyint(4) NOT NULL DEFAULT 0 ,
-                PRIMARY KEY (`ID`)"
+                PRIMARY KEY (`id`)"
         ];
 
         foreach ($tables as $table => $syntax) {

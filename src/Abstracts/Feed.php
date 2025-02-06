@@ -53,7 +53,7 @@ abstract class Feed implements FeedConstract
         $tooth = $this->getTooth();
         $rake  = $tooth->getRake();
 
-        $sql = sql()->select("ID")
+        $sql = sql()->select("id")
             ->from(DB::table('rake_crawled_urls'))
             ->where(
                 'url=? AND rake_id=? AND tooth_id=?',

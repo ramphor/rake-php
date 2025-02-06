@@ -95,7 +95,7 @@ class OptionManager
 
     public function checkExists($optionName)
     {
-        $query = sql()->select('ID')->from(DB::table('rake_options'))
+        $query = sql()->select('id')->from(DB::table('rake_options'))
             ->where('option_name=?', $optionName);
 
         return (int) DB::var($query);
@@ -111,7 +111,7 @@ class OptionManager
                     'option_value' => serialize($optionValue),
                     'autoload'     => (int)$autoload
                 ])
-                ->where('ID=?', $optionId);
+                ->where('id=?', $optionId);
         } else {
             $query = $query->insertInto(DB::table('rake_options'), ['option_name', 'option_value', 'autoload'])
                 ->values(

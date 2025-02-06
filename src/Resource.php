@@ -68,7 +68,7 @@ class Resource
         }
         $rake = $this->tooth->getRake();
 
-        $query = sql()->select('ID, imported')
+        $query = sql()->select('id, imported')
             ->from(DB::table('rake_resources'))
             ->where(
                 'guid = ? AND resource_type = ? AND rake_id = ? AND tooth_id =?',
@@ -86,7 +86,7 @@ class Resource
         // When the resource is imported create new resource
         $this->createFlag = (bool)$row->imported;
 
-        return $this->id = (int) $row->ID;
+        return $this->id = (int) $row->id;
     }
 
     public function setNewGuid($newGuid)
@@ -159,7 +159,7 @@ class Resource
 
         $query = sql()->update(DB::table('rake_resources'))
             ->set($values)
-            ->where('ID=?', $this->id);
+            ->where('id=?', $this->id);
 
         return DB::query($query);
     }
@@ -181,7 +181,7 @@ class Resource
             if ($this->type === 'link') {
                 $this->tooth->updatePostResource($this);
             }
-            $parentResource = Resources::findParent($this->id);
+            $parentResource = Resources::findParent();
             if (!is_null($parentResource)) {
                 $this->tooth->updateSystemResource($this, $parentResource);
             }
