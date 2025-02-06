@@ -7,9 +7,9 @@ use PHPHtmlParser\Dom;
 use PHPHtmlParser\Dom\Tag;
 use PHPHtmlParser\Dom\Node\HtmlNode;
 use Ramphor\Rake\Constracts\Processor as ProcessorConstract;
-use Ramphor\Rake\Facades\Client;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\DataSource\FeedItem;
+use Ramphor\Rake\Facades\Request;
 
 abstract class Processor implements ProcessorConstract
 {
