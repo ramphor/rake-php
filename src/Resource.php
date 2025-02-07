@@ -181,7 +181,7 @@ class Resource
             if ($this->type === 'link') {
                 $this->tooth->updatePostResource($this);
             }
-            $parentResource = Resources::findParent();
+            $parentResource = Resources::findParent($this->id);
             if (!is_null($parentResource)) {
                 $this->tooth->updateSystemResource($this, $parentResource);
             }
