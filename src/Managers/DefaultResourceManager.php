@@ -165,7 +165,11 @@ class DefaultResourceManager extends ResourceManager
 
             $fileResourceId = $fileResource->id;
             $parentResource = Resources::findParent($fileResourceId);
-            $parentResourceId = $parentResource->id;
+            if (!empty($parentResource)) {
+                $parentResourceId = $parentResource->id;
+            } else {
+                $parentResourceId = null;
+            }
 
             Logger::debug(sprintf('Create a resource from database %s', var_export([
                 'id'   => $fileResourceId,
