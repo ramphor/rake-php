@@ -86,7 +86,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     protected function mapFromDB(Resource &$resource, $dbResource)
     {
-        $resource->setId(isset($dbResource->id) ? $dbResource->id : $dbResource->id);
+        $resource->setId($dbResource->id);
         if ((bool)$dbResource->imported) {
             $resource->imported();
         }
@@ -107,6 +107,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
     public function findByQuery(QueryBuilder $query, callable $callback = null): ?Resource
     {
+        $queryResult = DB::row($query);
         if (empty($queryResult)) {
             return null;
         }

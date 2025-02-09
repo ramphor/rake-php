@@ -184,6 +184,10 @@ class DefaultResourceManager extends ResourceManager
             );
             $resource = $this->mapFromDB($resource, $fileResource);
 
+            if ($parentResourceId > 0) {
+                $resource->setParent($parentResource);
+            }
+
             array_push($this->resources, $resource);
         }
 
