@@ -41,12 +41,12 @@ class Initialize
             'rake_resources' => "`id` bigint(20) NOT NULL AUTO_INCREMENT,
                 `rake_id` VARCHAR(255) NOT NULL,
                 `tooth_id` VARCHAR(255) NULL,
-                `guid` text NOT NULL,
+                `guid` varchar(255) NOT NULL,
                 `resource_type` VARCHAR(255) NOT NULL,
                 `original_content` LONGTEXT NULL COMMENT 'The original content of the resource',
                 `content_text` LONGTEXT NULL,
                 `init_hash` varchar(64) NULL,
-                `new_guid` text,
+                `new_guid` varchar(255) NULL,
                 `new_type` varchar(255) DEFAULT NULL,
                 `imported` tinyint(4) NOT NULL DEFAULT 0,
                 `skipped` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'Use when resource is errors',
@@ -73,6 +73,10 @@ class Initialize
             // Create table
             DB::raw_query($query);
         }
+
+        // speed up query
+        DB::raw_query("ALTER TABLE `". DB::table('rake_resources')  ."` ADD INDEX(`guid`); ");
+        DB::raw_query("ALTER TABLE `". DB::table('rake_resources')  ."` ADD INDEX(`new_guid`, `imported`); ");
     }
 
     public function removeDbTables()
