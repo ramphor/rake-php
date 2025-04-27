@@ -116,7 +116,7 @@ abstract class ResourceManager implements ResourceManagerContract
             return null;
         }
 
-        Logger::debug(sprintf('Find the tooth from ID "%s"', $queryResult->tooth_id));
+        Logger::info(sprintf('Find the tooth from ID "%s"', $queryResult->tooth_id));
         $tooth = $rake->findTooth($queryResult->tooth_id);
         if (is_null($tooth)) {
             Logger::warning(sprintf('The tooth has ID %s is not found', $queryResult->tooth_id));
@@ -181,7 +181,7 @@ abstract class ResourceManager implements ResourceManagerContract
             ->where('rel.resource_id=?', $childId);
 
         $parent = $this->findByQuery($query);
-        Logger::debug(sprintf('Find the parent resource from child #%s', $childId), (array)$parent);
+        Logger::info(sprintf('Find the parent resource from child #%s', $childId), (array)$parent);
 
         return $parent;
     }
