@@ -197,7 +197,7 @@ abstract class Tooth implements ToothConstract
 
         foreach ($this->getFeeds() as $feed) {
             if (!$feed->valid()) {
-                Logger::debug(sprintf(
+                Logger::info(sprintf(
                     'The feed(%s) is invalid. It means this feed is crawled, finished or error',
                     $feed->getId()
                 ));
@@ -205,13 +205,13 @@ abstract class Tooth implements ToothConstract
             }
 
             if ($feed->hasResponse()) {
-                Logger::debug(sprintf('The feed(%s) has direct response', $feed->getId()));
+                Logger::info(sprintf('The feed(%s) has direct response', $feed->getId()));
                 $response = new Response(Response::TYPE_STREAM);
                 $response->setBody($feed->fetch());
 
                 array_push($this->responses, $response);
             } else {
-                Logger::debug(sprintf(
+                Logger::info(sprintf(
                     'The feed(%s) doesn\'t have direct response. It will be continued processing from Database',
                     $feed->getId()
                 ));
