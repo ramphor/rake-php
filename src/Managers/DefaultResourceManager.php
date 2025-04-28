@@ -171,7 +171,7 @@ class DefaultResourceManager extends ResourceManager
                 $parentResourceId = null;
             }
 
-            Logger::debug(sprintf('Create a resource from database %s', var_export([
+            Logger::info(sprintf('Create a resource from database %s', var_export([
                 'id'   => $fileResourceId,
                 'type' => $fileResource->resource_type,
                 'parent' => $parentResourceId

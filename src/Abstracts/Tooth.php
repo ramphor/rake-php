@@ -130,7 +130,7 @@ abstract class Tooth implements ToothConstract
             self::FORMAT_HTML => HtmlParser::class,
         ];
 
-        Logger::debug(sprintf('Create the %s parser to build feed items', strtoupper($this->toothFormat)));
+        Logger::info(sprintf('Create the %s parser to build feed items', strtoupper($this->toothFormat)));
         return new $parsers[$this->toothFormat]($resource, $parserOptions);
     }
 
