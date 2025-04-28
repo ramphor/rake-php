@@ -116,7 +116,7 @@ class Rake
             Logger::info('The %s rake doesn\'t have any tooth to execute');
             return;
         }
-        Logger::debug(sprintf('The rake "%s" has %d tooths will be executed', $this->getId(), count($this->teeth)), $this->teeth);
+        Logger::info(sprintf('The rake "%s" has %d tooth(s) will be executed', $this->getId(), count($this->teeth)), $this->teeth);
 
         // Load all options
         Option::loadAllOptions();
@@ -124,7 +124,7 @@ class Rake
         foreach ($this->teeth as $tooth) {
             $results = [];
             // Crawl data from the feeds of tooth
-            Logger::debug(sprintf('Execute the %s tooth with %d feed(s)', $tooth->getId(), count($this->teeth)));
+            Logger::info(sprintf('Execute the %s tooth with %d feed(s)', $tooth->getId(), count($this->teeth)));
 
             $tooth->collect();
 
@@ -185,7 +185,7 @@ class Rake
                             $feedItem->errorType
                         );
                     } else {
-                        Logger::debug(sprintf('Set feed item "%s" to processor', $feedItem->guid));
+                        Logger::info(sprintf('Set feed item "%s" to processor', $feedItem->guid));
                         $processor->setFeedItem($feedItem);
                         // Execute processor
                         $result      = $processor->execute();
@@ -206,7 +206,7 @@ class Rake
 
                             // Stop current process when duplicate action return 444
                             if ($code === static::STOP_CURRENT_PROCSSESS) {
-                                Logger::debug(sprintf('The tooth "%s" is stopped', $tooth->getId()));
+                                Logger::info(sprintf('The tooth "%s" is stopped', $tooth->getId()));
                                 break;
                             }
                         }
@@ -285,14 +285,14 @@ class Rake
 
                     // Transfer the resources are fetched from the feed
                     if ($tooth->isTransferResources()) {
-                        Logger::debug('Transfer files after process the feed');
+                        Logger::info('Transfer files after process the feed');
                         $resources->transferFiles();
                     }
                 } else {
-                    Logger::debug('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
+                    Logger::info('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
                     $exception = $result->getException();
                     if (!is_null($exception)) {
-                        Logger::debug($exception->getTraceAsString());
+                        Logger::info($exception->getTraceAsString());
                     }
                 }
             }
@@ -301,7 +301,7 @@ class Rake
             if (Option::isAutoTransferFiles()) {
                 $resources = Resources::getFilesFromDatabase($tooth);
 
-                Logger::debug(sprintf(
+                Logger::info(sprintf(
                     'Transfer %d files from resources in database',
                     $resources->getTotalResources()
                 ));
@@ -309,7 +309,7 @@ class Rake
             }
         } catch (Throwable $e) {
             Logger::error('The rake sync failed: ' . $e->getMessage());
-            Logger::debug($e->getTraceAsString());
+            Logger::info($e->getTraceAsString());
         }
     }
 
