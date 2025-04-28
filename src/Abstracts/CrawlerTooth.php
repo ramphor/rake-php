@@ -75,7 +75,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
 
-        Logger::debug(sprintf('Get %d crawl URLs in database', count($crawlDatas)));
+        Logger::info(sprintf('Get %d crawl URL(s) in database', count($crawlDatas)));
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
                 Logger::info(sprintf(
@@ -94,7 +94,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
                 if (!$this->validateResponse || $this->validateRequestResponse($response)) {
                     $response->append($crawlData->url, $requestResponse->getBody(), $crawlData->id);
                 }
-                Logger::debug(sprintf(
+                Logger::info(sprintf(
                     'Crawl URL %s is successful with status code %d',
                     $crawlData->url,
                     $requestResponse->getStatusCode()
