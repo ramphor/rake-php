@@ -191,7 +191,7 @@ class FeedItemBuilder implements FeedItemBuilderConstract
             Logger::warning(sprintf('Mapping field call the invalid property: %s', var_export([
                 'called' => $get,
                 'allow_props' => $allowProps,
-            ],  true)));
+            ], true)));
 
             // Override get type value
             $get = 'text';

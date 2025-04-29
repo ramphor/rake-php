@@ -24,13 +24,13 @@ class CrawlerManager
             $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
             Resources::skipLinkByUrl($result->getGuid(), $result->getTooth());
         } elseif ($result->isSuccess()) {
-            Logger::debug(sprintf('The URL "%s" is crawled successfully', $result->getGuid()));
+            Logger::info(sprintf('The URL "%s" is crawled successfully', $result->getGuid()));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } elseif ($result->isDuplicate()) {
-            Logger::debug(sprintf('The URL "%s" is crawled before', $result->getGuid()));
+            Logger::info(sprintf('The URL "%s" is crawled before', $result->getGuid()));
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } else {
-            Logger::debug(sprintf('The URL" %s" is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
+            Logger::error(sprintf('The URL" %s" is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
             $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
         }
         $query = $query->where('id=?', $feedItem->urlDbId);
@@ -80,7 +80,7 @@ class CrawlerManager
          * Use this URL ID to create a relationship
          */
         if ($existingId > 0) {
-            Logger::debug(sprintf('The URL %s already exists in database', $url));
+            Logger::info(sprintf('The URL %s already exists in database', $url));
             return $existingId;
         }
 
@@ -101,7 +101,7 @@ class CrawlerManager
             'NOW()',
             'NOW()'
         );
-        Logger::debug(sprintf('Import crawl URL %s to database', $url));
+        Logger::info(sprintf('Import crawl URL %s to database', $url));
         return DB::insert($query);
     }
 

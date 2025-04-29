@@ -75,8 +75,8 @@ class Initialize
         }
 
         // speed up query
-        DB::raw_query("ALTER TABLE `". DB::table('rake_resources')  ."` ADD INDEX(`guid`); ");
-        DB::raw_query("ALTER TABLE `". DB::table('rake_resources')  ."` ADD INDEX(`new_guid`, `imported`); ");
+        DB::raw_query("ALTER TABLE `" . DB::table('rake_resources')  . "` ADD INDEX(`guid`); ");
+        DB::raw_query("ALTER TABLE `" . DB::table('rake_resources')  . "` ADD INDEX(`new_guid`, `imported`); ");
     }
 
     public function removeDbTables()
