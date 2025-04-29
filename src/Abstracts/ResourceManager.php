@@ -91,7 +91,7 @@ abstract class ResourceManager implements ResourceManagerContract
             if ($resourceId > 0) {
                 if ($resource->isImported() && $tooth->validateSystemResource($resource->newGuid, $resource->newType)) {
                     if ($resource->type === 'link') {
-                        $tooth->updateContentResource($resource, $parentResource);
+                        $tooth->updatePostResource($resource);
                     }
 
                     $parentResource = Resources::findParent($resource->id);
@@ -200,7 +200,8 @@ abstract class ResourceManager implements ResourceManagerContract
             ->where('rel.resource_id=?', $childId);
 
         $parent = $this->findByQuery($query);
-        Logger::info(sprintf('Find the parent resource from child #%s', $childId), (array)$parent);
+        Logger::info(sprintf('Find the parent resource from child #%s', $childId));
+        Logger::debug('Parent info', (array)$parent);
 
         return $parent;
     }

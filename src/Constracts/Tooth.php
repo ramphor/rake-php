@@ -28,9 +28,6 @@ interface Tooth
 
     public function updatePostResource(Resource $resource);
 
-    public function updateContentResource(Resource $resource, Resource $parentResource);
-
-
     public function updateSystemResource(Resource $resource, Resource $parentResource);
 
     public function isCrawlUrlInContent();
@@ -80,4 +77,7 @@ interface Tooth
     public function collect();
 
     public function registerFeedItemCallbacks();
+
+
+    public function updateParentResourceContent($content, $newDataType, $newGuid);
 }

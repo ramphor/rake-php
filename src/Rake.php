@@ -279,6 +279,12 @@ class Rake
                     $resources = Resources::createFromResult($result, $tooth);
                     $resources->import(true);
 
+                    $tooth->updateParentResourceContent(
+                        $result->getContent(false),
+                        $result->getNewType(),
+                        $result->getNewGuid()
+                    );
+
                     if ($tooth->isCrawlUrlInContent()) {
                         $resources->importCrawlUrls();
                     }
