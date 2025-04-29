@@ -45,14 +45,13 @@ class DefaultResourceManager extends ResourceManager
             $tooth = $result->getTooth();
         }
         $this->resources  = [];
-        $rake             = $tooth->getRake();
         $resultResources  = $result->getResources();
         $parent           = Resource::create($result->getGuid(), 'link', $tooth);
+        $parent->setContent($result->getContent(false));
         if ($result->isSuccess()) {
             $parent->imported();
             $parent->setNewGuid($result->getNewGuid());
             $parent->setNewType($result->getNewType());
-            $parent->setContent($result->getContent(false));
         }
 
         foreach ($resultResources as $resultResource) {
