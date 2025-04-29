@@ -181,4 +181,11 @@ abstract class Processor implements ProcessorConstract
     {
         return $this->process();
     }
+
+
+    public function setImportedId($importedId) : \Ramphor\Rake\Constracts\Processor {
+        $this->importedId = $importedId;
+
+        return $this;
+    }
 }

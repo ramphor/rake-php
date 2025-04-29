@@ -12,4 +12,7 @@ interface Processor
      * @return \Ramphor\Rake\ProcessResult
      */
     public function process(): ProcessResult;
+
+
+    public function setImportedId($importedId) : self;
 }
