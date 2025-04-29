@@ -2,6 +2,7 @@
 
 namespace Ramphor\Rake\Abstracts;
 
+use Ramphor\Rake\Facades\Resources;
 use Ramphor\Sql as QueryBuilder;
 use Ramphor\Rake\Constracts\ResourceManager as ResourceManagerContract;
 use Ramphor\Rake\Resource;
@@ -14,6 +15,10 @@ use Ramphor\Rake\Abstracts\Tooth;
 abstract class ResourceManager implements ResourceManagerContract
 {
     protected $protocols = ['ftp', 'http', 'https'];
+    /**
+     * Summary of resources
+     * @var \Ramphor\Rake\Resource[]
+     */
     protected $resources = [];
 
     public function import($createFlow = false)
@@ -80,7 +85,21 @@ abstract class ResourceManager implements ResourceManagerContract
             /* After download files via Tooth.
             * Rake will be update resource to database with new GUID and Type
             */
-            $resource->save();
+            $resourceId = $resource->save();
+
+            // update content after download images
+            if ($resourceId > 0) {
+                if ($resource->isImported() && $tooth->validateSystemResource($resource->newGuid, $resource->newType)) {
+                    if ($resource->type === 'link') {
+                        $tooth->updateContentResource($resource, $parentResource);
+                    }
+
+                    $parentResource = Resources::findParent($resource->id);
+                    if (!is_null($parentResource)) {
+                        $tooth->updateSystemResource($resource, $parentResource);
+                    }
+                }
+            }
         }
     }
 
