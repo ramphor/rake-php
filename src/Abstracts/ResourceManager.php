@@ -24,12 +24,17 @@ abstract class ResourceManager implements ResourceManagerContract
     public function import($createFlow = false)
     {
         foreach ($this->resources as $resource) {
-            $parentId   = 0;
-            $parent     = $resource->parent;
+            $parentId = 0;
+            $parent = $resource->parent;
+
+
+            // Update new GUID for resource if not exists
             if ($parent) {
                 $parentId = $parent->findId();
                 if ($parentId <= 0) {
                     $parentId = $parent->save();
+                } else {
+                    $parent->update();
                 }
             }
 
@@ -46,7 +51,7 @@ abstract class ResourceManager implements ResourceManagerContract
             ->from(DB::table('rake_relations'))
             ->where('resource_id=? AND parent_id=?', $resourceId, $sourceId);
 
-        return (int)DB::var($query) > 0;
+        return (int) DB::var($query) > 0;
     }
 
     protected function createRelation($resourceId, $sourceId)
@@ -79,24 +84,26 @@ abstract class ResourceManager implements ResourceManagerContract
             return;
         }
         foreach ($this->resources as $resource) {
-            $tooth    = $resource->getTooth();
+            $tooth = $resource->getTooth();
             $resource = $tooth->downloadResource($resource);
 
             /* After download files via Tooth.
-            * Rake will be update resource to database with new GUID and Type
-            */
+             * Rake will be update resource to database with new GUID and Type
+             */
             $resourceId = $resource->save();
 
             // update content after download images
             if ($resourceId > 0) {
-                if ($resource->isImported() && $tooth->validateSystemResource($resource->newGuid, $resource->newType)) {
+                if ($resource->isImported()) {
                     if ($resource->type === 'link') {
                         $tooth->updatePostResource($resource);
                     }
 
-                    $parentResource = Resources::findParent($resource->id);
-                    if (!is_null($parentResource)) {
-                        $tooth->updateSystemResource($resource, $parentResource);
+                    if ($tooth->validateSystemResource($resource->newGuid, $resource->newType)) {
+                        $parentResource = Resources::findParent($resource->id);
+                        if (!is_null($parentResource)) {
+                            $tooth->updateSystemResource($resource, $parentResource);
+                        }
                     }
                 }
             }
@@ -106,7 +113,7 @@ abstract class ResourceManager implements ResourceManagerContract
     protected function mapFromDB(Resource &$resource, $dbResource)
     {
         $resource->setId($dbResource->id);
-        if ((bool)$dbResource->imported) {
+        if ((bool) $dbResource->imported) {
             $resource->imported();
         }
         $resource->setNewGuid($dbResource->new_guid);
@@ -201,7 +208,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
         $parent = $this->findByQuery($query);
         Logger::info(sprintf('Find the parent resource from child #%s', $childId));
-        Logger::debug('Parent info', (array)$parent);
+        Logger::debug('Parent info', (array) $parent);
 
         return $parent;
     }
