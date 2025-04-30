@@ -46,12 +46,12 @@ class OptionManager
     {
         if (isset($this->options[$optionName]['value'])) {
             $value = $this->options[$optionName]['value'];
-            Logger::debug(sprintf('The %s option is return the value is %s', $optionName, $value));
+            Logger::info(sprintf('The %s option is return the value is %s', $optionName, $value));
             return $value;
         }
 
         if (!($value = $this->getFromDB($optionName))) {
-            Logger::debug(sprintf('The %s option is not exists so the default value will be returned', $optionName));
+            Logger::info(sprintf('The %s option is not exists so the default value will be returned', $optionName));
             return $defaultValue;
         }
 

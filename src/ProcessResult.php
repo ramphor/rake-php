@@ -176,7 +176,7 @@ class ProcessResult
         }
 
         if (is_array($this->feedItem->galleryImages) && count($this->feedItem->galleryImages) > 0) {
-            Logger::debug(sprintf('[%s] Found %d gallery images', $this->tooth->getId(), count($this->feedItem->galleryImages)));
+            Logger::info(sprintf('[%s] Found %d gallery images', $this->tooth->getId(), count($this->feedItem->galleryImages)));
 
             foreach ($this->feedItem->galleryImages as $imageUrl) {
                 $convertedUrl = $processor->convertImageUrl($imageUrl);
@@ -227,7 +227,7 @@ class ProcessResult
             ]);
             $image->setAttribute('src', (string)$imageLink);
         }
-        Logger::debug(sprintf('The Rake founded %d images from content', count($resources)));
+        Logger::info(sprintf('The Rake founded %d images from content', count($resources)));
 
         // Freeup memory
         unset($processor, $images);
@@ -259,7 +259,7 @@ class ProcessResult
             ]);
             $link->setAttribute('href', (string)$url);
         }
-        Logger::debug(sprintf('The Rake founded %d links from content', count($resources)));
+        Logger::info(sprintf('The Rake founded %d links from content', count($resources)));
 
         return $resources;
     }
@@ -294,7 +294,7 @@ class ProcessResult
         try {
             $outputSrc = $src;
             foreach (static::$contentImageCallbacks as $id => $callback) {
-                Logger::debug(sprintf('Call the callback %s', $id));
+                Logger::info(sprintf('Call the callback %s', $id));
                 $outputSrc = call_user_func($callback, $outputSrc, $imageDom);
             }
             return $outputSrc;

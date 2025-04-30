@@ -62,7 +62,7 @@ class DefaultResourceManager extends ResourceManager
 
             // Parse link to ensure working correctly
             $resultResource['guid']->parse();
-            Logger::debug(sprintf(
+            Logger::info(sprintf(
                 'Create a %s resource from result with GUID is "%s"',
                 $resultResource['type'],
                 $resultResource['guid']->__toString(),

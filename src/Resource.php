@@ -187,7 +187,7 @@ class Resource
     {
         $id = $this->findId();
         if ($id <= 0) {
-            Logger::debug(
+            Logger::info(
                 'The resource is not found to save the hash',
                 ['guid' => $this->guid, 'type' => $this->type]
             );

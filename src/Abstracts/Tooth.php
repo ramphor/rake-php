@@ -219,7 +219,7 @@ abstract class Tooth implements ToothConstract
             }
 
             // Update feed to get next page, next run
-            Logger::debug('Create the flag to get next page of the feed');
+            Logger::info('Create the flag to get next page of the feed');
             $feed->next();
         }
     }

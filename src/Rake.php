@@ -176,7 +176,7 @@ class Rake
 
                     if (!$feedItem->isValid()) {
                         Logger::warning(
-                            'The feed item is invalid then create a error ProcessResult',
+                            sprintf('The feed item #%d is invalid then create a error ProcessResult', $index),
                             [$feedItem->getErrorMessage()]
                         );
 
@@ -187,8 +187,10 @@ class Rake
                     } else {
                         Logger::info(sprintf('Set feed item "%s" to processor', $feedItem->guid));
                         $processor->setFeedItem($feedItem);
+
                         // Execute processor
-                        $result      = $processor->execute();
+                        $result = $processor->process();
+
                         if (!$result instanceof ProcessResult) {
                             throw new Exception(sprintf(
                                 'The result must be instance of %s',
@@ -276,8 +278,8 @@ class Rake
 
                 if ($result->isSuccess()) {
                     // Import resources
-                    $resources = Resources::createFromResult($result, $tooth);
-                    $resources->import(true);
+                    $resourcesManager = Resources::createFromResult($result, $tooth);
+                    $resourcesManager->import(true);
 
                     $tooth->updateParentResourceContent(
                         $result->getContent(false),
@@ -286,13 +288,13 @@ class Rake
                     );
 
                     if ($tooth->isCrawlUrlInContent()) {
-                        $resources->importCrawlUrls();
+                        $resourcesManager->importCrawlUrls();
                     }
 
                     // Transfer the resources are fetched from the feed
                     if ($tooth->isTransferResources()) {
                         Logger::info('Transfer files after process the feed');
-                        $resources->transferFiles();
+                        $resourcesManager->transferFiles();
                     }
                 } else {
                     Logger::info('The rake doesn\'t sync result to database when it is error', ['GUID' => $result->getGuid()]);
