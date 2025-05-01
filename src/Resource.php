@@ -154,7 +154,7 @@ class Resource
         );
         $query = call_user_func_array([$query, 'values'], $values);
 
-        Logger::debug('Insert SQL: ', [$query]);
+        Logger::debug(sprintf('Insert SQL for [%s] %s: ', $this->type, $this->guid), [$query]);
         Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
 
         return $this->id = DB::insert($query);
@@ -180,7 +180,7 @@ class Resource
             ->set($values)
             ->where('id=?', $this->id);
 
-        Logger::debug('Update SQL: ', [$query]);
+        Logger::debug(sprintf('Update SQL for [%s] %s: ', $this->type, $this->guid), [$query]);
         Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
 
         return DB::query($query);
