@@ -6,6 +6,20 @@ use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Abstracts\Tooth;
 use Ramphor\Rake\Facades\Logger;
 
+/**
+ * @property-read int|null $id
+ * @property-read string $guid
+ * @property-read string $type
+ * @property-read bool $imported
+ * @property-read string|null $content
+ * @property-read string|null $newType
+ * @property-read string|null $newGuid
+ * @property-read bool $skipped
+ * @property-read Tooth $tooth
+ * @property-read int|null $retry
+ * @property-read Resource|null $parent
+ */
+
 class Resource
 {
     protected $contentChanged = false;
@@ -50,11 +64,14 @@ class Resource
         $this->id = (int)$id;
     }
 
-    public function setParent(self &$parent)
+    public function setParent(&$parent = null)
     {
         $this->parent = $parent;
     }
 
+    public function setTooth(&$tooth = null) {
+        $this->tooth = $tooth;
+    }
     public function getTooth()
     {
         return $this->tooth;
@@ -137,6 +154,16 @@ class Resource
         );
         $query = call_user_func_array([$query, 'values'], $values);
 
+        if ($this->type='gallery_image') {
+            $this->tooth= null;
+            $this->parent = null;
+            dd($this, $query);
+        }
+
+
+        Logger::debug('Insert SQL: ', [$query]);
+        Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
+
         return $this->id = DB::insert($query);
     }
 
@@ -159,6 +186,8 @@ class Resource
         $query = sql()->update(DB::table('rake_resources'))
             ->set($values)
             ->where('id=?', $this->id);
+
+        Logger::debug('Update SQL: ', [$query]);
 
         return DB::query($query);
     }
