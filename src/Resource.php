@@ -188,6 +188,7 @@ class Resource
             ->where('id=?', $this->id);
 
         Logger::debug('Update SQL: ', [$query]);
+        Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
 
         return DB::query($query);
     }
