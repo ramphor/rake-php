@@ -154,13 +154,6 @@ class Resource
         );
         $query = call_user_func_array([$query, 'values'], $values);
 
-        if ($this->type='gallery_image') {
-            $this->tooth= null;
-            $this->parent = null;
-            dd($this, $query);
-        }
-
-
         Logger::debug('Insert SQL: ', [$query]);
         Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
 
