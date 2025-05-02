@@ -101,6 +101,7 @@ abstract class ResourceManager implements ResourceManagerContract
 
                     if ($tooth->validateSystemResource($resource->newGuid, $resource->newType)) {
                         $parentResource = Resources::findParent($resource->id);
+                        Logger::info(sprintf('Found parent resource is #%d', $parentResource->id), [$parentResource]);
                         if (!is_null($parentResource)) {
                             $tooth->updateSystemResource($resource, $parentResource);
                         }
