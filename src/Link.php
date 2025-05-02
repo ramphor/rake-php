@@ -46,6 +46,20 @@ final class Link
         }
     }
 
+    protected function encodePath($path) {
+        $paths = explode('/', $path);
+        foreach($paths as $index => $splittedPath) {
+            if (strpos($splittedPath, '%') !== false) {
+                $splittedPath = urldecode($splittedPath);
+            }
+            $paths[$index] = urlencode($splittedPath);
+            $paths[$index] = str_replace('+', '%20', $paths[$index]);
+
+            unset($splittedPath, $index);
+        }
+        return implode('/', $paths);
+    }
+
     public function __toString()
     {
         $notify = false;
@@ -53,7 +67,8 @@ final class Link
             $notify = true;
             $this->parse();
         }
-        $suffix = trim($this->path);
+
+        $suffix = $this->encodePath($this->path);
         if ($this->query) {
             $suffix .= '?' . $this->query;
         }
@@ -101,6 +116,56 @@ final class Link
         return $outputUrl;
     }
 
+    /**
+     * Native function of PHP has bug so this method is work around to fix it.
+     *
+     * Bug:
+     * Raw URL: https://xanhvina.com/temp/uploaded-2024-tường hoa giả_lam-tuong-hoa-gia-cho-Mercedes-Benz-dai-tu (1)_rs1_1080x720.jpg"
+     * Result: array(3) {
+     *     'scheme' => "https"
+     *     'host' => string(12) "xanhvina.com"
+     *     'path' => string(102) "/temp/uploaded-2024-tư�_ng hoa giả_lam-tuong-hoa-gia-cho-Mercedes-Benz-dai-tu (1)_rs1_1080x720.jpg"
+     * }
+     * @return array
+     */
+    protected function parseUrl($url) {
+        $schemeInfo = explode('//', $url);
+        $ret = [];
+        $hasDomain = false;
+        if (isset($schemeInfo[1])) {
+            $ret['scheme'] = trim($schemeInfo[0], ':');
+            $hasDomain = true;
+        }
+        $domainAndPath = isset($schemeInfo[1]) ? $schemeInfo[1] : $schemeInfo[0];
+        $query = '';
+
+        if (strpos($domainAndPath, '?')) {
+            $splitByQuestionCharacter = explode('?', $domainAndPath);
+            $domainAndPath=$splitByQuestionCharacter[0];
+            $query = $splitByQuestionCharacter[1];
+        }
+
+        $path = $domainAndPath;
+        if ($hasDomain) {
+            $paths = explode('/', $domainAndPath);
+            $domain = array_shift($paths);
+
+            // to start path with / character
+            array_unshift($paths, '');
+
+            $path = implode('/', $paths);
+
+            $ret['host'] = $domain;
+        }
+        $ret['path'] = $path;
+
+        if (!empty($query)) {
+            $ret['query'] = $query;
+        }
+
+        return $ret;
+    }
+
     public function setRawUrl($url)
     {
         if ($this->trimLastSlash) {
@@ -117,7 +182,7 @@ final class Link
 
     public function parse()
     {
-        $parsedUrl = parse_url($this->rawUrl);
+        $parsedUrl = $this->parseUrl($this->rawUrl);
         foreach ($parsedUrl as $key => $value) {
             $this->$key = $value;
         }
