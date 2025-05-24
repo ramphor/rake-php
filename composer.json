@@ -17,7 +17,8 @@
         "guzzlehttp/psr7": "^2.7.0",
         "ramphor/sql": "1.0.0",
         "ramphor/php-html-parser": "^3.1.0",
-        "ramphor/httplug-guzzle6-adapter": "^2.0.2"
+        "ramphor/httplug-guzzle6-adapter": "^2.0.2",
+        "php-extended/php-html-object": "^6.1|^8.0"
     },
     "autoload": {
         "psr-4": {
