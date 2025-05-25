@@ -27,7 +27,7 @@ abstract class Tooth implements ToothConstract
     protected $acceptToothFormats = [self::FORMAT_CSV, self::FORMAT_HTML];
     protected $skipCheckTooth     = false;
     protected $transferResources  = false;
-    protected $limitQueryResource = 10;
+    protected $limitQueryResources = 10;
     protected $urlUseLastSplash   = false;
 
     protected $id;
@@ -233,9 +233,9 @@ abstract class Tooth implements ToothConstract
         return $this->responses;
     }
 
-    public function limitQueryResource()
+    public function getLimitQueryResources()
     {
-        return $this->limitQueryResource;
+        return $this->limitQueryResources;
     }
 
     /**

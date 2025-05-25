@@ -132,7 +132,7 @@ class DefaultResourceManager extends ResourceManager
         $fileResources  = $this->queryFileResources(
             $rake->getId(),
             $tooth->getId(),
-            $tooth->limitQueryResource()
+            $tooth->getLimitQueryResources()
         );
 
         $totalResources = count($fileResources);
