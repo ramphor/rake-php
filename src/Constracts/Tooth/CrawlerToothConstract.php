@@ -11,6 +11,8 @@ interface CrawlerToothConstract extends Tooth
 
     public function crawlUrlsQuery(QueryBuilder $query): QueryBuilder;
 
+    public function getLimitQueryUrls();
+
     public function getCrawlUrls();
 
     public function getResponses();

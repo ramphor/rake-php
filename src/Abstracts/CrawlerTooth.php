@@ -25,6 +25,10 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         ];
     }
 
+    public function getLimitQueryUrls() {
+        return $this->limitQueryUrls;
+    }
+
     abstract protected function validateURL($url);
 
     protected function validateRequestResponse($response): bool
@@ -36,7 +40,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
     {
         return $query
             ->orderBy('retry ASC, updated_at ASC, id ASC')
-            ->limit($this->limitQueryUrls);
+            ->limit($this->getLimitQueryUrls());
     }
 
     public function getCrawlUrls()
@@ -75,7 +79,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
 
-        Logger::info(sprintf('Get %d crawl URL(s) in database', count($crawlDatas)));
+        Logger::info(sprintf('Get %d crawl URL(s) in database', count( $crawlDatas)));
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
                 Logger::info(sprintf(
