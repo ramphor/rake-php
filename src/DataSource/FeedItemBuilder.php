@@ -167,6 +167,9 @@ class FeedItemBuilder implements FeedItemBuilderConstract
     public function methodTransformer($method)
     {
         $method = strtolower($method);
+        if ($method === 'html') {
+            return 'innerHtml';
+        }
         if ($method === 'innerhtml') {
             return 'innerHtml';
         }
