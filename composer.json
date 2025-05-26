@@ -18,7 +18,8 @@
         "ramphor/sql": "1.0.0",
         "ramphor/php-html-parser": "^3.1.0",
         "ramphor/httplug-guzzle6-adapter": "^2.0.2",
-        "php-extended/php-html-object": "^6.1|^8.0"
+        "php-extended/php-html-object": "^6.1|^8.0",
+        "nesbot/carbon": "^2.73|^3.9.0"
     },
     "autoload": {
         "psr-4": {
