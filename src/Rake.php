@@ -132,6 +132,8 @@ class Rake
             // Set the tooth for Processor
             $processor->setTooth($tooth);
 
+
+            // Load URLs in database to crawl data and parse into feed item
             $parsers   = $tooth->getParsers();
 
             foreach ($parsers as $feedItems) {
@@ -288,7 +290,9 @@ class Rake
                     );
 
                     if ($tooth->isCrawlUrlInContent()) {
+                        Logger::info('[Import] Start import URL(s) in content to Rake URL Database...');
                         $resourcesManager->importCrawlUrls();
+                        Logger::info('[Import] End import URL(s) in content to Rake URL Database.');
                     }
 
                     // Transfer the resources are fetched from the feed

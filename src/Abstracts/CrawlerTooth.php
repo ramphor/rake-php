@@ -5,7 +5,7 @@ namespace Ramphor\Rake\Abstracts;
 use Http\Client\Exception\RequestException;
 use Ramphor\Rake\Constracts\Tooth\CrawlerToothConstract;
 use Ramphor\Rake\Response;
-use Ramphor\Rake\Facades\Db;
+use Ramphor\Rake\Facades\DB;
 use Ramphor\Rake\Facades\Request;
 use Ramphor\Rake\Facades\Logger;
 use Ramphor\Rake\Types\CrawledUrl;
@@ -50,7 +50,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
 
         if ($this->skipCheckTooth) {
             $sql = $sql->where(
-                'rake_id=? AND tooth_id IS NULL AND crawled=? AND skipped=?',
+                'rake_id=? AND tooth_id IS NULL AND (crawled=? OR crawled IS NULL) AND skipped=?',
                 $this->rake->getId(),
                 0,
                 0
@@ -74,10 +74,31 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         return $results;
     }
 
+    protected function setProcessingCrawlUrls($crawlUrls) {
+        $ids = array_map(function($crawlUrl){
+            return $crawlUrl->id;
+        }, $crawlUrls);
+
+        $sql = sql('UPDATE @ SET crawled=? WHERE id IN([])', DB::table('rake_crawled_urls'), 2, $ids);
+        Logger::info('Set crawled status to `2`. It\' means they are processing.');
+        Logger::info((string)$sql);
+
+        DB::query($sql);
+    }
+
+
+    /**
+     * Fetch response from URLs in database
+     *
+     * @return Response[]
+     */
     public function getResponses()
     {
         $response   = new Response(Response::TYPE_ARRAY);
         $crawlDatas = $this->getCrawlUrls();
+
+        // Exclude processing crawl urls in next run time
+        $this->setProcessingCrawlUrls($crawlDatas);
 
         Logger::info(sprintf('Get %d crawl URL(s) in database', count( $crawlDatas)));
         foreach ($crawlDatas as $crawlData) {
