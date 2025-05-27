@@ -21,7 +21,7 @@ class CrawlerManager
 
         $query = sql()->update(DB::table('rake_crawled_urls'));
         if ($result->isSkipped()) {
-            $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()']);
+            $query = $query->set(['skipped' => 1, '@updated_at' => 'NOW()', 'crawled' => 0]);
             Resources::skipLinkByUrl($result->getGuid(), $result->getTooth());
         } elseif ($result->isSuccess()) {
             Logger::info(sprintf('The URL "%s" is crawled successfully', $result->getGuid()));
@@ -31,7 +31,7 @@ class CrawlerManager
             $query = $query->set(['crawled' => 1, '@updated_at' => 'NOW()']);
         } else {
             Logger::error(sprintf('The URL" %s" is crawled failed. It will be retry to re-crawl later', $result->getGuid()));
-            $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()']);
+            $query = $query->set(['@retry' => 'retry + 1', '@updated_at' => 'NOW()', 'crawled' => 0]);
         }
         $query = $query->where('id=?', $feedItem->urlDbId);
 
