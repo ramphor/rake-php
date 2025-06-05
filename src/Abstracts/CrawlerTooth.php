@@ -25,7 +25,8 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         ];
     }
 
-    public function getLimitQueryUrls() {
+    public function getLimitQueryUrls()
+    {
         return $this->limitQueryUrls;
     }
 
@@ -74,14 +75,15 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         return $results;
     }
 
-    protected function setProcessingCrawlUrls($crawlUrls) {
-        $ids = array_map(function($crawlUrl){
+    protected function setProcessingCrawlUrls($crawlUrls)
+    {
+        $ids = array_map(function ($crawlUrl) {
             return $crawlUrl->id;
         }, $crawlUrls);
 
         $sql = sql('UPDATE @ SET crawled=? WHERE id IN([])', DB::table('rake_crawled_urls'), 2, $ids);
         Logger::info('Set crawled status to `2`. It\'s means they are processing.');
-        Logger::info('[SQL] '. (string)$sql);
+        Logger::info('[SQL] ' . (string)$sql);
 
         DB::query($sql);
     }
@@ -100,7 +102,7 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
         // Exclude processing crawl urls in next run time
         $this->setProcessingCrawlUrls($crawlDatas);
 
-        Logger::info(sprintf('Get %d crawl URL(s) in database', count( $crawlDatas)));
+        Logger::info(sprintf('Get %d crawl URL(s) in database', count($crawlDatas)));
         foreach ($crawlDatas as $crawlData) {
             if (!$this->validateURL($crawlData->url)) {
                 Logger::info(sprintf(

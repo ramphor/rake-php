@@ -77,6 +77,9 @@ class FeedItem
     protected $errorContext;
     protected $errorMessage = '';
 
+
+    protected $htmlLinks = [];
+
     public function __construct($guid = null, $urlDbId = null)
     {
         $this->guid = $guid;
@@ -152,5 +155,18 @@ class FeedItem
     public function getErrorMessage()
     {
         return $this->errorMessage;
+    }
+
+
+    public function setHtmlLinks($htmlLinks)
+    {
+        if (is_array($htmlLinks)) {
+            $this->htmlLinks = $htmlLinks;
+        }
+    }
+
+    public function getHtmlLinks()
+    {
+        return $this->htmlLinks;
     }
 }

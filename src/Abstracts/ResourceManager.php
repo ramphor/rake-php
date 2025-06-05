@@ -73,7 +73,7 @@ abstract class ResourceManager implements ResourceManagerContract
             if ($resource->type !== 'link') {
                 continue;
             }
-
+            Logger::info(sprintf('Import resource "%s" to database', $resource->guid), [$resource]);
             Crawler::importFromResource($resource);
         }
     }

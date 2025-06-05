@@ -46,9 +46,10 @@ final class Link
         }
     }
 
-    protected function encodePath($path) {
+    protected function encodePath($path)
+    {
         $paths = explode('/', $path);
-        foreach($paths as $index => $splittedPath) {
+        foreach ($paths as $index => $splittedPath) {
             if (strpos($splittedPath, '%') !== false) {
                 $splittedPath = urldecode($splittedPath);
             }
@@ -128,7 +129,8 @@ final class Link
      * }
      * @return array
      */
-    protected function parseUrl($url) {
+    protected function parseUrl($url)
+    {
         $schemeInfo = explode('//', $url);
         $ret = [];
         $hasDomain = false;
@@ -141,7 +143,7 @@ final class Link
 
         if (strpos($domainAndPath, '?')) {
             $splitByQuestionCharacter = explode('?', $domainAndPath);
-            $domainAndPath=$splitByQuestionCharacter[0];
+            $domainAndPath = $splitByQuestionCharacter[0];
             $query = $splitByQuestionCharacter[1];
         }
 

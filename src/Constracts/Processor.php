@@ -14,5 +14,5 @@ interface Processor
     public function process(): ProcessResult;
 
 
-    public function setImportedId($importedId) : self;
+    public function setImportedId($importedId): self;
 }

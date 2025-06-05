@@ -56,7 +56,7 @@ class DefaultResourceManager extends ResourceManager
 
         foreach ($resultResources as $resultResource) {
             if (!$resultResource['guid'] instanceof Link) {
-                Logger::info(sprintf('The %s resource has guid is not instance of %s', Link::class));
+                Logger::info(sprintf('The %s resource has guid is not instance of %s', $resultResource['guid'], Link::class));
                 continue;
             }
 

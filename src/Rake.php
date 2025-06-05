@@ -126,6 +126,7 @@ class Rake
             // Crawl data from the feeds of tooth
             Logger::info(sprintf('Execute the %s tooth with %d feed(s)', $tooth->getId(), count($this->teeth)));
 
+
             $tooth->collect();
 
             $processor = $tooth->getProcessor();
@@ -289,7 +290,9 @@ class Rake
                         $result->getNewGuid()
                     );
 
-                    if ($tooth->isCrawlUrlInContent()) {
+
+
+                    if ($tooth->isCrawlUrlInContent() || $tooth->isCrawlUrlInHtml()) {
                         Logger::info('[Import] Start import URL(s) in content to Rake URL Database...');
                         $resourcesManager->importCrawlUrls();
                         Logger::info('[Import] End import URL(s) in content to Rake URL Database.');

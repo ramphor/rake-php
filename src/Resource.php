@@ -69,7 +69,8 @@ class Resource
         $this->parent = $parent;
     }
 
-    public function setTooth(&$tooth = null) {
+    public function setTooth(&$tooth = null)
+    {
         $this->tooth = $tooth;
     }
     public function getTooth()
@@ -155,7 +156,7 @@ class Resource
         $query = call_user_func_array([$query, 'values'], $values);
 
         Logger::debug(sprintf('Insert SQL for [%s] %s: ', $this->type, $this->guid), [$query]);
-        Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
+        Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         return $this->id = DB::insert($query);
     }
@@ -181,7 +182,7 @@ class Resource
             ->where('id=?', $this->id);
 
         Logger::debug(sprintf('Update SQL for [%s] %s: ', $this->type, $this->guid), [$query]);
-        Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS ));
+        Logger::debug('Tracing: ', debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         return DB::query($query);
     }

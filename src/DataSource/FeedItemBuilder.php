@@ -98,6 +98,30 @@ class FeedItemBuilder implements FeedItemBuilderConstract
 
                     // Create HTML Document from original HTML
                     $this->document->loadStr((string)$data['body']);
+
+
+                    $linkInHtml = [];
+                    $links = $this->document->find('a');
+                    foreach ($links as $link) {
+                        $href = $link->getAttribute('href');
+                        if (is_null($link) || strpos($href, '#') === 0 || empty(trim($link))) {
+                            continue;
+                        }
+                        if (strpos($href, '/') === false) {
+                            // unexpected cases
+                            if (strlen($href) < 4) {
+                                continue;
+                            }
+
+                            // check href must start with http or https. exclude tel, mailto
+                            $protocol = substr($href, 0, 4);
+                            if ($protocol !== 'http') {
+                                continue;
+                            }
+                        }
+                        $linkInHtml[] = trim($href);
+                    }
+                    $this->feedItem->setHtmlLinks($linkInHtml);
                 }
             } else {
                 $this->feedItem->setError($data['status']);

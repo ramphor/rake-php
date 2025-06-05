@@ -30,6 +30,8 @@ class ProcessResult
 
     protected $errors = [];
 
+    protected $htmlLinks = [];
+
     protected $exception;
 
     protected static $contentImageCallbacks = [];
@@ -264,6 +266,26 @@ class ProcessResult
         return $resources;
     }
 
+    protected function getHtmlLinkResources()
+    {
+        $this->htmlLinks = $this->getFeedItem()->getHtmlLinks();
+
+        if (is_null($this->htmlLinks)) {
+            return [];
+        }
+
+        $resources = [];
+        foreach ($this->htmlLinks as $link) {
+            $resources[] = [
+                'guid' => $link,
+                'type' => 'link',
+            ];
+        }
+        Logger::info(sprintf('The Rake founded %d links from html', count($resources)));
+
+        return $resources;
+    }
+
     public function getResources()
     {
         $resources = array_merge(
@@ -271,7 +293,15 @@ class ProcessResult
             $this->getContentImageResources(),
         );
 
-        return $resources;
+        if ($this->tooth->isCrawlUrlInContent()) {
+            $resources = array_merge($resources, $this->getContentLinkResources());
+        }
+
+        if ($this->tooth->isCrawlUrlInHtml()) {
+            $resources = array_merge($resources, $this->getHtmlLinkResources());
+        }
+
+        return array_unique($resources, SORT_REGULAR);
     }
 
     public static function addContentImageCallback($id, $callable)

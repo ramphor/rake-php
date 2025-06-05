@@ -273,6 +273,11 @@ abstract class Tooth implements ToothConstract
         return true;
     }
 
+    public function isCrawlUrlInHtml()
+    {
+        return false;
+    }
+
     /**
      * @param callable|\Closure $callable
      */

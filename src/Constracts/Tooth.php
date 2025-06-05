@@ -32,6 +32,8 @@ interface Tooth
 
     public function isCrawlUrlInContent();
 
+    public function isCrawlUrlInHtml();
+
 
     /**
      * @param callable|\Closure $callable
