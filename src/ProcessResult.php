@@ -276,8 +276,14 @@ class ProcessResult
 
         $resources = [];
         foreach ($this->htmlLinks as $link) {
+            $url = Link::create(
+                $link,
+                $this->feedItem->guid,
+                $this->tooth->urlUseLastSplash()
+            );
+
             $resources[] = [
-                'guid' => $link,
+                'guid' => $url,
                 'type' => 'link',
             ];
         }
