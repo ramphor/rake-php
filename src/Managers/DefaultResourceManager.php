@@ -18,25 +18,7 @@ class DefaultResourceManager extends ResourceManager
 {
     protected function checkLinkResourceIsOk($resource)
     {
-        if (!$resource['guid']->isSameSource()) {
-            return false;
-        }
-
-        try {
-            $response = Request::sendRequest(
-                'HEAD',
-                (string)$resource['guid'],
-                array('verify' => false)
-            );
-            $mimeType = $response->getHeaderLine('Content-Type');
-            return preg_match('/^(text|application)\//', $mimeType);
-        } catch (Exception $e) {
-            ob_start();
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-            $errorLogs = ob_get_clean();
-            Logger::warning(sprintf('%s\n%s', $e->getMessage(), $errorLogs), (array)$resource);
-        }
-        return false;
+        return $resource['guid']->isSameSource();
     }
 
     public function createFromResult($result, $tooth = null): ResourceManager
