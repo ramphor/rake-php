@@ -26,6 +26,8 @@ final class Link
     protected $query;
     protected $fragment;
 
+    protected $relativePaths = [];
+
     public static function create($url, $sourceUrl = null, $trimLastSlash = true)
     {
         return new static($url, $sourceUrl, $trimLastSlash);
@@ -69,7 +71,7 @@ final class Link
             $this->parse();
         }
 
-        $suffix = $this->encodePath($this->path);
+        $suffix = $this->encodePath($this->getPath());
         if ($this->query) {
             $suffix .= '?' . $this->query;
         }
@@ -182,6 +184,29 @@ final class Link
         $this->sourceUrl = $sourceUrl;
     }
 
+    protected function getPath()
+    {
+        if (strpos($this->path, '../') === 0) {
+            $pathArr = explode('/', $this->path);
+            $realPath = [];
+            foreach ($pathArr as $path) {
+                if ($path === '..') {
+                    unset($this->relativePaths[count($this->relativePaths) - 1]);
+                    $this->relativePaths = array_values($this->relativePaths);
+                } else {
+                    $realPath[] = $path;
+                }
+            }
+
+            $paths = array_merge($this->relativePaths, $realPath);
+            $this->path = implode('/', $paths);
+
+            unset($pathArr, $realPath, $paths);
+        }
+
+        return $this->path;
+    }
+
     public function parse()
     {
         $parsedUrl = $this->parseUrl($this->rawUrl);
@@ -191,6 +216,7 @@ final class Link
         $parsedSourceUrl = [];
         if (!empty($this->sourceUrl)) {
             $parsedSourceUrl = parse_url($this->sourceUrl);
+            $this->relativePaths = explode('/', dirname($parsedSourceUrl['path']));
         }
 
         if (!$this->host) {
