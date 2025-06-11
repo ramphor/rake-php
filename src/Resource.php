@@ -47,7 +47,8 @@ class Resource
 
     public function __construct($guid, $resourceType, Tooth &$tooth)
     {
-        $this->guid = $guid;
+        $this->setGuid($guid);
+
         $this->type = $resourceType;
         $this->tooth = $tooth;
     }
@@ -62,6 +63,12 @@ class Resource
     public function setId($id)
     {
         $this->id = (int)$id;
+    }
+
+
+    public function setGuid($guid)
+    {
+        $this->guid = $guid;
     }
 
     public function setParent(&$parent = null)
