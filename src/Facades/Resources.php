@@ -22,6 +22,7 @@ use Ramphor\Rake\Resource;
  * @method static string generateHash($data, $type)
  * @method static Resource getFromHash($hash, $type)
  * @method static void skipLinkByUrl($url, $tooth)
+ * @method static void findByUrl($url, $tooth)
  *
  * @see \Ramphor\Rake\Abstracts\ResourceManager
  */

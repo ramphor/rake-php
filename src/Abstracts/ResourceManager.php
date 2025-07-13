@@ -101,9 +101,12 @@ abstract class ResourceManager implements ResourceManagerContract
 
                     if ($tooth->validateSystemResource($resource->newGuid, $resource->newType)) {
                         $parentResource = Resources::findParent($resource->id);
-                        Logger::info(sprintf('Found parent resource is #%d', $parentResource->id), [$parentResource]);
+
                         if (!is_null($parentResource)) {
+                            Logger::info(sprintf('Found parent resource is #%d', $parentResource->id), [$parentResource]);
                             $tooth->updateSystemResource($resource, $parentResource);
+                        } else {
+                            Logger::info(sprintf('Not found parent of resource #%d', $resource->id), [$resource]);
                         }
                     }
                 }
@@ -241,5 +244,25 @@ abstract class ResourceManager implements ResourceManagerContract
             );
 
         return DB::query($query);
+    }
+
+
+    public function findByUrl($url, $tooth)
+    {
+        if (!is_a($tooth, Tooth::class)) {
+            Logger::warning(sprintf('The tooth must be an instance of %: %s', Tooth::class, $url));
+            return;
+        }
+        $rake = $tooth->getRake();
+        $query = sql()->select('*')
+            ->from(DB::table('rake_resources'))
+            ->where(
+                'guid=? AND tooth_id=? AND rake_id=?',
+                $url,
+                $tooth->getId(),
+                $rake->getId()
+            );
+
+        return DB::row($query);
     }
 }
