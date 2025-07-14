@@ -83,9 +83,11 @@ abstract class CrawlerTooth extends Tooth implements CrawlerToothConstract
 
         $sql = sql('UPDATE @ SET crawled=? WHERE id IN([])', DB::table('rake_crawled_urls'), 2, $ids);
         Logger::info('Set crawled status to `2`. It\'s means they are processing.');
-        Logger::info('[SQL] ' . (string)$sql);
 
-        DB::query($sql);
+        if (count($ids) > 0) {
+            Logger::info('[SQL] ' . (string)$sql);
+            DB::query($sql);
+        }
     }
 
 

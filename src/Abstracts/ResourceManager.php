@@ -54,15 +54,15 @@ abstract class ResourceManager implements ResourceManagerContract
         return (int) DB::var($query) > 0;
     }
 
-    protected function createRelation($resourceId, $sourceId)
+    public function createRelation($resourceId, $parentId)
     {
-        if ($this->relationIsExists($resourceId, $sourceId)) {
+        if ($this->relationIsExists($resourceId, $parentId)) {
             return;
         }
 
         $query = sql()
             ->insertInto(DB::table('rake_relations'), ['resource_id', 'parent_id'])
-            ->values('?, ?', $resourceId, $sourceId);
+            ->values('?, ?', $resourceId, $parentId);
 
         return DB::insert($query);
     }

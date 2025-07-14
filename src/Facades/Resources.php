@@ -23,7 +23,7 @@ use Ramphor\Rake\Resource;
  * @method static Resource getFromHash($hash, $type)
  * @method static void skipLinkByUrl($url, $tooth)
  * @method static void findByUrl($url, $tooth)
- *
+ * @method static void function createRelation($resourceId, $parentId)
  * @see \Ramphor\Rake\Abstracts\ResourceManager
  */
 class Resources extends Facade

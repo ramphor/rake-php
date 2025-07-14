@@ -351,8 +351,4 @@ abstract class Tooth implements ToothConstract
     {
         // Register callbacks for feed item
     }
-
-    public function convertImageUrl($url) {
-        return $url;
-    }
 }

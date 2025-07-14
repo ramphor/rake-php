@@ -82,6 +82,4 @@ interface Tooth
 
 
     public function updateParentResourceContent($content, $newDataType, $newGuid);
-
-    public function convertImageUrl($url);
 }
