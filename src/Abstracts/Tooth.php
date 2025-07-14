@@ -189,7 +189,7 @@ abstract class Tooth implements ToothConstract
     {
         if (count($this->getFeeds()) <= 0) {
             Logger::info(sprintf(
-                'The %s tooth doesn\'t have tooth to execute',
+                'The %s tooth doesn\'t have any feed to execute',
                 $this->getId()
             ));
             return;
