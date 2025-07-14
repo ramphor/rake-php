@@ -44,6 +44,7 @@ class App implements Iterator
     /**
      * @return string|int|null
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         $instanceName = array_keys($this->resolvedInstance);
@@ -64,6 +65,7 @@ class App implements Iterator
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function next(): void
     {
         $this->currentKey += 1;
@@ -72,6 +74,7 @@ class App implements Iterator
     /**
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->resolvedInstance[$this->key()];
@@ -80,6 +83,7 @@ class App implements Iterator
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->currentKey = 0;

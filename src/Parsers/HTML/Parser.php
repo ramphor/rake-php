@@ -11,6 +11,8 @@ class Parser extends AbstractParser
     protected $feedBuilder;
     protected $currentIndex = 0;
 
+
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->currentIndex;
@@ -26,16 +28,20 @@ class Parser extends AbstractParser
         return $this->feedBuilder->getFeedItem();
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->currentIndex = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         $this->currentIndex++;
     }
 
+
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return is_array($this->data) && isset($this->data[$this->currentIndex]);
