@@ -1,175 +1,155 @@
 flowchart TD
     %% Rake Boot
     subgraph RakeBoot["Rake Boot"]
-        CL[Config Loader]
-        CFG[rake.config.php]
-        CF[Config Transformer]
-        DB[Database【Config】]
-        DDL[Database Driver Loader]
-        DBCFG[rake.db.php]
-        DDT[DB Driver Transformer]
-        DB2[Database【Driver】]
-        TF[Tooth Factory]
-        CL -- Ưu tiên --> CFG
-        CL -- Nếu không có file --> CF
-        CF -- Load config từ --> DB
-        CL -- Trả về config chuẩn --> TF
-        DDL -- Ưu tiên --> DBCFG
-        DDL -- Nếu không có file --> DDT
-        DDT -- Load driver từ --> DB2
-        DDL -- Trả về driver chuẩn --> DBDM
+        ConfigLoader[Config Loader]
+        ConfigFile[rake.config.php]
+        ConfigTransformer[Config Transformer]
+        ConfigDatabase[Database【Config】]
+        DatabaseDriverLoader[Database Driver Loader]
+        DatabaseDriverFile[rake.db.php]
+        DatabaseDriverTransformer[Database Driver Transformer]
+        DatabaseDriverDatabase[Database【Driver】]
+        ToothFactory[Tooth Factory]
+        ConfigLoader -- Ưu tiên --> ConfigFile
+        ConfigLoader -- Nếu không có file --> ConfigTransformer
+        ConfigTransformer -- Load config từ --> ConfigDatabase
+        ConfigLoader -- Trả về config chuẩn --> ToothFactory
+        DatabaseDriverLoader -- Ưu tiên --> DatabaseDriverFile
+        DatabaseDriverLoader -- Nếu không có file --> DatabaseDriverTransformer
+        DatabaseDriverTransformer -- Load driver từ --> DatabaseDriverDatabase
+        DatabaseDriverLoader -- Trả về driver chuẩn --> DatabaseDriverManager
     end
 
-    %% Rake Core Managers
-    subgraph Managers["Rake Managers (Service Registry)"]
-        RM[Reception Manager]
-        PM[Parser Manager]
-        PRM[Preset Manager]
-        FIBM[Feed Item Builder Manager]
-        FIM[Feed Item Manager]
-        PCM[Processor Manager]
-        HCM[HTTP Client Manager]
-        DBDM[Database Driver Manager]
+    %% Rake Core Managers (Registry/Service Locator)
+    subgraph Managers["Rake Managers (Registry/Service Locator)"]
+        ReceptionManager[Reception Manager]
+        ParserManager[Parser Manager]
+        PresetManager[Preset Manager]
+        FeedItemBuilderManager[Feed Item Builder Manager]
+        FeedItemManager[Feed Item Manager]
+        ProcessorManager[Processor Manager]
+        HttpClientManager[HTTP Client Manager]
+        DatabaseDriverManager[Database Driver Manager]
+        EventBus[Event Bus【Observer/Event】]
     end
 
     %% User/Plugin mở rộng
     subgraph Plugins["User/Plugin mở rộng"]
-        U1[Custom Reception]
-        U2[Custom Parser]
-        U3[Custom Preset Rule]
-        U4[Custom Feed Item Builder]
-        U5[Custom Processor]
-        U6[Custom HTTP Client]
-        U7[Custom DB Driver]
-        U1 -- register --> RM
-        U2 -- register --> PM
-        U3 -- register --> PRM
-        U4 -- register --> FIBM
-        U5 -- register --> PCM
-        U6 -- register --> HCM
-        U7 -- register --> DBDM
+        CustomReception[Custom Reception]
+        CustomParser[Custom Parser]
+        CustomPresetRule[Custom Preset Rule]
+        CustomFeedItemBuilder[Custom Feed Item Builder]
+        CustomProcessor[Custom Processor]
+        CustomHttpClientAdapter[Custom HTTP Client Adapter]
+        CustomDatabaseDriverAdapter[Custom DB Driver Adapter]
+        CustomEventListener[Custom Event Listener]
+        CustomReception -- register --> ReceptionManager
+        CustomParser -- register --> ParserManager
+        CustomPresetRule -- register --> PresetManager
+        CustomFeedItemBuilder -- register --> FeedItemBuilderManager
+        CustomProcessor -- register --> ProcessorManager
+        CustomHttpClientAdapter -- register【Adapter】 --> HttpClientManager
+        CustomDatabaseDriverAdapter -- register【Adapter】 --> DatabaseDriverManager
+        CustomEventListener -- register --> EventBus
     end
 
     %% Rake App (Luồng 1)
     subgraph RakeApp["Rake App"]
-        TF -- Tạo Tooth --> T1[Tooth 1]
-        TF -- Tạo Tooth --> T2[Tooth 2]
-        T1 --> F1a[Feed 1【URL】]
-        T1 --> F1b[Feed 2【Sitemap XML】]
-        T2 --> F2a[Feed 1【JSON】]
-        T2 --> F2b[Feed 2【CSV】]
-        F1a --> DF1a[Data Fetcher【Feed 1】]
-        F1b --> DF1b[Data Fetcher【Feed 2】]
-        F2a --> DF2a[Data Fetcher【Feed 1】]
-        F2b --> DF2b[Data Fetcher【Feed 2】]
-        DF1a -- chọn client --> HCM
-        DF1b -- chọn client --> HCM
-        DF2a -- chọn client --> HCM
-        DF2b -- chọn client --> HCM
-        DF1a --> DBF1a[Rake Database【Feed 1】]
-        DF1b --> DBF1b[Rake Database【Feed 2】]
-        DF2a --> DBF2a[Rake Database【Feed 1】]
-        DF2b --> DBF2b[Rake Database【Feed 2】]
-        DBF1a --> QF1a[Queue Chunk Data【Feed 1】]
-        DBF1b --> QF1b[Queue Chunk Data【Feed 2】]
-        DBF2a --> QF2a[Queue Chunk Data【Feed 1】]
-        DBF2b --> QF2b[Queue Chunk Data【Feed 2】]
+        ToothFactory -- Tạo Tooth --> Tooth1[Tooth 1]
+        ToothFactory -- Tạo Tooth --> Tooth2[Tooth 2]
+        Tooth1 --> Feed1Tooth1[Feed 1【URL】]
+        Tooth1 --> Feed2Tooth1[Feed 2【Sitemap XML】]
+        Tooth2 --> Feed1Tooth2[Feed 1【JSON】]
+        Tooth2 --> Feed2Tooth2[Feed 2【CSV】]
+        Feed1Tooth1 --> DataFetcherFeed1Tooth1[Data Fetcher【Feed 1】]
+        Feed2Tooth1 --> DataFetcherFeed2Tooth1[Data Fetcher【Feed 2】]
+        Feed1Tooth2 --> DataFetcherFeed1Tooth2[Data Fetcher【Feed 1】]
+        Feed2Tooth2 --> DataFetcherFeed2Tooth2[Data Fetcher【Feed 2】]
+        DataFetcherFeed1Tooth1 -- chọn client【Adapter】 --> HttpClientManager
+        DataFetcherFeed2Tooth1 -- chọn client【Adapter】 --> HttpClientManager
+        DataFetcherFeed1Tooth2 -- chọn client【Adapter】 --> HttpClientManager
+        DataFetcherFeed2Tooth2 -- chọn client【Adapter】 --> HttpClientManager
+        DataFetcherFeed1Tooth1 --> DatabaseFeed1Tooth1[Rake Database【Feed 1】]
+        DataFetcherFeed2Tooth1 --> DatabaseFeed2Tooth1[Rake Database【Feed 2】]
+        DataFetcherFeed1Tooth2 --> DatabaseFeed1Tooth2[Rake Database【Feed 1】]
+        DataFetcherFeed2Tooth2 --> DatabaseFeed2Tooth2[Rake Database【Feed 2】]
+        DatabaseFeed1Tooth1 --> QueueChunkFeed1Tooth1[Queue Chunk Data【Feed 1】]
+        DatabaseFeed2Tooth1 --> QueueChunkFeed2Tooth1[Queue Chunk Data【Feed 2】]
+        DatabaseFeed1Tooth2 --> QueueChunkFeed1Tooth2[Queue Chunk Data【Feed 1】]
+        DatabaseFeed2Tooth2 --> QueueChunkFeed2Tooth2[Queue Chunk Data【Feed 2】]
     end
 
     %% Luồng 2: Xử lý dữ liệu từ queue chunk (cho từng feed)
     subgraph L2["Luồng 2: Xử lý dữ liệu từ Queue Chunk Data"]
-        QF1a --> RM
-        QF1b --> RM
-        QF2a --> RM
-        QF2b --> RM
-        RM -- detect type --> PM
-        PM -- parse data --> FIBM
-        PRM -- provide rule --> FIBM
-        FIBM -- build --> FIM
-        FIM -- manage --> PCM
-        PCM -- process --> FIM
-        FIBM --> BLD1[Feed Item Builder【Product】]
-        FIBM --> BLD2[Feed Item Builder【Post】]
-        FIBM --> BLD3[Feed Item Builder【Movie】]
-        BLD1 --> FIM
-        BLD2 --> FIM
-        BLD3 --> FIM
-        FIM --> FI1[Feed Item【Product】]
-        FIM --> FI2[Feed Item【Post】]
-        FIM --> FI3[Feed Item【Movie】]
-        %% Processor chain (Chain of Responsibility)
+        QueueChunkFeed1Tooth1 --> ReceptionManager
+        QueueChunkFeed2Tooth1 --> ReceptionManager
+        QueueChunkFeed1Tooth2 --> ReceptionManager
+        QueueChunkFeed2Tooth2 --> ReceptionManager
+        ReceptionManager -- detect type --> ParserManager
+        ParserManager -- parse data --> FeedItemBuilderManager
+        PresetManager -- provide rule --> FeedItemBuilderManager
+        FeedItemBuilderManager -- build --> FeedItemManager
+        FeedItemManager -- manage --> ProcessorManager
+        ProcessorManager -- process --> FeedItemManager
+        FeedItemBuilderManager --> FeedItemBuilderProduct[Feed Item Builder【Product】]
+        FeedItemBuilderManager --> FeedItemBuilderPost[Feed Item Builder【Post】]
+        FeedItemBuilderManager --> FeedItemBuilderMovie[Feed Item Builder【Movie】]
+        FeedItemBuilderProduct --> FeedItemManager
+        FeedItemBuilderPost --> FeedItemManager
+        FeedItemBuilderMovie --> FeedItemManager
+        FeedItemManager --> FeedItemProduct[Feed Item【Product】]
+        FeedItemManager --> FeedItemPost[Feed Item【Post】]
+        FeedItemManager --> FeedItemMovie[Feed Item【Movie】]
+        %% State Pattern cho Feed Item
+        FeedItemProduct -.-> StateProduct[State【Pending/Processing/Done/Error】]
+        FeedItemPost -.-> StatePost[State【Pending/Processing/Done/Error】]
+        FeedItemMovie -.-> StateMovie[State【Pending/Processing/Done/Error】]
+        %% Tất cả output đều đi qua Resource
+        FeedItemProduct --> ResourceProduct[Resource【Product, URL, Metadata, ...】]
+        FeedItemPost --> ResourcePost[Resource【Post, URL, Metadata, ...】]
+        FeedItemMovie --> ResourceMovie[Resource【Movie, URL, Metadata, ...】]
+        %% Processor chain (Chain of Responsibility + Decorator)
         subgraph COR["Chain of Responsibility: Processor Chain"]
             direction LR
-            FI1 --> GP1[Group Processor【Database】]
-            FI1 --> GP2[Group Processor【EPUB】]
-            FI1 --> GP3[Group Processor【JSON】]
-            FI1 --> GP4[Group Processor【DOCX】]
-            FI1 --> GP5[Group Processor【CSV】]
-            GP1 -- chọn driver --> DBDM
-            DBDM -- wpdb【】Eloquent【】Doctrine【】Custom... --> GP1
-            GP1 --> Q1a[Save file/image URLs + type to resources table]
-            GP2 --> OUT1[Output EPUB]
-            GP3 --> OUT2[Output JSON]
-            GP4 --> OUT3[Output DOCX]
-            GP5 --> OUT4[Output CSV]
+            ResourceProduct --> DecoratorProcessor[Decorator【Logging/Validation】]
+            DecoratorProcessor --> GroupProcessorDatabase[Group Processor【Database】]
+            GroupProcessorDatabase -- chọn driver【Adapter】 --> DatabaseDriverManager
+            DatabaseDriverManager -- wpdb【】Eloquent【】Doctrine【】Custom... --> GroupProcessorDatabase
+            GroupProcessorDatabase --> SaveResourceToTable[Save file/image URLs + type to resources table]
+            ResourceProduct --> GroupProcessorEPUB[Group Processor【EPUB】]
+            ResourceProduct --> GroupProcessorJSON[Group Processor【JSON】]
+            ResourceProduct --> GroupProcessorDOCX[Group Processor【DOCX】]
+            ResourceProduct --> GroupProcessorCSV[Group Processor【CSV】]
+            GroupProcessorEPUB --> OutputEPUB[Output EPUB]
+            GroupProcessorJSON --> OutputJSON[Output JSON]
+            GroupProcessorDOCX --> OutputDOCX[Output DOCX]
+            GroupProcessorCSV --> OutputCSV[Output CSV]
         end
-        Q1a --> R1a[Finish~Log]
-        OUT1 --> R1a
-        OUT2 --> R1a
-        OUT3 --> R1a
-        OUT4 --> R1a
+        SaveResourceToTable --> FinishLog[Finish~Log]
+        OutputEPUB --> FinishLog
+        OutputJSON --> FinishLog
+        OutputDOCX --> FinishLog
+        OutputCSV --> FinishLog
+        SaveResourceToTable -.-> CommandInsert[Command【Insert/Update/Download/Export...】]
+        FinishLog -.-> EventBus
     end
 
     %% Luồng 3: Download files/ảnh từ resources (worker riêng, dùng chung cho toàn hệ thống)
     subgraph L3["Luồng 3: Download files/images từ resources"]
-        W[Top-level Download Worker]
-        X[Download file/image thực tế]
-        CHK[Check duplicate file【checksum】]
-        Y1[Update resources table【new file, local path, status...】]
-        Y2[Update resources table【reuse id, update parent, metadata...】]
-        Z[Update parent resource content【post/product/movie...】]
-        Q1a --> W
-        W --> X
-        X --> CHK
-        CHK -- not duplicate --> Y1
-        CHK -- duplicate --> Y2
-        Y1 --> Z
-        Y2 --> Z
+        TopLevelDownloadWorker[Top-level Download Worker]
+        DownloadFileWorker[Download file/image thực tế]
+        CheckDuplicateFile[Check duplicate file【checksum】]
+        UpdateResourceNewFile[Update resources table【new file, local path, status...】]
+        UpdateResourceReuseId[Update resources table【reuse id, update parent, metadata...】]
+        UpdateParentResource[Update parent resource content【post/product/movie...】]
+        TopLevelDownloadWorker -.-> CommandDownloadFile[Command【DownloadFile】]
+        DownloadFileWorker -.-> StateDownload[State【Pending/Downloading/Done/Error】]
+        SaveResourceToTable --> TopLevelDownloadWorker
+        TopLevelDownloadWorker --> DownloadFileWorker
+        DownloadFileWorker --> CheckDuplicateFile
+        CheckDuplicateFile -- not duplicate --> UpdateResourceNewFile
+        CheckDuplicateFile -- duplicate --> UpdateResourceReuseId
+        UpdateResourceNewFile --> UpdateParentResource
+        UpdateResourceReuseId --> UpdateParentResource
+        UpdateParentResource -.-> EventBus
     end
-
-    %% Tô màu các manager
-    style RM fill:#e3f6fc,stroke:#333,stroke-width:2px
-    style PM fill:#e3f6fc,stroke:#333,stroke-width:2px
-    style PRM fill:#fffbe3,stroke:#333,stroke-width:2px
-    style FIBM fill:#ffe3f6,stroke:#333,stroke-width:2px
-    style FIM fill:#e3f6fc,stroke:#333,stroke-width:2px
-    style PCM fill:#fffbe3,stroke:#333,stroke-width:2px
-    style HCM fill:#e3f6fc,stroke:#333,stroke-width:2px
-    style DBDM fill:#e3f6fc,stroke:#333,stroke-width:2px
-
-    %% Tô màu user/plugin
-    style U1 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-    style U2 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-    style U3 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-    style U4 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-    style U5 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-    style U6 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-    style U7 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
-
-    %% Tô màu các bước quan trọng
-    style Q1a fill:#bff,stroke:#333,stroke-width:2px
-    style W fill:#fbb,stroke:#333,stroke-width:2px
-    style X fill:#ffb,stroke:#333,stroke-width:2px
-    style CHK fill:#ffd,stroke:#333,stroke-width:2px
-    style Y1 fill:#bfb,stroke:#333,stroke-width:2px
-    style Y2 fill:#bfb,stroke:#333,stroke-width:2px
-    style Z fill:#bbf,stroke:#333,stroke-width:2px
-
-    %% Tô màu nền cho từng luồng với opacity nhẹ
-    classDef bg1 fill:#e3f6fc88,stroke:#333,stroke-width:1px
-    classDef bg2 fill:#fffbe388,stroke:#333,stroke-width:1px
-    classDef bg3 fill:#ffe3f688,stroke:#333,stroke-width:1px
-    class RakeApp bg1
-    class L2 bg2
-    class L3 bg3
-    class COR bg2
