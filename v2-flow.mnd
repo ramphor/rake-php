@@ -1,92 +1,217 @@
 flowchart TD
     %% Luồng 1: Crawl và lưu dữ liệu
-    subgraph "Luồng 1: Crawl và lưu dữ liệu"
-        A1[Config Loader] --> B1[Tooth Queue Manager]
-        B1 -->|Worker| C1[Tooth 1]
-        B1 -->|Worker| C2[Tooth 2]
-
-        %% Tooth 1 có nhiều feed với data type khác nhau
-        C1 --> D1a[Feed 1 【Tooth 1】【URL】]
-        C1 --> D1b[Feed 2 【Tooth 1】【Sitemap XML】]
-        C1 --> D1c[Feed 3 【Tooth 1】【CSV】]
-        D1a --> E1a[Data Fetcher 【Feed 1】【URL】]
-        D1b --> E1b[Data Fetcher 【Feed 2】【Sitemap XML】]
-        D1c --> E1c[Data Fetcher 【Feed 3】【CSV】]
-        E1a --> F1a[Rake Database 【Feed 1】]
-        E1b --> F1b[Rake Database 【Feed 2】]
-        E1c --> F1c[Rake Database 【Feed 3】]
-        F1a --> G1a[Queue Chunk Data 【Feed 1】]
-        F1b --> G1b[Queue Chunk Data 【Feed 2】]
-        F1c --> G1c[Queue Chunk Data 【Feed 3】]
+    subgraph L1["Luồng 1: Crawl và lưu dữ liệu"]
+        A1[Config Loader]
+        B1[Tooth Queue Manager]
+        C1[Tooth 1]
+        C2[Tooth 2]
+        D1a[Feed 1 【Tooth 1】【URL】]
+        D1b[Feed 2 【Tooth 1】【Sitemap XML】]
+        D1c[Feed 3 【Tooth 1】【CSV】]
+        E1a[Data Fetcher 【Feed 1】【URL】]
+        E1b[Data Fetcher 【Feed 2】【Sitemap XML】]
+        E1c[Data Fetcher 【Feed 3】【CSV】]
+        F1a[Rake Database 【Feed 1】]
+        F1b[Rake Database 【Feed 2】]
+        F1c[Rake Database 【Feed 3】]
+        G1a[Queue Chunk Data 【Feed 1】]
+        G1b[Queue Chunk Data 【Feed 2】]
+        G1c[Queue Chunk Data 【Feed 3】]
+        D2a[Feed 1 【Tooth 2】【JSON】]
+        D2b[Feed 2 【Tooth 2】【CSV】]
+        E2a[Data Fetcher 【Feed 1】【JSON】]
+        E2b[Data Fetcher 【Feed 2】【CSV】]
+        F2a[Rake Database 【Feed 1】]
+        F2b[Rake Database 【Feed 2】]
+        G2a[Queue Chunk Data 【Feed 1】]
+        G2b[Queue Chunk Data 【Feed 2】]
+        A1 --> B1
+        B1 -->|Worker| C1
+        B1 -->|Worker| C2
+        C1 --> D1a
+        C1 --> D1b
+        C1 --> D1c
+        D1a --> E1a
+        D1b --> E1b
+        D1c --> E1c
+        E1a --> F1a
+        E1b --> F1b
+        E1c --> F1c
+        F1a --> G1a
+        F1b --> G1b
+        F1c --> G1c
+        C2 --> D2a
+        C2 --> D2b
+        D2a --> E2a
+        D2b --> E2b
+        E2a --> F2a
+        E2b --> F2b
+        F2a --> G2a
+        F2b --> G2b
     end
 
     %% Luồng 2: Xử lý dữ liệu từ queue chunk (cho từng feed)
-    subgraph "Luồng 2: Xử lý dữ liệu từ Queue Chunk Data"
-        %% Feed 1: output là Product
-        G1a --> H1a[Load Tooth 1【Feed 1】【URL】config~rule~chain]
-        H1a --> I1a[Reception]
-        I1a --> J1a[Parser]
-        J1a --> S1a[Preset Rule【Product】]
-        J1a --> T1a[Override Preset【Product】]
+    subgraph L2["Luồng 2: Xử lý dữ liệu từ Queue Chunk Data"]
+        H1a[Load Tooth 1【Feed 1】【URL】config~rule~chain]
+        I1a[Reception]
+        J1a[Parser]
+        S1a[Preset Rule【Product】]
+        T1a[Override Preset【Product】]
+        K1a[Feed Item【Product】]
+        L1a[Processor Chain【Product】]
+        M1a[Queue Worker]
+        O1a[Check Duplicate]
+        P1a[Insert~Update]
+        Q1a[Save file/image URLs + type to resources table]
+        R1a[Finish~Log]
+        H1b[Load Tooth 1【Feed 2】【Sitemap XML】config~rule~chain]
+        I1b[Reception]
+        J1b[Parser]
+        S1b[Preset Rule【Post】]
+        T1b[Override Preset【Post】]
+        K1b[Feed Item【Post】]
+        L1b[Processor Chain【Post】]
+        M1b[Queue Worker]
+        O1b[Check Duplicate]
+        P1b[Insert~Update]
+        Q1b[Save file/image URLs + type to resources table]
+        R1b[Finish~Log]
+        H1c[Load Tooth 1【Feed 3】【CSV】config~rule~chain]
+        I1c[Reception]
+        J1c[Parser]
+        S1c[Preset Rule【Movie】]
+        T1c[Override Preset【Movie】]
+        K1c[Feed Item【Movie】]
+        L1c[Processor Chain【Movie】]
+        M1c[Queue Worker]
+        O1c[Check Duplicate]
+        P1c[Insert~Update]
+        Q1c[Save file/image URLs + type to resources table]
+        R1c[Finish~Log]
+        H2a[Load Tooth 2【Feed 1】【JSON】config~rule~chain]
+        I2a[Reception]
+        J2a[Parser]
+        S2a[Preset Rule【Product】]
+        T2a[Override Preset【Product】]
+        K2a[Feed Item【Product】]
+        L2a[Processor Chain【Product】]
+        M2a[Queue Worker]
+        O2a[Check Duplicate]
+        P2a[Insert~Update]
+        Q2a[Save file/image URLs + type to resources table]
+        R2a[Finish~Log]
+        H2b[Load Tooth 2【Feed 2】【CSV】config~rule~chain]
+        I2b[Reception]
+        J2b[Parser]
+        S2b[Preset Rule【Post】]
+        T2b[Override Preset【Post】]
+        K2b[Feed Item【Post】]
+        L2b[Processor Chain【Post】]
+        M2b[Queue Worker]
+        O2b[Check Duplicate]
+        P2b[Insert~Update]
+        Q2b[Save file/image URLs + type to resources table]
+        R2b[Finish~Log]
+        G1a --> H1a
+        H1a --> I1a
+        I1a --> J1a
+        J1a --> S1a
+        J1a --> T1a
         S1a -.-> J1a
         T1a -.-> J1a
-        J1a --> K1a[Feed Item【Product】]
-        K1a --> L1a[Processor Chain【Product】]
-        L1a --> M1a[Queue Worker]
-        M1a --> O1a[Check Duplicate]
-        O1a --> P1a[Insert~Update]
-        P1a --> Q1a[Download Files]
-        Q1a --> R1a[Finish~Log]
-
-        %% Feed 2: output là Post
-        G1b --> H1b[Load Tooth 1【Feed 2】【Sitemap XML】config~rule~chain]
-        H1b --> I1b[Reception]
-        I1b --> J1b[Parser]
-        J1b --> S1b[Preset Rule【Post】]
-        J1b --> T1b[Override Preset【Post】]
+        J1a --> K1a
+        K1a --> L1a
+        L1a --> M1a
+        M1a --> O1a
+        O1a --> P1a
+        P1a --> Q1a
+        Q1a --> R1a
+        G1b --> H1b
+        H1b --> I1b
+        I1b --> J1b
+        J1b --> S1b
+        J1b --> T1b
         S1b -.-> J1b
         T1b -.-> J1b
-        J1b --> K1b[Feed Item【Post】]
-        K1b --> L1b[Processor Chain【Post】]
-        L1b --> M1b[Queue Worker]
-        M1b --> O1b[Check Duplicate]
-        O1b --> P1b[Insert~Update]
-        P1b --> Q1b[Download Files]
-        Q1b --> R1b[Finish~Log]
-
-        %% Feed 3: output là Movie
-        G1c --> H1c[Load Tooth 1【Feed 3】【CSV】config~rule~chain]
-        H1c --> I1c[Reception]
-        I1c --> J1c[Parser]
-        J1c --> S1c[Preset Rule【Movie】]
-        J1c --> T1c[Override Preset【Movie】]
+        J1b --> K1b
+        K1b --> L1b
+        L1b --> M1b
+        M1b --> O1b
+        O1b --> P1b
+        P1b --> Q1b
+        Q1b --> R1b
+        G1c --> H1c
+        H1c --> I1c
+        I1c --> J1c
+        J1c --> S1c
+        J1c --> T1c
         S1c -.-> J1c
         T1c -.-> J1c
-        J1c --> K1c[Feed Item【Movie】]
-        K1c --> L1c[Processor Chain【Movie】]
-        L1c --> M1c[Queue Worker]
-        M1c --> O1c[Check Duplicate]
-        O1c --> P1c[Insert~Update]
-        P1c --> Q1c[Download Files]
-        Q1c --> R1c[Finish~Log]
+        J1c --> K1c
+        K1c --> L1c
+        L1c --> M1c
+        M1c --> O1c
+        O1c --> P1c
+        P1c --> Q1c
+        Q1c --> R1c
+        G2a --> H2a
+        H2a --> I2a
+        I2a --> J2a
+        J2a --> S2a
+        J2a --> T2a
+        S2a -.-> J2a
+        T2a -.-> J2a
+        J2a --> K2a
+        K2a --> L2a
+        L2a --> M2a
+        M2a --> O2a
+        O2a --> P2a
+        P2a --> Q2a
+        Q2a --> R2a
+        G2b --> H2b
+        H2b --> I2b
+        I2b --> J2b
+        J2b --> S2b
+        J2b --> T2b
+        S2b -.-> J2b
+        T2b -.-> J2b
+        J2b --> K2b
+        K2b --> L2b
+        L2b --> M2b
+        M2b --> O2b
+        O2b --> P2b
+        P2b --> Q2b
+        Q2b --> R2b
+    end
+
+    %% Luồng 3: Download files/ảnh từ resources (worker riêng, dùng chung cho toàn hệ thống)
+    subgraph L3["Luồng 3: Download files/images từ resources"]
+        W[Top-level Download Worker]
+        X[Download file/image thực tế]
+        Y[Update resources table【local path, status...】]
+        Z[Update parent resource content【post/product/movie...】]
+        Q1a & Q1b & Q1c & Q2a & Q2b --> W
+        W --> X
+        X --> Y
+        Y --> Z
     end
 
     %% Tô màu các bước quan trọng
-    style J1a fill:#f9f,stroke:#333,stroke-width:2px
-    style J1b fill:#f9f,stroke:#333,stroke-width:2px
-    style J1c fill:#f9f,stroke:#333,stroke-width:2px
-
-    style M1a fill:#bbf,stroke:#333,stroke-width:2px
-    style O1a fill:#ffb,stroke:#333,stroke-width:2px
-    style P1a fill:#bfb,stroke:#333,stroke-width:2px
     style Q1a fill:#bff,stroke:#333,stroke-width:2px
-
-    style M1b fill:#bbf,stroke:#333,stroke-width:2px
-    style O1b fill:#ffb,stroke:#333,stroke-width:2px
-    style P1b fill:#bfb,stroke:#333,stroke-width:2px
     style Q1b fill:#bff,stroke:#333,stroke-width:2px
-
-    style M1c fill:#bbf,stroke:#333,stroke-width:2px
-    style O1c fill:#ffb,stroke:#333,stroke-width:2px
-    style P1c fill:#bfb,stroke:#333,stroke-width:2px
     style Q1c fill:#bff,stroke:#333,stroke-width:2px
+    style Q2a fill:#bff,stroke:#333,stroke-width:2px
+    style Q2b fill:#bff,stroke:#333,stroke-width:2px
+
+    style W fill:#fbb,stroke:#333,stroke-width:2px
+    style X fill:#ffb,stroke:#333,stroke-width:2px
+    style Y fill:#bfb,stroke:#333,stroke-width:2px
+    style Z fill:#bbf,stroke:#333,stroke-width:2px
+
+    %% Tô màu nền cho từng luồng với opacity nhẹ
+    classDef bg1 fill:#e3f6fc88,stroke:#333,stroke-width:1px
+    classDef bg2 fill:#fffbe388,stroke:#333,stroke-width:1px
+    classDef bg3 fill:#ffe3f688,stroke:#333,stroke-width:1px
+    class L1 bg1
+    class L2 bg2
+    class L3 bg3
