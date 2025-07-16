@@ -1,65 +1,92 @@
 flowchart TD
-    subgraph Rake App
-        A["Config Loader"] --> B["Tooth Queue Manager"]
-        B -->|Worker 1| C1["Tooth #1"]
-        B -->|Worker 2| C2["Tooth #2"]
-        B -->|Worker n| Cn["Tooth #n"]
+    %% Luồng 1: Crawl và lưu dữ liệu
+    subgraph "Luồng 1: Crawl và lưu dữ liệu"
+        A1[Config Loader] --> B1[Tooth Queue Manager]
+        B1 -->|Worker| C1[Tooth 1]
+        B1 -->|Worker| C2[Tooth 2]
+
+        %% Tooth 1 có nhiều feed với data type khác nhau
+        C1 --> D1a[Feed 1 【Tooth 1】【URL】]
+        C1 --> D1b[Feed 2 【Tooth 1】【Sitemap XML】]
+        C1 --> D1c[Feed 3 【Tooth 1】【CSV】]
+        D1a --> E1a[Data Fetcher 【Feed 1】【URL】]
+        D1b --> E1b[Data Fetcher 【Feed 2】【Sitemap XML】]
+        D1c --> E1c[Data Fetcher 【Feed 3】【CSV】]
+        E1a --> F1a[Rake Database 【Feed 1】]
+        E1b --> F1b[Rake Database 【Feed 2】]
+        E1c --> F1c[Rake Database 【Feed 3】]
+        F1a --> G1a[Queue Chunk Data 【Feed 1】]
+        F1b --> G1b[Queue Chunk Data 【Feed 2】]
+        F1c --> G1c[Queue Chunk Data 【Feed 3】]
     end
 
-    subgraph Tooth
-        direction TB
-        D1["Data Source #1 (platform, custom rule)"] --> E1["Reception #1 (Detect type)"]
-        D2["Data Source #2 (platform, custom rule)"] --> E2["Reception #2 (Detect type)"]
-        Dn["Data Source #n (platform, custom rule)"] --> En["Reception #n (Detect type)"]
+    %% Luồng 2: Xử lý dữ liệu từ queue chunk (cho từng feed)
+    subgraph "Luồng 2: Xử lý dữ liệu từ Queue Chunk Data"
+        %% Feed 1: output là Product
+        G1a --> H1a[Load Tooth 1【Feed 1】【URL】config~rule~chain]
+        H1a --> I1a[Reception]
+        I1a --> J1a[Parser]
+        J1a --> S1a[Preset Rule【Product】]
+        J1a --> T1a[Override Preset【Product】]
+        S1a -.-> J1a
+        T1a -.-> J1a
+        J1a --> K1a[Feed Item【Product】]
+        K1a --> L1a[Processor Chain【Product】]
+        L1a --> M1a[Queue Worker]
+        M1a --> O1a[Check Duplicate]
+        O1a --> P1a[Insert~Update]
+        P1a --> Q1a[Download Files]
+        Q1a --> R1a[Finish~Log]
+
+        %% Feed 2: output là Post
+        G1b --> H1b[Load Tooth 1【Feed 2】【Sitemap XML】config~rule~chain]
+        H1b --> I1b[Reception]
+        I1b --> J1b[Parser]
+        J1b --> S1b[Preset Rule【Post】]
+        J1b --> T1b[Override Preset【Post】]
+        S1b -.-> J1b
+        T1b -.-> J1b
+        J1b --> K1b[Feed Item【Post】]
+        K1b --> L1b[Processor Chain【Post】]
+        L1b --> M1b[Queue Worker]
+        M1b --> O1b[Check Duplicate]
+        O1b --> P1b[Insert~Update]
+        P1b --> Q1b[Download Files]
+        Q1b --> R1b[Finish~Log]
+
+        %% Feed 3: output là Movie
+        G1c --> H1c[Load Tooth 1【Feed 3】【CSV】config~rule~chain]
+        H1c --> I1c[Reception]
+        I1c --> J1c[Parser]
+        J1c --> S1c[Preset Rule【Movie】]
+        J1c --> T1c[Override Preset【Movie】]
+        S1c -.-> J1c
+        T1c -.-> J1c
+        J1c --> K1c[Feed Item【Movie】]
+        K1c --> L1c[Processor Chain【Movie】]
+        L1c --> M1c[Queue Worker]
+        M1c --> O1c[Check Duplicate]
+        O1c --> P1c[Insert~Update]
+        P1c --> Q1c[Download Files]
+        Q1c --> R1c[Finish~Log]
     end
 
-    C1 --> D1
-    C1 --> D2
-    C1 --> Dn
+    %% Tô màu các bước quan trọng
+    style J1a fill:#f9f,stroke:#333,stroke-width:2px
+    style J1b fill:#f9f,stroke:#333,stroke-width:2px
+    style J1c fill:#f9f,stroke:#333,stroke-width:2px
 
-    E1 --> F1["Item: Product"]
-    E1 --> F2["Item: Post"]
-    E2 --> F3["Item: Category"]
-    En --> Fn["Item: ..."]
+    style M1a fill:#bbf,stroke:#333,stroke-width:2px
+    style O1a fill:#ffb,stroke:#333,stroke-width:2px
+    style P1a fill:#bfb,stroke:#333,stroke-width:2px
+    style Q1a fill:#bff,stroke:#333,stroke-width:2px
 
-    F1 --> G1{"Custom rule?"}
-    F2 --> G2{"Custom rule?"}
-    F3 --> G3{"Custom rule?"}
-    Fn --> Gn{"Custom rule?"}
+    style M1b fill:#bbf,stroke:#333,stroke-width:2px
+    style O1b fill:#ffb,stroke:#333,stroke-width:2px
+    style P1b fill:#bfb,stroke:#333,stroke-width:2px
+    style Q1b fill:#bff,stroke:#333,stroke-width:2px
 
-    G1 -- Yes --> H1["Dùng custom rule"]
-    G1 -- No --> I1["Dùng preset rule theo platform + type"]
-    G2 -- Yes --> H2["Dùng custom rule"]
-    G2 -- No --> I2["Dùng preset rule theo platform + type"]
-    G3 -- Yes --> H3["Dùng custom rule"]
-    G3 -- No --> I3["Dùng preset rule theo platform + type"]
-    Gn -- Yes --> Hn["Dùng custom rule"]
-    Gn -- No --> In["Dùng preset rule theo platform + type"]
-
-    H1 & I1 --> J1["Parser"]
-    H2 & I2 --> J2["Parser"]
-    H3 & I3 --> J3["Parser"]
-    Hn & In --> Jn["Parser"]
-
-    J1 --> K1["Feed Item: Product"]
-    J2 --> K2["Feed Item: Post"]
-    J3 --> K3["Feed Item: Category"]
-    Jn --> Kn["Feed Item: ..."]
-
-    K1 --> L1["Product Chain"]
-    K2 --> L2["Post Chain"]
-    K3 --> L3["Category Chain"]
-    Kn --> Ln["... Chain"]
-
-    subgraph Chain of Responsibility
-        L1 --> M1["Processor 1"] --> M2["Processor 2"] --> Mn["Processor n"]
-        L2 --> N1["Processor 1'"] --> N2["Processor 2'"] --> Nn["Processor n'"]
-        L3 --> O1["Processor 1''"] --> O2["Processor 2''"] --> On["Processor n''"]
-        Ln --> P1["Processor ..."] --> P2["Processor ..."] --> Pn["Processor ..."]
-    end
-
-    Mn --> Q["Queue/Worker"]
-    Nn --> Q
-    On --> Q
-    Pn --> Q
-    Q --> Z["Insert/Backup/Validate/Download..."]
+    style M1c fill:#bbf,stroke:#333,stroke-width:2px
+    style O1c fill:#ffb,stroke:#333,stroke-width:2px
+    style P1c fill:#bfb,stroke:#333,stroke-width:2px
+    style Q1c fill:#bff,stroke:#333,stroke-width:2px
