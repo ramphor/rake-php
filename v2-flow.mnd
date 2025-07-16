@@ -120,12 +120,17 @@ flowchart TD
     subgraph L3["Luồng 3: Download files/images từ resources"]
         W[Top-level Download Worker]
         X[Download file/image thực tế]
-        Y[Update resources table【local path, status...】]
+        CHK[Check duplicate file【checksum】]
+        Y1[Update resources table【new file, local path, status...】]
+        Y2[Update resources table【reuse id, update parent, metadata...】]
         Z[Update parent resource content【post/product/movie...】]
         Q1a & Q1b & Q1c --> W
         W --> X
-        X --> Y
-        Y --> Z
+        X --> CHK
+        CHK -- not duplicate --> Y1
+        CHK -- duplicate --> Y2
+        Y1 --> Z
+        Y2 --> Z
     end
 
     %% Tô màu các manager
@@ -150,7 +155,9 @@ flowchart TD
 
     style W fill:#fbb,stroke:#333,stroke-width:2px
     style X fill:#ffb,stroke:#333,stroke-width:2px
-    style Y fill:#bfb,stroke:#333,stroke-width:2px
+    style CHK fill:#ffd,stroke:#333,stroke-width:2px
+    style Y1 fill:#bfb,stroke:#333,stroke-width:2px
+    style Y2 fill:#bfb,stroke:#333,stroke-width:2px
     style Z fill:#bbf,stroke:#333,stroke-width:2px
 
     %% Tô màu nền cho từng luồng với opacity nhẹ
