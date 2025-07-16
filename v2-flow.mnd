@@ -1,4 +1,19 @@
 flowchart TD
+    %% Config Loader & Tooth Factory
+    subgraph "Config Loader & Tooth Factory"
+        CL[Config Loader]
+        CFG[rake.config.php]
+        CF[Config Transformer]
+        DB[(Database)]
+        TF[Tooth Factory]
+        CL -- Ưu tiên --> CFG
+        CL -- Nếu không có file --> CF
+        CF -- Load config từ --> DB
+        CL -- Trả về config chuẩn --> TF
+        TF -- Tạo nhiều Tooth --> T1[Tooth 1]
+        TF -- Tạo nhiều Tooth --> T2[Tooth 2]
+    end
+
     %% User/Plugin mở rộng
     subgraph "User/Plugin mở rộng"
         U1[Custom Reception]
@@ -27,10 +42,6 @@ flowchart TD
 
     %% Luồng 1: Crawl và lưu dữ liệu
     subgraph L1["Luồng 1: Crawl và lưu dữ liệu"]
-        A1[Config Loader]
-        B1[Tooth Queue Manager]
-        C1[Tooth 1]
-        C2[Tooth 2]
         D1a[Feed 1【Tooth 1】【URL】]
         D1b[Feed 2【Tooth 1】【Sitemap XML】]
         D1c[Feed 3【Tooth 1】【CSV】]
@@ -51,12 +62,11 @@ flowchart TD
         F2b[Rake Database【Feed 2】]
         G2a[Queue Chunk Data【Feed 1】]
         G2b[Queue Chunk Data【Feed 2】]
-        A1 --> B1
-        B1 -->|Worker| C1
-        B1 -->|Worker| C2
-        C1 --> D1a
-        C1 --> D1b
-        C1 --> D1c
+        T1 --> D1a
+        T1 --> D1b
+        T1 --> D1c
+        T2 --> D2a
+        T2 --> D2b
         D1a --> E1a
         D1b --> E1b
         D1c --> E1c
@@ -66,8 +76,6 @@ flowchart TD
         F1a --> G1a
         F1b --> G1b
         F1c --> G1c
-        C2 --> D2a
-        C2 --> D2b
         D2a --> E2a
         D2b --> E2b
         E2a --> F2a
