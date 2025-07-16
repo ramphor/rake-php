@@ -21,6 +21,7 @@ flowchart TD
         U3[Custom Preset Rule]
         U4[Custom Feed Item Builder]
         U5[Custom Processor]
+        U6[Custom HTTP Client]
     end
 
     %% Các manager trung tâm
@@ -31,6 +32,7 @@ flowchart TD
         FIBM[Feed Item Builder Manager]
         FIM[Feed Item Manager]
         PCM[Processor Manager]
+        HCM[HTTP Client Manager]
     end
 
     %% Đăng ký mở rộng
@@ -39,6 +41,7 @@ flowchart TD
     U3 -- register --> PRM
     U4 -- register --> FIBM
     U5 -- register --> PCM
+    U6 -- register --> HCM
 
     %% Luồng 1: Crawl và lưu dữ liệu
     subgraph L1["Luồng 1: Crawl và lưu dữ liệu"]
@@ -82,6 +85,17 @@ flowchart TD
         E2b --> F2b
         F2a --> G2a
         F2b --> G2b
+        %% HTTP Client Manager cho Data Fetcher
+        E1a -- chọn client --> HCM
+        E1b -- chọn client --> HCM
+        E1c -- chọn client --> HCM
+        E2a -- chọn client --> HCM
+        E2b -- chọn client --> HCM
+        HCM -- Guzzle/Selenium/Webdriver/Web Bidi/Unirest... --> E1a
+        HCM -- Guzzle/Selenium/Webdriver/Web Bidi/Unirest... --> E1b
+        HCM -- Guzzle/Selenium/Webdriver/Web Bidi/Unirest... --> E1c
+        HCM -- Guzzle/Selenium/Webdriver/Web Bidi/Unirest... --> E2a
+        HCM -- Guzzle/Selenium/Webdriver/Web Bidi/Unirest... --> E2b
     end
 
     %% Luồng 2: Xử lý dữ liệu từ queue chunk (cho từng feed)
@@ -112,16 +126,25 @@ flowchart TD
         FIM --> FI2[Feed Item【Post】]
         FIM --> FI3[Feed Item【Movie】]
 
-        %% Processor chain và lưu resource
-        FI1 --> PC1[Processor Chain【Product】]
-        FI2 --> PC2[Processor Chain【Post】]
-        FI3 --> PC3[Processor Chain【Movie】]
-        PC1 --> Q1a[Save file/image URLs + type to resources table]
-        PC2 --> Q1b[Save file/image URLs + type to resources table]
-        PC3 --> Q1c[Save file/image URLs + type to resources table]
+        %% Processor chain (Chain of Responsibility)
+        subgraph COR["Chain of Responsibility: Processor Chain"]
+            direction LR
+            FI1 --> GP1[Group Processor【Database】]
+            FI1 --> GP2[Group Processor【EPUB】]
+            FI1 --> GP3[Group Processor【JSON】]
+            FI1 --> GP4[Group Processor【DOCX】]
+            FI1 --> GP5[Group Processor【CSV】]
+            GP1 --> Q1a[Save file/image URLs + type to resources table]
+            GP2 --> OUT1[Output EPUB]
+            GP3 --> OUT2[Output JSON]
+            GP4 --> OUT3[Output DOCX]
+            GP5 --> OUT4[Output CSV]
+        end
         Q1a --> R1a[Finish~Log]
-        Q1b --> R1b[Finish~Log]
-        Q1c --> R1c[Finish~Log]
+        OUT1 --> R1a
+        OUT2 --> R1a
+        OUT3 --> R1a
+        OUT4 --> R1a
     end
 
     %% Luồng 3: Download files/ảnh từ resources (worker riêng, dùng chung cho toàn hệ thống)
@@ -132,7 +155,7 @@ flowchart TD
         Y1[Update resources table【new file, local path, status...】]
         Y2[Update resources table【reuse id, update parent, metadata...】]
         Z[Update parent resource content【post/product/movie...】]
-        Q1a & Q1b & Q1c --> W
+        Q1a --> W
         W --> X
         X --> CHK
         CHK -- not duplicate --> Y1
@@ -148,6 +171,7 @@ flowchart TD
     style FIBM fill:#ffe3f6,stroke:#333,stroke-width:2px
     style FIM fill:#e3f6fc,stroke:#333,stroke-width:2px
     style PCM fill:#fffbe3,stroke:#333,stroke-width:2px
+    style HCM fill:#e3f6fc,stroke:#333,stroke-width:2px
 
     %% Tô màu user/plugin
     style U1 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
@@ -155,12 +179,10 @@ flowchart TD
     style U3 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
     style U4 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
     style U5 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
+    style U6 fill:#f0f0f0,stroke:#aaa,stroke-width:1px
 
     %% Tô màu các bước quan trọng
     style Q1a fill:#bff,stroke:#333,stroke-width:2px
-    style Q1b fill:#bff,stroke:#333,stroke-width:2px
-    style Q1c fill:#bff,stroke:#333,stroke-width:2px
-
     style W fill:#fbb,stroke:#333,stroke-width:2px
     style X fill:#ffb,stroke:#333,stroke-width:2px
     style CHK fill:#ffd,stroke:#333,stroke-width:2px
@@ -175,3 +197,4 @@ flowchart TD
     class L1 bg1
     class L2 bg2
     class L3 bg3
+    class COR bg2
