@@ -1,0 +1,88 @@
+erDiagram
+  RakeTooths {
+    int id PK
+  }
+  RakeDataSources {
+    int id PK
+    int tooth_id FK
+    string type
+    string name
+    text config
+    datetime created_at
+  }
+  RakeUrls {
+    int id PK
+    int tooth_id FK
+    string url
+    string status
+    tinyint skipped
+    int retry_count
+    text last_error
+    datetime crawled_at
+    datetime created_at
+  }
+  RakeUrlSourceMaps {
+    int id PK
+    int url_id FK
+    int source_id FK
+    datetime created_at
+  }
+  RakeDataOrigins {
+    int id PK
+    int source_id FK
+    string guid
+    longtext raw_data
+    datetime fetched_at
+  }
+  RakeResources {
+    int id PK
+    int parent_id FK
+    int tooth_id FK
+    string data_type
+    string guid
+    longtext current_content
+    string app_data_type
+    string app_guid
+    string import_status
+    int import_retry
+    datetime imported_at
+    text metadata
+    datetime created_at
+    datetime updated_at
+  }
+  RakeFileChecksums {
+    int id PK
+    int resource_id FK
+    string checksum
+    string app_new_type
+    string app_new_guid
+    datetime created_at
+  }
+  RakeQueues {
+    bigint id PK
+    string queue
+    longtext payload
+    tinyint attempts
+    int reserved_at
+    int available_at
+    int created_at
+  }
+  RakeFailedJobs {
+    bigint id PK
+    string uuid
+    text connection
+    text queue
+    longtext payload
+    longtext exception
+    datetime failed_at
+  }
+
+  RakeDataSources ||--o{ RakeDataOrigins : source_id
+  RakeDataSources ||--o{ RakeUrlSourceMaps : source_id
+  RakeTooths ||--o{ RakeDataSources : tooth_id
+  RakeTooths ||--o{ RakeUrls : tooth_id
+  RakeTooths ||--o{ RakeResources : tooth_id
+  RakeUrls ||--o{ RakeUrlSourceMaps : url_id
+  RakeDataOrigins }o--|| RakeDataSources : source_id
+  RakeResources ||--o{ RakeFileChecksums : resource_id
+  RakeResources ||--o{ RakeResources : parent_id
