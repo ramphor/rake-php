@@ -5,18 +5,18 @@ return [
     'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'auto_increment' => true,
             'primary' => true,
             'comment' => 'Auto-increment ID',
         ],
         'parent_id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'nullable' => true,
             'comment' => 'Parent resource ID (if any)',
         ],
         'tooth_id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'nullable' => true,
             'comment' => 'Tooth (project) ID that owns this resource',
         ],

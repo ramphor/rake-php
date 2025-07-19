@@ -5,12 +5,12 @@ return [
     'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'auto_increment' => true,
             'primary' => true,
         ],
         'tooth_id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'comment' => 'Reference to rake_tooths.id (project/tooth owner)',
         ],
         'type' => [

@@ -4,18 +4,18 @@ return [
     'engine' => 'InnoDB',
     'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
-        'key' => [
+        'config_key' => [
             'type' => 'string',
             'length' => 128,
             'primary' => true,
         ],
-        'value' => [
+        'config_value' => [
             'type' => 'text',
             'nullable' => true,
         ],
         'updated_at' => [
             'type' => 'datetime',
-            'default' => 'CURRENT_TIMESTAMP',
+            // Bỏ default
         ],
     ],
     'version' => '2.0.0',

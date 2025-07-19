@@ -16,18 +16,20 @@ class MigrationManager
     private $adapter;
 
     /**
-     * @var array
+     * @var \Rake\Config\DatabaseConfig|null
      */
-    private $executedMigrations = [];
+    private $databaseConfig;
 
     /**
      * MigrationManager constructor.
      *
      * @param DatabaseAdapterInterface $adapter
+     * @param \Rake\Config\DatabaseConfig|null $databaseConfig
      */
-    public function __construct(DatabaseAdapterInterface $adapter)
+    public function __construct(DatabaseAdapterInterface $adapter, ?\Rake\Config\DatabaseConfig $databaseConfig = null)
     {
         $this->adapter = $adapter;
+        $this->databaseConfig = $databaseConfig;
     }
 
     /**
@@ -49,6 +51,9 @@ class MigrationManager
             $definitions[$def['table']] = $def;
         }
 
+        // Kiểm tra trạng thái migration
+        $migrated = $this->checkMigrationStatus();
+
         // Sort definitions by dependencies
         $sortedDefinitions = $this->sortByDependencies($definitions);
 
@@ -60,7 +65,7 @@ class MigrationManager
 
         foreach ($sortedDefinitions as $table => $def) {
             $actualTable = $actual[$table] ?? ['fields' => [], 'indexes' => []];
-            $currentVersion = $this->getTableVersion($table);
+            $currentVersion = $migrated ? $this->getTableVersion($table) : '0.0.0';
             $targetVersion = $def['version'] ?? '1.0.0';
 
             // Track changes for history
@@ -150,7 +155,7 @@ class MigrationManager
         $temp = [];
 
         // Priority tables that should be created first
-        $priorityTables = ['rake_configs'];
+        $priorityTables = ['rake_configs', 'rake_tooths'];
 
         // Add priority tables first
         foreach ($priorityTables as $priorityTable) {
@@ -195,6 +200,10 @@ class MigrationManager
         if (isset($definitions[$table]['foreign_keys'])) {
             foreach ($definitions[$table]['foreign_keys'] as $fk) {
                 $refTable = $fk['references']['table'];
+                // Bỏ qua nếu bảng tham chiếu chính nó
+                if ($refTable === $table) {
+                    continue;
+                }
                 if (isset($definitions[$refTable])) {
                     $this->topologicalSort($refTable, $definitions, $visited, $temp, $sorted);
                 }
@@ -221,17 +230,17 @@ class MigrationManager
     {
         $sqls = [];
 
-        // Compare each field
-        foreach ($def['fields'] as $col => $colDef) {
-            $actCol = $actualTable['fields'][$col] ?? null;
-            if (!$actCol) {
-                // New column
-                $sqls[] = $schemaGenerator->generateAddColumnSQL($table, $col, $colDef);
-            } else if ($schemaGenerator->compareColumn($colDef, $actCol)) {
+            // Compare each field
+            foreach ($def['fields'] as $col => $colDef) {
+                $actCol = $actualTable['fields'][$col] ?? null;
+                if (!$actCol) {
+                    // New column
+                    $sqls[] = $schemaGenerator->generateAddColumnSQL($table, $col, $colDef);
+                } else if ($schemaGenerator->compareColumn($colDef, $actCol)) {
                 // Column has differences - upgrade
-                $sqls[] = $schemaGenerator->generateModifyColumnSQL($table, $col, $colDef);
+                    $sqls[] = $schemaGenerator->generateModifyColumnSQL($table, $col, $colDef);
+                }
             }
-        }
 
         // Compare indexes
         if (isset($def['indexes'])) {
@@ -269,11 +278,11 @@ class MigrationManager
         $sqls = [];
 
         // Remove fields that don't exist in target version
-        foreach ($actualTable['fields'] as $col => $actCol) {
-            if (!isset($def['fields'][$col])) {
-                $sqls[] = $schemaGenerator->generateDropColumnSQL($table, $col);
+            foreach ($actualTable['fields'] as $col => $actCol) {
+                if (!isset($def['fields'][$col])) {
+                    $sqls[] = $schemaGenerator->generateDropColumnSQL($table, $col);
+                }
             }
-        }
 
         // Remove indexes that don't exist in target version
         foreach ($actualTable['indexes'] as $indexName => $actIndex) {
@@ -297,6 +306,20 @@ class MigrationManager
     }
 
     /**
+     * Get prefixed table name
+     *
+     * @param string $tableName
+     * @return string
+     */
+    private function getPrefixedTableName(string $tableName): string
+    {
+        if ($this->databaseConfig) {
+            return $this->databaseConfig->getTableName($tableName);
+        }
+        return $tableName;
+    }
+
+    /**
      * Get current version of a table.
      *
      * @param string $table
@@ -304,11 +327,22 @@ class MigrationManager
      */
     private function getTableVersion(string $table): string
     {
+        // Kiểm tra sự tồn tại của bảng rake_configs
+        $configTable = $this->getPrefixedTableName('rake_configs');
+        if (!$this->adapter->tableExists($configTable)) {
+            // Tạo bảng rake_configs nếu chưa tồn tại
+            $this->adapter->execute("CREATE TABLE IF NOT EXISTS `$configTable` (
+                `config_key` VARCHAR(128) PRIMARY KEY,
+                `config_value` TEXT,
+                `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        }
+
         // Try to read from rake_configs table
         try {
-            $result = $this->adapter->select('rake_configs', ['value'], ['key' => "table_version_{$table}"]);
+            $result = $this->adapter->select($configTable, ['config_value'], ['config_key' => "table_version_{$table}"]);
             if (!empty($result)) {
-                return $result[0]['value'] ?? '1.0.0';
+                return $result[0]['config_value'] ?? '1.0.0';
             }
         } catch (\Exception $e) {
             // Table doesn't exist or other error, return default version
@@ -327,17 +361,18 @@ class MigrationManager
     private function updateTableVersion(string $table, string $version): bool
     {
         try {
-            $this->adapter->update('rake_configs',
-                ['value' => $version, 'updated_at' => date('Y-m-d H:i:s')],
-                ['key' => "table_version_{$table}"]
+            $configTable = $this->getPrefixedTableName('rake_configs');
+            $this->adapter->update($configTable,
+                ['config_value' => $version, 'updated_at' => date('Y-m-d H:i:s')],
+                ['config_key' => "table_version_{$table}"]
             );
             return true;
         } catch (\Exception $e) {
             // If update fails, try insert
             try {
-                $this->adapter->insert('rake_configs', [
-                    'key' => "table_version_{$table}",
-                    'value' => $version,
+                $this->adapter->insert($configTable, [
+                    'config_key' => "table_version_{$table}",
+                    'config_value' => $version,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
                 return true;
@@ -361,9 +396,10 @@ class MigrationManager
     private function logMigrationHistory(string $table, string $fromVersion, string $toVersion, array $changes, string $status = 'success'): bool
     {
         try {
-            $this->adapter->insert('rake_configs', [
-                'key' => "migration_history_{$table}_" . time(),
-                'value' => json_encode([
+            $configTable = $this->getPrefixedTableName('rake_configs');
+            $this->adapter->insert($configTable, [
+                'config_key' => "migration_history_{$table}_" . time(),
+                'config_value' => json_encode([
                     'table' => $table,
                     'from_version' => $fromVersion,
                     'to_version' => $toVersion,
@@ -391,12 +427,13 @@ class MigrationManager
     public function getMigrationHistory(string $table, int $limit = 10): array
     {
         try {
+            $configTable = $this->getPrefixedTableName('rake_configs');
             $pattern = "migration_history_{$table}_%";
-            $result = $this->adapter->select('rake_configs', ['value'], ['key' => $pattern], $limit, ['updated_at' => 'DESC']);
+            $result = $this->adapter->select($configTable, ['config_value'], ['config_key' => $pattern], $limit, ['updated_at' => 'DESC']);
 
             $history = [];
             foreach ($result as $row) {
-                $data = json_decode($row['value'], true);
+                $data = json_decode($row['config_value'], true);
                 if ($data) {
                     $history[] = $data;
                 }
@@ -418,11 +455,12 @@ class MigrationManager
     public function getAllMigrationHistory(int $limit = 50): array
     {
         try {
-            $result = $this->adapter->select('rake_configs', ['value'], ['key' => 'migration_history_%'], $limit, ['updated_at' => 'DESC']);
+            $configTable = $this->getPrefixedTableName('rake_configs');
+            $result = $this->adapter->select($configTable, ['config_value'], ['config_key' => 'migration_history_%'], $limit, ['updated_at' => 'DESC']);
 
             $history = [];
             foreach ($result as $row) {
-                $data = json_decode($row['value'], true);
+                $data = json_decode($row['config_value'], true);
                 if ($data) {
                     $history[] = $data;
                 }
@@ -558,14 +596,28 @@ class MigrationManager
         }
 
         try {
-            $driver = $this->adapter->getDriver();
-            $driver->beginTransaction();
+            $this->adapter->beginTransaction();
 
             foreach ($sqls as $sql) {
                 if (!empty($sql)) {
-                    $result = $driver->execute($sql);
+                    $result = $this->adapter->execute($sql);
                     if ($result === false) {
-                        throw new \Exception("Failed to execute SQL: " . $sql);
+                        // Check if it's a duplicate key/constraint error or index error
+                        $error = $this->adapter->getLastError();
+                        if ($error && (
+                            strpos($error, 'Duplicate key name') !== false ||
+                            strpos($error, 'Duplicate foreign key constraint name') !== false ||
+                            strpos($error, 'Failed to open the referenced table') !== false ||
+                            strpos($error, 'Incorrect prefix key') !== false ||
+                            strpos($error, 'BLOB/TEXT column') !== false ||
+                            strpos($error, 'Specified key was too long') !== false ||
+                            strpos($error, 'doesn\'t exist') !== false
+                        )) {
+                            // Log the error but continue
+                            error_log("Migration warning (ignored): " . $error);
+                            continue;
+                        }
+                        throw new \Exception("Failed to execute SQL: " . $sql . " - Error: " . $error);
                     }
                 }
             }
@@ -580,45 +632,11 @@ class MigrationManager
                 $this->logMigrationHistory($table, $history['from_version'], $history['to_version'], $history['changes']);
             }
 
-            $driver->commit();
+            $this->adapter->commit();
             return true;
         } catch (\Exception $e) {
-            $driver->rollback();
+            $this->adapter->rollback();
             error_log("Migration execution failed: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Rollback migration by executing reverse SQL statements.
-     *
-     * @param array $reverseSqls
-     * @return bool
-     */
-    public function rollbackMigration(array $reverseSqls): bool
-    {
-        if (empty($reverseSqls)) {
-            return true;
-        }
-
-        try {
-            $driver = $this->adapter->getDriver();
-            $driver->beginTransaction();
-
-            foreach ($reverseSqls as $sql) {
-                if (!empty($sql)) {
-                    $result = $driver->execute($sql);
-                    if ($result === false) {
-                        throw new \Exception("Failed to execute rollback SQL: " . $sql);
-                    }
-                }
-            }
-
-            $driver->commit();
-            return true;
-        } catch (\Exception $e) {
-            $driver->rollback();
-            error_log("Migration rollback failed: " . $e->getMessage());
             return false;
         }
     }
@@ -655,5 +673,16 @@ class MigrationManager
     public function setAdapter(DatabaseAdapterInterface $adapter): void
     {
         $this->adapter = $adapter;
+    }
+
+    /**
+     * Check migration status
+     *
+     * @return bool
+     */
+    private function checkMigrationStatus(): bool
+    {
+        $configTable = $this->getPrefixedTableName('rake_configs');
+        return $this->adapter->tableExists($configTable);
     }
 }

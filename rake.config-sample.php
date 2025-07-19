@@ -1,82 +1,52 @@
-php
 <?php
 
 return [
-    // Thông tin chung cho dự án crawl/migrate
-    'project' => [
-        'name'        => 'Bookix Migration',
-        'description' => 'Di chuyển dữ liệu sản phẩm từ WordPress sang hệ thống mới',
-        'env'         => 'production', // hoặc 'development'
-    ],
-
-    // Định nghĩa các Tooth (mỗi Tooth là một dự án crawl/migrate riêng biệt)
-    'teeth' => [
-        [
-            'id'    => 'bookix-products',
-            'label' => 'Bookix Products',
-            'feeds' => [
-                [
-                    'type' => 'url',
-                    'source' => 'https://bookix.vn/sitemap-products.xml',
-                    'parser' => 'xml',
-                ],
-                [
-                    'type' => 'csv',
-                    'source' => '/data/products.csv',
-                    'parser' => 'csv',
-                ],
-            ],
-            'processors' => [
-                'normalize',
-                'deduplicate',
-                'save_to_db',
-                'export_epub',
-            ],
-            'resource_types' => ['product', 'image'],
-            'options' => [
-                'batch_size' => 100,
-                'retry'      => 3,
-            ],
-        ],
-        // Có thể thêm nhiều Tooth khác...
-    ],
-
-    // Cấu hình database (cho các driver adapter)
+    // Database configuration
     'database' => [
-        'driver'   => 'mysql',
-        'host'     => 'localhost',
-        'port'     => 3306,
-        'dbname'   => 'bookix',
-        'user'     => 'root',
-        'password' => 'secret',
-        'charset'  => 'utf8mb4',
-        // Có thể mở rộng cho các loại driver khác (pgsql, sqlite, v.v.)
+        'driver' => 'mysql',
+        'host' => 'localhost',
+        'port' => 3306,
+        'dbname' => 'your_database',
+        'user' => 'your_username',
+        'password' => 'your_password',
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => 'rake_', // Database table prefix
     ],
 
-    // Cấu hình HTTP client (cho crawl, download file, v.v.)
+    // HTTP Client configuration
     'http_client' => [
-        'adapter'  => 'guzzle',
-        'timeout'  => 10,
-        'retries'  => 2,
-        'headers'  => [
-            'User-Agent' => 'BookixBot/1.0',
-        ],
+        'timeout' => 30,
+        'user_agent' => 'Rake/2.0',
+        'retries' => 3,
+        'delay' => 1, // Delay between requests in seconds
     ],
 
-    // Các preset, mapping, rule, v.v. (nếu có)
-    'presets' => [
-        'product_mapping' => [
-            'title'       => 'name',
-            'description' => 'desc',
-            'price'       => 'cost',
-            // ...
-        ],
+    // Logging configuration
+    'logging' => [
+        'level' => 'info', // debug, info, warning, error
+        'file' => 'rake.log',
+        'max_files' => 10,
     ],
 
-    // Cấu hình worker, queue, logging, v.v.
-    'worker' => [
-        'concurrent' => 2,
-        'log_level'  => 'info',
-        'queue'      => 'default',
+    // Migration configuration
+    'migration' => [
+        'schema_dir' => __DIR__ . '/schema_definitions',
+        'backup_tables' => true,
+        'dry_run' => false, // Set to true to preview changes without executing
+    ],
+
+    // Resource management
+    'resources' => [
+        'max_concurrent_downloads' => 5,
+        'download_timeout' => 60,
+        'storage_path' => __DIR__ . '/storage',
+    ],
+
+    // Processing configuration
+    'processing' => [
+        'batch_size' => 100,
+        'memory_limit' => '256M',
+        'max_execution_time' => 300,
     ],
 ];

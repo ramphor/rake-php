@@ -5,12 +5,12 @@ return [
     'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'auto_increment' => true,
             'primary' => true,
         ],
         'source_id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'comment' => 'Reference to rake_data_sources.id',
         ],
         'guid' => [
