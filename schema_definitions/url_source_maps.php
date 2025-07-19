@@ -23,7 +23,6 @@ return [
         ],
     ],
     'indexes' => [
-        ['fields' => ['url_id']],
         ['fields' => ['source_id']],
         ['fields' => ['url_id', 'source_id'], 'unique' => true],
     ],

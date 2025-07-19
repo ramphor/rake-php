@@ -613,8 +613,7 @@ class MigrationManager
                             strpos($error, 'Specified key was too long') !== false ||
                             strpos($error, 'doesn\'t exist') !== false
                         )) {
-                            // Log the error but continue
-                            error_log("Migration warning (ignored): " . $error);
+                            // Continue without logging
                             continue;
                         }
                         throw new \Exception("Failed to execute SQL: " . $sql . " - Error: " . $error);

@@ -15,7 +15,7 @@ return [
         ],
         'url' => [
             'type' => 'string',
-            'length' => 1024,
+            'length' => 191,
         ],
         'status' => [
             'type' => 'string',
@@ -50,7 +50,7 @@ return [
     ],
     'indexes' => [
         ['fields' => ['tooth_id']],
-        ['fields' => ['url'], 'unique' => true],
+        ['fields' => ['url']],
         ['fields' => ['status']],
         ['fields' => ['skipped']],
     ],

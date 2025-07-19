@@ -19,7 +19,8 @@ return [
             'comment' => 'Queue connection name',
         ],
         'queue' => [
-            'type' => 'text',
+            'type' => 'string',
+            'length' => 255,
             'comment' => 'Queue name',
         ],
         'payload' => [
