@@ -1,6 +1,8 @@
 <?php
 return [
     'table' => 'rake_failed_jobs',
+    'engine' => 'InnoDB',
+    'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'id' => [
             'type' => 'bigint',

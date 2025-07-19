@@ -24,66 +24,140 @@ class SchemaGenerator
     }
 
     /**
-     * Create a new table.
+     * Get all table names in the current database.
      *
-     * @param string $table
-     * @param callable $callback
-     * @return void
+     * @return array
      */
-    public function create(string $table, callable $callback)
+    public function getTables(): array
     {
-        // $callback sẽ nhận một Blueprint để định nghĩa cột
-        // $this->adapter->createTable($table, $columns)
+        return $this->adapter->getTables();
     }
 
     /**
-     * Drop a table.
-     *
-     * @param string $table
-     * @return void
-     */
-    public function drop(string $table)
-    {
-        // $this->adapter->dropTable($table)
-    }
-
-    /**
-     * Add a column to a table.
+     * Generate SQL to add a column to a table.
      *
      * @param string $table
      * @param string $column
-     * @param string $type
+     * @param array $definition
+     * @return string
+     */
+    public function generateAddColumnSQL(string $table, string $column, array $definition): string
+    {
+        $sql = "ALTER TABLE `$table` ADD COLUMN `$column` " . $definition['type'];
+        if (!empty($definition['nullable']) === false) $sql .= ' NOT NULL';
+        if (isset($definition['default'])) $sql .= " DEFAULT '" . $definition['default'] . "'";
+        if (!empty($definition['comment'])) $sql .= " COMMENT '" . addslashes($definition['comment']) . "'";
+        return $sql . ';';
+    }
+
+    /**
+     * Generate SQL to rename a column in a table.
+     *
+     * @param string $table
+     * @param string $oldColumn
+     * @param string $newColumn
+     * @return string
+     */
+    public function generateRenameColumnSQL(string $table, string $oldColumn, string $newColumn): string
+    {
+        return "ALTER TABLE `$table` RENAME COLUMN `$oldColumn` TO `$newColumn`;";
+    }
+
+    /**
+     * Generate SQL to modify a column in a table (alias for generateModifyColumnSQL).
+     *
+     * @param string $table
+     * @param string $column
+     * @param array $definition
+     * @return string
+     */
+    public function generateModifyColumnSQL(string $table, string $column, array $definition): string
+    {
+        $sql = "ALTER TABLE `$table` MODIFY COLUMN `$column` " . $definition['type'];
+        if (!empty($definition['nullable']) === false) $sql .= ' NOT NULL';
+        if (isset($definition['default'])) $sql .= " DEFAULT '" . $definition['default'] . "'";
+        if (!empty($definition['comment'])) $sql .= " COMMENT '" . addslashes($definition['comment']) . "'";
+        return $sql . ';';
+    }
+
+    /**
+     * Generate SQL to drop a column from a table.
+     *
+     * @param string $table
+     * @param string $column
+     * @return string
+     */
+    public function generateDropColumnSQL(string $table, string $column): string
+    {
+        return "ALTER TABLE `$table` DROP COLUMN `$column`;";
+    }
+
+    /**
+     * Generate SQL to create a new table.
+     *
+     * @param string $table
+     * @param array $columns
      * @param array $options
-     * @return void
+     * @return string
      */
-    public function addColumn(string $table, string $column, string $type, array $options = [])
+    public function generateCreateTableSQL(string $table, array $columns, array $options = []): string
     {
-        // $this->adapter->addColumn($table, $column, $type, $options)
+        $cols = [];
+        foreach ($columns as $col => $colDef) {
+            $colSql = "`$col` " . $colDef['type'];
+            if (!empty($colDef['auto_increment'])) $colSql .= ' AUTO_INCREMENT';
+            if (!empty($colDef['primary'])) $colSql .= ' PRIMARY KEY';
+            if (!empty($colDef['nullable']) === false) $colSql .= ' NOT NULL';
+            if (isset($colDef['default'])) $colSql .= " DEFAULT '" . $colDef['default'] . "'";
+            if (!empty($colDef['comment'])) $colSql .= " COMMENT '" . addslashes($colDef['comment']) . "'";
+            $cols[] = $colSql;
+        }
+        $engine = $options['engine'] ?? 'InnoDB';
+        $collation = $options['collation'] ?? 'utf8mb4_unicode_ci';
+        $charset = explode('_', $collation)[0] ?? 'utf8mb4';
+        $tableComment = !empty($options['comment']) ? " COMMENT='" . addslashes($options['comment']) . "'" : '';
+        $sql = "CREATE TABLE IF NOT EXISTS `$table` (" . implode(", ", $cols) . ") ENGINE={$engine} DEFAULT CHARSET={$charset} COLLATE={$collation}{$tableComment};";
+        return $sql;
     }
 
     /**
-     * Drop a column from a table.
+     * Generate SQL to drop a table.
      *
      * @param string $table
-     * @param string $column
-     * @return void
+     * @return string
      */
-    public function dropColumn(string $table, string $column)
+    public function generateDropTableSQL(string $table): string
     {
-        // $this->adapter->dropColumn($table, $column)
+        return "DROP TABLE IF EXISTS `$table`;";
     }
 
     /**
-     * Rename a table.
+     * Generate SQL to add an index to a table.
      *
-     * @param string $from
-     * @param string $to
-     * @return void
+     * @param string $table
+     * @param array $index
+     * @return string
      */
-    public function renameTable(string $from, string $to)
+    public function generateAddIndexSQL(string $table, array $index): string
     {
-        // $this->adapter->renameTable($from, $to)
+        $unique = !empty($index['unique']) ? 'UNIQUE ' : '';
+        $cols = implode(',', array_map(function($c) { return "`$c`"; }, $index['columns']));
+        $indexName = $index['name'] ?? "idx_{$table}_{$index['columns'][0]}";
+        return "CREATE {$unique}INDEX `$indexName` ON `$table` ($cols);";
     }
 
-    // Có thể mở rộng thêm các phương thức khác như renameColumn, modifyColumn, ...
+    /**
+     * Generate SQL to drop an index from a table.
+     *
+     * @param string $table
+     * @param array $index
+     * @return string
+     */
+    public function generateDropIndexSQL(string $table, array $index): string
+    {
+        $indexName = $index['name'] ?? "idx_{$table}_{$index['column']}";
+        return "DROP INDEX `$indexName` ON `$table`;";
+    }
+
+    // Could extend with additional methods like renameTable, modifyTable, etc.
 }

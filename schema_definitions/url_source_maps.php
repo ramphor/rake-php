@@ -1,6 +1,8 @@
 <?php
 return [
     'table' => 'rake_url_source_maps',
+    'engine' => 'InnoDB',
+    'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'id' => [
             'type' => 'int',

@@ -10,19 +10,11 @@ use Rake\Contracts\Database\DatabaseDriverInterface;
 interface DatabaseAdapterInterface
 {
     /**
-     * DatabaseAdapter constructor.
-     *
-     * @param \Rake\Contracts\Database\DatabaseDriverInterface $driver The database driver instance to use for all operations.
-     */
-    public function __construct(DatabaseDriverInterface $driver);
-
-
-    /**
      * Get the underlying database driver instance.
      *
-     * @return \Rake\Contracts\Database\DatabaseDriverInterface
+     * @return DatabaseDriverInterface
      */
-    public function getDriver();
+    public function getDriver() : ? DatabaseDriverInterface;
 
     /**
      * Get a query builder for a table.
@@ -66,9 +58,26 @@ interface DatabaseAdapterInterface
      * @param string $table
      * @param array $columns
      * @param array $where
+     * @param int $limit
+     * @param array $orderBy
      * @return array
      */
-    public function select(string $table, array $columns = ['*'], array $where = []): array;
+    public function select(string $table, array $columns = ['*'], array $where = [], int $limit = 0, array $orderBy = []): array;
+
+    /**
+     * Count records in table
+     * @param string $table
+     * @param array $where
+     * @return int
+     */
+    public function count(string $table, array $where = []): int;
+
+    /**
+     * Migrate (create or update) table from schema definition
+     * @param array $schema
+     * @return bool
+     */
+    public function migrate(array $schema): bool;
 
     /**
      * Run a set of operations in a transaction.

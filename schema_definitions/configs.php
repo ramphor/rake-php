@@ -1,6 +1,8 @@
 <?php
 return [
     'table' => 'rake_configs',
+    'engine' => 'InnoDB',
+    'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'key' => [
             'type' => 'string',
