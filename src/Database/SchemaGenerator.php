@@ -24,16 +24,6 @@ class SchemaGenerator
     }
 
     /**
-     * Get all table names in the current database.
-     *
-     * @return array
-     */
-    public function getTables(): array
-    {
-        return $this->adapter->getTables();
-    }
-
-    /**
      * Generate SQL to add a column to a table.
      *
      * @param string $table
@@ -48,19 +38,6 @@ class SchemaGenerator
         if (isset($definition['default'])) $sql .= " DEFAULT '" . $definition['default'] . "'";
         if (!empty($definition['comment'])) $sql .= " COMMENT '" . addslashes($definition['comment']) . "'";
         return $sql . ';';
-    }
-
-    /**
-     * Generate SQL to rename a column in a table.
-     *
-     * @param string $table
-     * @param string $oldColumn
-     * @param string $newColumn
-     * @return string
-     */
-    public function generateRenameColumnSQL(string $table, string $oldColumn, string $newColumn): string
-    {
-        return "ALTER TABLE `$table` RENAME COLUMN `$oldColumn` TO `$newColumn`;";
     }
 
     /**
@@ -96,14 +73,14 @@ class SchemaGenerator
      * Generate SQL to create a new table.
      *
      * @param string $table
-     * @param array $columns
+     * @param array $fields
      * @param array $options
      * @return string
      */
-    public function generateCreateTableSQL(string $table, array $columns, array $options = []): string
+    public function generateCreateTableSQL(string $table, array $fields, array $options = []): string
     {
         $cols = [];
-        foreach ($columns as $col => $colDef) {
+        foreach ($fields as $col => $colDef) {
             $colSql = "`$col` " . $colDef['type'];
             if (!empty($colDef['auto_increment'])) $colSql .= ' AUTO_INCREMENT';
             if (!empty($colDef['primary'])) $colSql .= ' PRIMARY KEY';
@@ -121,14 +98,22 @@ class SchemaGenerator
     }
 
     /**
-     * Generate SQL to drop a table.
+     * Generate SQL to add a foreign key to a table.
      *
      * @param string $table
+     * @param array $fkDef
      * @return string
      */
-    public function generateDropTableSQL(string $table): string
+    public function generateAddForeignKeySQL(string $table, array $fkDef): string
     {
-        return "DROP TABLE IF EXISTS `$table`;";
+        $fkName = $fkDef['name'] ?? "fk_{$table}_{$fkDef['columns'][0]}";
+        $columns = implode(',', array_map(function($c) { return "`$c`"; }, $fkDef['columns']));
+        $refTable = $fkDef['references']['table'];
+        $refColumns = implode(',', array_map(function($c) { return "`$c`"; }, $fkDef['references']['columns']));
+        $onDelete = isset($fkDef['on_delete']) ? " ON DELETE {$fkDef['on_delete']}" : '';
+        $onUpdate = isset($fkDef['on_update']) ? " ON UPDATE {$fkDef['on_update']}" : '';
+
+        return "ALTER TABLE `$table` ADD CONSTRAINT `$fkName` FOREIGN KEY ($columns) REFERENCES `$refTable` ($refColumns){$onDelete}{$onUpdate};";
     }
 
     /**
@@ -141,8 +126,8 @@ class SchemaGenerator
     public function generateAddIndexSQL(string $table, array $index): string
     {
         $unique = !empty($index['unique']) ? 'UNIQUE ' : '';
-        $cols = implode(',', array_map(function($c) { return "`$c`"; }, $index['columns']));
-        $indexName = $index['name'] ?? "idx_{$table}_{$index['columns'][0]}";
+        $cols = implode(',', array_map(function($c) { return "`$c`"; }, $index['fields']));
+        $indexName = $index['name'] ?? "idx_{$table}_{$index['fields'][0]}";
         return "CREATE {$unique}INDEX `$indexName` ON `$table` ($cols);";
     }
 
@@ -155,9 +140,75 @@ class SchemaGenerator
      */
     public function generateDropIndexSQL(string $table, array $index): string
     {
-        $indexName = $index['name'] ?? "idx_{$table}_{$index['column']}";
+        $indexName = $index['name'] ?? "idx_{$table}_{$index['fields'][0]}";
         return "DROP INDEX `$indexName` ON `$table`;";
     }
 
-    // Could extend with additional methods like renameTable, modifyTable, etc.
+    /**
+     * Get the current database schema.
+     *
+     * @return array
+     */
+    public function getDatabaseSchema(): array
+    {
+        // This would need to be implemented based on the adapter
+        // For now, return empty array
+        return [];
+    }
+
+    /**
+     * Compare two column definitions.
+     *
+     * @param array $definition
+     * @param array $actual
+     * @return bool
+     */
+    public function compareColumn(array $definition, array $actual): bool
+    {
+        // Compare type, nullable, default, comment, etc.
+        $fieldsToCompare = ['type', 'nullable', 'default', 'comment'];
+
+        foreach ($fieldsToCompare as $field) {
+            if (isset($definition[$field]) && isset($actual[$field])) {
+                if ($definition[$field] !== $actual[$field]) {
+                    return true; // Has differences
+                }
+            } elseif (isset($definition[$field]) !== isset($actual[$field])) {
+                return true; // One has the field, the other doesn't
+            }
+        }
+
+        return false; // No differences
+    }
+
+    /**
+     * Compare two index definitions.
+     *
+     * @param array $definition
+     * @param array $actual
+     * @return bool
+     */
+    public function compareIndex(array $definition, array $actual): bool
+    {
+        if (!isset($definition['fields']) || !isset($actual['fields'])) {
+            return true;
+        }
+
+        return $definition['fields'] !== $actual['fields'] ||
+               ($definition['unique'] ?? false) !== ($actual['unique'] ?? false);
+    }
+
+    /**
+     * Generate SQL to update table version.
+     *
+     * @param string $table
+     * @param string $version
+     * @return string
+     */
+    public function generateUpdateVersionSQL(string $table, string $version): string
+    {
+        // This would update a version table or table comment
+        // For now, return empty string - implementation depends on version storage strategy
+        return "";
+    }
 }
