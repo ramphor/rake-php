@@ -1,6 +1,6 @@
 <?php
 
-namespace Rake\Manager;
+namespace Rake\Manager\Database;
 
 /**
  * DatabaseDriverManager: Registry quản lý các Database Driver adapter (wpdb, Eloquent, ...)

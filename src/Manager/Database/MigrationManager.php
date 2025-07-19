@@ -1,8 +1,9 @@
 <?php
 
-namespace Rake\Database;
+namespace Rake\Manager\Database;
 
 use Rake\Contracts\Database\Adapter\DatabaseAdapterInterface;
+use Rake\Database\SchemaGenerator;
 
 /**
  * MigrationManager handles running, rolling back, and tracking database migrations.
@@ -36,7 +37,7 @@ class MigrationManager
      * @param string $schemaDir
      * @return array List of SQL statements to migrate
      */
-    public function migrateFromDefinitions(SchemaGenerator $schemaGenerator, string $schemaDir = __DIR__ . '/../../schema_definitions') : array
+    public function migrateFromDefinitions(SchemaGenerator $schemaGenerator, string $schemaDir = __DIR__ . '/../../../schema_definitions') : array
     {
         $definitions = [];
         if (!is_dir($schemaDir)) {
@@ -148,7 +149,7 @@ class MigrationManager
      * @param string $schemaDir
      * @return bool
      */
-    public function runMigration(SchemaGenerator $schemaGenerator, string $schemaDir = __DIR__ . '/../../schema_definitions'): bool
+    public function runMigration(SchemaGenerator $schemaGenerator, string $schemaDir = __DIR__ . '/../../../schema_definitions'): bool
     {
         $sqls = $this->migrateFromDefinitions($schemaGenerator, $schemaDir);
         return $this->executeMigration($sqls);
