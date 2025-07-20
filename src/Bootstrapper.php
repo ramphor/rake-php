@@ -3,6 +3,7 @@
 namespace Rake;
 
 use Rake\Manager\DatabaseDriverManager;
+use Rake\Manager\LoggerManager;
 
 class Bootstrapper
 {
@@ -16,14 +17,19 @@ class Bootstrapper
         // Helpers
         static::registerFunctions();
 
-
         // Register singletons
         $app->singleton(DatabaseDriverManager::class, function () {
             return new DatabaseDriverManager();
         });
+
+        $app->singleton(LoggerManager::class, function () {
+            return LoggerManager::getInstance();
+        });
+
         $app->singleton(Rake::class, function () use ($app) {
             return $app;
         });
+
         // Có thể đăng ký thêm các manager/service khác tại đây
     }
 
