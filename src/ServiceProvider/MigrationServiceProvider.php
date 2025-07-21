@@ -17,9 +17,6 @@ class MigrationServiceProvider extends AbstractServiceProvider
     protected function registerServices(): void
     {
         // Register migration services
-        $this->app->singleton('Rake\Admin\MigrationService', function () {
-            return new \Rake\Admin\MigrationService();
-        });
     }
 
     /**
