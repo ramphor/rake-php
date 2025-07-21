@@ -2,7 +2,6 @@
 
 namespace Rake\Kernel;
 
-use Rake\Bootstrapper\BootstrapperInterface;
 use Rake\Bootstrapper\MigrationBootstrapper;
 
 /**
@@ -12,12 +11,17 @@ use Rake\Bootstrapper\MigrationBootstrapper;
  */
 class MigrationKernel extends AbstractKernel
 {
+    protected function registerBootstrappers(): void
+    {
+        $this->addCustomBootstrapper(MigrationBootstrapper::class);
+    }
+
     /**
      * Get the bootstrappers for this kernel
      *
      * @return array<BootstrapperInterface>
      */
-    protected function getBootstrappers(): array
+    public function getBootstrappers(): array
     {
         return [
             new MigrationBootstrapper(),

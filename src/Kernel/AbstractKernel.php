@@ -124,7 +124,6 @@ abstract class AbstractKernel implements KernelInterface
             return $this;
         }
 
-        $this->app->setConfig($this->config);
         $this->runBootstrappers();
         $this->booted = true;
         return $this;
