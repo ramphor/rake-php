@@ -1,4 +1,4 @@
-# CRAWFLOW & RAKE FRAMEWORK ECOSYSTEM
+# RAKE CORE FRAMEWORK
 **Phiên bản:** 3.0
 **Ngày tạo:** 2025
 **Tác giả:** Development Team
@@ -7,264 +7,598 @@
 
 ## 📋 MỤC LỤC
 
-1. [Tổng quan hệ thống](#tổng-quan-hệ-thống)
-2. [Kiến trúc 3 Packages](#kiến-trúc-3-packages)
-3. [Triết lý thiết kế](#triết-lý-thiết-kế)
-4. [Flow hoạt động](#flow-hoạt-động)
+1. [Tổng quan Rake Core](#tổng-quan-rake-core)
+2. [Triết lý thiết kế](#triết-lý-thiết-kế)
+3. [Kiến trúc Framework](#kiến-trúc-framework)
+4. [Các thành phần cốt lõi](#các-thành-phần-cốt-lõi)
 5. [Tài liệu kỹ thuật](#tài-liệu-kỹ-thuật)
-6. [Hướng dẫn sử dụng](#hướng-dẫn-sử-dụng)
-7. [Development Guidelines](#development-guidelines)
+6. [Development Guidelines](#development-guidelines)
 
 ---
 
-## 🎯 TỔNG QUAN HỆ THỐNG
+## 🎯 TỔNG QUAN RAKE CORE
 
 ### Mục tiêu dự án
-CrawlFlow là hệ thống crawling và xử lý dữ liệu mạnh mẽ được xây dựng trên Rake Framework 2.0, cung cấp:
+Rake Core là **framework tổng quát** cho việc xây dựng ứng dụng, không phụ thuộc vào platform cụ thể nào. Framework này cung cấp:
 
-- **Modular Architecture**: Kiến trúc module hóa với 3 packages độc lập
+- **Platform Agnostic**: Không phụ thuộc vào WordPress, Laravel, hay platform cụ thể nào
+- **Modular Architecture**: Kiến trúc module hóa với các thành phần độc lập
 - **Flow-based Design**: Mọi thứ phải thấy được luồng xử lý và có thể visualize
-- **WordPress Integration**: Tích hợp hoàn chỉnh với WordPress
-- **Database Migration**: Hệ thống migration tự động
-- **Visual Composer**: React-based visual flow composer cho database schemas
+- **Dependency Injection**: Container pattern cho quản lý dependencies
 - **Event-driven**: Hệ thống event-driven với logging toàn diện
+- **Extensible**: Dễ dàng mở rộng và tùy chỉnh
+
+### Vai trò trong hệ sinh thái
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    RAKE ECOSYSTEM                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────┐ │
+│  │   RAKE CORE     │    │   RAKE WORDPRESS│    │ RAKE    │ │
+│  │   FRAMEWORK     │◄───┤    ADAPTER      │    │ OTHER   │ │
+│  │                 │    │                 │    │ ADAPTERS│ │
+│  │ • Container     │    │ • WP Database   │    │ • Laravel│ │
+│  │ • Kernel        │    │ • WP Hooks      │    │ • Symfony│ │
+│  │ • Bootstrapper  │    │ • WP Admin      │    │ • Custom │ │
+│  │ • Facade        │    │ • WP Security   │    │ • Platform│ │
+│  │ • Migration     │    │ • WP Cache      │    │ • Specific│ │
+│  │ • Logging       │    │ • WP Config     │    │ • Adapters│ │
+│  └─────────────────┘    └─────────────────┘    └─────────┘ │
+│                                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────┐ │
+│  │   CRAWFLOW      │    │   CRAWFLOW CLI  │    │ CRAWFLOW│ │
+│  │   PLUGIN        │    │    TOOL         │    │  CORE   │ │
+│  │                 │    │                 │    │         │ │
+│  │ • WordPress UI  │    │ • Command Line  │    │ • Engine│ │
+│  │ • Visual Editor │    │ • Batch Process │    │ • API   │ │
+│  │ • Admin Panel   │    │ • Scripts       │    │ • Core  │ │
+│  └─────────────────┘    └─────────────────┘    └─────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ### Công nghệ sử dụng
 - **PHP 8.1+**: Ngôn ngữ chính
-- **WordPress**: Platform hosting
-- **React + XYFlow**: Visual flow composer
-- **Monolog**: Logging library
-- **Composer**: Dependency management
 - **PSR-4**: Autoloading standard
 - **PSR-3**: Logger interface
-
----
-
-## 🏗️ KIẾN TRÚC 3 PACKAGES
-
-### 1. **Rake Core Framework** (`rake/`)
-Framework cốt lõi, độc lập với platform:
-
-```
-rake/
-├── src/
-│   ├── Container/             # Dependency Injection
-│   ├── Kernel/                # Application Kernels
-│   ├── Bootstrapper/          # Service Bootstrappers
-│   ├── Facade/                # Facade Pattern
-│   ├── Migration/             # Database Migration
-│   ├── Logging/               # Logging System
-│   └── Database/              # Database Abstraction
-├── schema_definitions/        # Database Schemas
-└── composer.json
-```
-
-**Chức năng chính:**
-- Dependency Injection Container
-- Kernel System cho application lifecycle
-- Database Migration System
-- Logging System với Monolog
-- Facade Pattern implementation
-
-### 2. **Rake WordPress Adapter** (`rake-wordpress-adapter/`)
-Adapter để tích hợp với WordPress:
-
-```
-rake-wordpress-adapter/
-├── src/
-│   ├── Database/              # WP Database Adapter
-│   ├── Hooks/                 # WP Hooks Integration
-│   ├── Admin/                 # WP Admin Integration
-│   ├── Security/              # WP Security Layer
-│   └── Cache/                 # WP Cache Integration
-└── composer.json
-```
-
-**Chức năng chính:**
-- WordPress Database Integration
-- WordPress Hooks Integration
-- WordPress Admin Integration
-- Security Layer
-- Cache Integration
-
-### 3. **CrawlFlow Plugin** (`wp-crawlflow/`)
-Plugin WordPress sử dụng Rake Framework:
-
-```
-wp-crawlflow/
-├── src/
-│   ├── Admin/                 # Admin Controllers
-│   ├── Kernel/                # Plugin Kernels
-│   ├── Bootstrapper/          # Plugin Bootstrappers
-│   ├── ServiceProvider/       # Service Providers
-│   └── Assets/                # Frontend Assets
-├── assets/
-│   ├── css/                   # Stylesheets
-│   └── js/                    # JavaScript
-└── composer.json
-```
-
-**Chức năng chính:**
-- Dashboard quản lý projects
-- Visual flow composer với React + XYFlow
-- Project management
-- Migration integration
-- Logging và analytics
+- **PSR-11**: Container interface
+- **Composer**: Dependency management
+- **Monolog**: Logging library
 
 ---
 
 ## 🎨 TRIẾT LÝ THIẾT KẾ
 
-### Flow-based Architecture
-CrawlFlow được xây dựng theo triết lý **"Flow-based Architecture"** - mọi thứ phải thấy được luồng xử lý và có thể visualize:
+### Platform Agnostic Philosophy
+Rake Core được thiết kế theo triết lý **"Platform Agnostic"** - không phụ thuộc vào platform cụ thể nào:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    CRAWFLOW ECOSYSTEM                      │
+│                    RAKE CORE FRAMEWORK                    │
 ├─────────────────────────────────────────────────────────────┤
+│                                                             │
 │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
-│  │   RAKE CORE     │  │ RAKE WORDPRESS  │  │  CRAWFLOW   │ │
-│  │   FRAMEWORK     │  │    ADAPTER      │  │   PLUGIN    │ │
+│  │   CONTAINER     │  │     KERNEL      │  │ BOOTSTRAPPER│ │
 │  │                 │  │                 │  │             │ │
-│  │ • Container     │  │ • WP Database   │  │ • Dashboard │ │
-│  │ • Kernel        │  │ • WP Hooks      │  │ • Projects  │ │
-│  │ • Bootstrapper  │  │ • WP Admin      │  │ • Migration │ │
-│  │ • Facade        │  │ • WP Security   │  │ • Logging   │ │
-│  │ • Migration     │  │ • WP Cache      │  │ • Analytics │ │
-│  │ • Logging       │  │ • WP Config     │  │             │ │
+│  │ • DI Container  │  │ • App Lifecycle │  │ • Service   │ │
+│  │ • Service Locator│  │ • Request Handle│  │ • Provider  │ │
+│  │ • Dependency Mgmt│  │ • Response Gen  │  │ • Bootstrap │ │
+│  │ • Singleton Mgmt│  │ • Error Handle  │  │ • Register  │ │
+│  └─────────────────┘  └─────────────────┘  └─────────────┘ │
+│                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐ │
+│  │    FACADE       │  │   MIGRATION     │  │   LOGGING   │ │
+│  │                 │  │                 │  │             │ │
+│  │ • Static Access │  │ • Schema Mgmt   │  │ • PSR-3     │ │
+│  │ • Service Proxy │  │ • Version Track │  │ • Monolog   │ │
+│  │ • Easy API      │  │ • Auto Migrate  │  │ • Daily Logs│ │
+│  │ • Clean Interface│  │ • Rollback      │  │ • CLI Output│ │
 │  └─────────────────┘  └─────────────────┘  └─────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Design Patterns Applied
 - **Dependency Injection**: Container pattern cho quản lý dependencies
-- **Factory Pattern**: Tooth Factory, HTTP Client Manager, Database Driver Manager
-- **Builder Pattern**: Feed Item Builder
-- **Chain of Responsibility**: Processor Chain
-- **Strategy Pattern**: Parser, Reception, Client, Driver selection
-- **Adapter Pattern**: HTTP Client, Database Driver
-- **Command Pattern**: Queue/Worker system
-- **State Pattern**: Feed Item, Resource, Tooth states
-- **Decorator Pattern**: Processor/Feed Item wrapping
+- **Service Locator**: Truy cập services thông qua container
+- **Factory Pattern**: Service factory, component factory
+- **Builder Pattern**: Configuration builder, service builder
+- **Chain of Responsibility**: Middleware chain, processor chain
+- **Strategy Pattern**: Service strategy, handler strategy
+- **Adapter Pattern**: Platform adapter, service adapter
+- **Command Pattern**: Console commands, queue commands
+- **State Pattern**: Application state, service state
+- **Decorator Pattern**: Service decorator, middleware decorator
 - **Observer/Event Bus**: Event-driven architecture
+
+### Flow-based Architecture
+Rake Core được xây dựng theo triết lý **"Flow-based Architecture"** - mọi thứ phải thấy được luồng xử lý:
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   REQUEST       │───▶│   KERNEL        │───▶│   RESPONSE      │
+│                 │    │                 │    │                 │
+│ • Input Data    │    │ • Process       │    │ • Output Data   │
+│ • Parameters    │    │ • Transform     │    │ • Status Code   │
+│ • Headers       │    │ • Validate      │    │ • Headers       │
+│ • Context       │    │ • Execute       │    │ • Body          │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   VALIDATION    │    │   EXECUTION     │    │   LOGGING       │ │
+│                 │    │                 │    │                 │ │
+│ • Input Check   │    │ • Service Call  │    │ • Request Log   │ │
+│ • Schema Valid  │    │ • Business Logic│    │ • Response Log  │ │
+│ • Security Check│    │ • Data Process  │    │ • Error Log     │ │
+│ • Permission    │    │ • State Change  │    │ • Performance   │ │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
 ---
 
-## 🔄 FLOW HOẠT ĐỘNG
+## 🏗️ KIẾN TRÚC FRAMEWORK
 
-### Plugin Activation Flow
+### Package Structure
 ```
-┌─────────────────┐
-│ Plugin Activated│
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Initialize Rake │
-│    Container    │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Bootstrap Core  │
-│   Services      │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Register WP     │
-│   Adapters      │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Run Migrations  │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Register Admin  │
-│    Hooks        │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Plugin Ready    │
-└─────────────────┘
+rake/
+├── src/
+│   ├── Container/             # Dependency Injection
+│   │   ├── Container.php      # Main container
+│   │   ├── ContainerInterface.php
+│   │   └── ServiceProvider.php
+│   ├── Kernel/                # Application Kernels
+│   │   ├── AbstractKernel.php
+│   │   ├── ConsoleKernel.php
+│   │   ├── HttpKernel.php
+│   │   └── KernelInterface.php
+│   ├── Bootstrapper/          # Service Bootstrappers
+│   │   ├── BootstrapperInterface.php
+│   │   ├── CoreBootstrapper.php
+│   │   └── ServiceBootstrapper.php
+│   ├── Facade/                # Facade Pattern
+│   │   ├── Facade.php
+│   │   ├── Logger.php
+│   │   └── Database.php
+│   ├── Migration/             # Database Migration
+│   │   ├── MigrationManager.php
+│   │   ├── SchemaGenerator.php
+│   │   └── MigrationInterface.php
+│   ├── Logging/               # Logging System
+│   │   ├── LoggerManager.php
+│   │   ├── LogInterface.php
+│   │   └── LogFormatter.php
+│   └── Database/              # Database Abstraction
+│       ├── DatabaseAdapterInterface.php
+│       ├── DatabaseConfig.php
+│       └── DatabaseDriverManager.php
+├── schema_definitions/        # Database Schemas
+├── composer.json
+└── README.md
 ```
 
-### Request Handling Flow
-```
-┌─────────────────┐
-│ WordPress Admin │
-│    Request      │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Detect Screen   │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Load Screen     │
-│     Data        │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Render Template │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Return Response │
-└─────────────────┘
+### Core Components
+
+#### 1. **Container (Dependency Injection)**
+```php
+// Main container for dependency management
+class Container
+{
+    private array $services = [];
+    private array $singletons = [];
+    private array $resolved = [];
+
+    public function bind(string $abstract, $concrete): void;
+    public function singleton(string $abstract, $concrete): void;
+    public function make(string $abstract): mixed;
+    public function has(string $abstract): bool;
+    public function resolve($concrete): mixed;
+}
 ```
 
-### Migration Flow
+#### 2. **Kernel (Application Lifecycle)**
+```php
+// Abstract kernel for application lifecycle
+abstract class AbstractKernel
+{
+    protected Container $container;
+    protected array $bootstrappers = [];
+
+    abstract public function bootstrap(): void;
+    abstract public function handle($request): mixed;
+    abstract public function terminate($request, $response): void;
+}
 ```
-┌─────────────────┐
-│ Migration       │
-│   Request       │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Load Schema     │
-│  Definitions    │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Generate SQL    │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Execute SQL     │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Update Migration│
-│    History      │
-└─────────┬───────┘
-          │
-          ▼
-┌─────────────────┐
-│ Return Result   │
-└─────────────────┘
+
+#### 3. **Bootstrapper (Service Registration)**
+```php
+// Service bootstrapper interface
+interface BootstrapperInterface
+{
+    public function bootstrap(Container $container): void;
+    public function register(Container $container): void;
+    public function boot(Container $container): void;
+}
+```
+
+#### 4. **Facade (Static Access)**
+```php
+// Base facade class
+abstract class Facade
+{
+    protected static Container $container;
+
+    public static function setContainer(Container $container): void;
+    public static function getFacadeAccessor(): string;
+    public static function __callStatic(string $method, array $arguments): mixed;
+}
+```
+
+#### 5. **Migration (Database Management)**
+```php
+// Migration manager
+class MigrationManager
+{
+    private DatabaseAdapterInterface $adapter;
+    private SchemaGenerator $generator;
+
+    public function runMigrations(): array;
+    public function rollbackMigrations(): array;
+    public function getMigrationStatus(): array;
+    public function createMigration(string $name): string;
+}
+```
+
+#### 6. **Logging (PSR-3 Implementation)**
+```php
+// Logger manager
+class LoggerManager
+{
+    private LoggerInterface $logger;
+    private array $config;
+
+    public function log($level, string $message, array $context = []): void;
+    public function emergency(string $message, array $context = []): void;
+    public function alert(string $message, array $context = []): void;
+    public function critical(string $message, array $context = []): void;
+    public function error(string $message, array $context = []): void;
+    public function warning(string $message, array $context = []): void;
+    public function notice(string $message, array $context = []): void;
+    public function info(string $message, array $context = []): void;
+    public function debug(string $message, array $context = []): void;
+}
+```
+
+---
+
+## 🔧 CÁC THÀNH PHẦN CỐT LÕI
+
+### 1. **Dependency Injection Container**
+
+#### Container Interface
+```php
+interface ContainerInterface
+{
+    public function bind(string $abstract, $concrete): void;
+    public function singleton(string $abstract, $concrete): void;
+    public function make(string $abstract): mixed;
+    public function has(string $abstract): bool;
+    public function resolve($concrete): mixed;
+    public function call($callback, array $parameters = []): mixed;
+}
+```
+
+#### Service Registration
+```php
+// Bind interface to implementation
+$container->bind(DatabaseInterface::class, MySQLDatabase::class);
+
+// Bind singleton
+$container->singleton(LoggerInterface::class, Logger::class);
+
+// Bind with closure
+$container->bind('config', function() {
+    return new Config(['debug' => true]);
+});
+```
+
+#### Service Resolution
+```php
+// Resolve service
+$logger = $container->make(LoggerInterface::class);
+
+// Resolve with parameters
+$service = $container->make(Service::class, ['param' => 'value']);
+
+// Call method with dependency injection
+$result = $container->call([$service, 'method'], ['param' => 'value']);
+```
+
+### 2. **Kernel System**
+
+#### Abstract Kernel
+```php
+abstract class AbstractKernel
+{
+    protected Container $container;
+    protected array $bootstrappers = [];
+    protected array $middleware = [];
+
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+        $this->bootstrap();
+    }
+
+    abstract public function bootstrap(): void;
+    abstract public function handle($request): mixed;
+    abstract public function terminate($request, $response): void;
+
+    protected function runBootstrappers(): void
+    {
+        foreach ($this->bootstrappers as $bootstrapper) {
+            $this->container->make($bootstrapper)->bootstrap($this->container);
+        }
+    }
+}
+```
+
+#### Console Kernel
+```php
+class ConsoleKernel extends AbstractKernel
+{
+    protected array $commands = [];
+
+    public function handle($input, $output = null): int
+    {
+        // Handle console command
+        $command = $this->resolveCommand($input);
+        return $command->execute($input, $output);
+    }
+
+    protected function bootstrap(): void
+    {
+        $this->runBootstrappers();
+        $this->registerCommands();
+    }
+}
+```
+
+#### HTTP Kernel
+```php
+class HttpKernel extends AbstractKernel
+{
+    protected array $middleware = [];
+
+    public function handle($request): Response
+    {
+        // Handle HTTP request
+        $response = $this->sendRequestThroughRouter($request);
+        return $this->prepareResponse($response);
+    }
+
+    protected function bootstrap(): void
+    {
+        $this->runBootstrappers();
+        $this->registerMiddleware();
+    }
+}
+```
+
+### 3. **Bootstrapper System**
+
+#### Bootstrapper Interface
+```php
+interface BootstrapperInterface
+{
+    public function bootstrap(Container $container): void;
+    public function register(Container $container): void;
+    public function boot(Container $container): void;
+}
+```
+
+#### Core Bootstrapper
+```php
+class CoreBootstrapper implements BootstrapperInterface
+{
+    public function register(Container $container): void
+    {
+        // Register core services
+        $container->singleton(ContainerInterface::class, Container::class);
+        $container->singleton(LoggerInterface::class, Logger::class);
+        $container->singleton(DatabaseAdapterInterface::class, DatabaseAdapter::class);
+    }
+
+    public function boot(Container $container): void
+    {
+        // Boot core services
+        $logger = $container->make(LoggerInterface::class);
+        $logger->info('Core services booted');
+    }
+
+    public function bootstrap(Container $container): void
+    {
+        $this->register($container);
+        $this->boot($container);
+    }
+}
+```
+
+### 4. **Facade System**
+
+#### Base Facade
+```php
+abstract class Facade
+{
+    protected static Container $container;
+
+    public static function setContainer(Container $container): void
+    {
+        static::$container = $container;
+    }
+
+    public static function getFacadeAccessor(): string
+    {
+        throw new RuntimeException('Facade does not implement getFacadeAccessor method.');
+    }
+
+    public static function __callStatic(string $method, array $arguments): mixed
+    {
+        $instance = static::$container->make(static::getFacadeAccessor());
+        return $instance->$method(...$arguments);
+    }
+}
+```
+
+#### Logger Facade
+```php
+class Logger extends Facade
+{
+    protected static function getFacadeAccessor(): string
+    {
+        return LoggerInterface::class;
+    }
+}
+
+// Usage
+Logger::info('Application started');
+Logger::error('An error occurred', ['context' => 'data']);
+```
+
+### 5. **Migration System**
+
+#### Migration Manager
+```php
+class MigrationManager
+{
+    private DatabaseAdapterInterface $adapter;
+    private SchemaGenerator $generator;
+    private array $migrations = [];
+
+    public function runMigrations(): array
+    {
+        $results = [];
+
+        foreach ($this->migrations as $migration) {
+            try {
+                $this->runMigration($migration);
+                $results[] = ['migration' => $migration, 'status' => 'success'];
+            } catch (Exception $e) {
+                $results[] = ['migration' => $migration, 'status' => 'failed', 'error' => $e->getMessage()];
+            }
+        }
+
+        return $results;
+    }
+
+    public function rollbackMigrations(): array
+    {
+        // Rollback migrations
+        return [];
+    }
+
+    public function getMigrationStatus(): array
+    {
+        // Get migration status
+        return [];
+    }
+}
+```
+
+#### Schema Generator
+```php
+class SchemaGenerator
+{
+    private DatabaseAdapterInterface $adapter;
+
+    public function createTable(string $table, array $schema): bool
+    {
+        $sql = $this->generateCreateTableSQL($table, $schema);
+        return $this->adapter->query($sql);
+    }
+
+    public function dropTable(string $table): bool
+    {
+        $sql = "DROP TABLE IF EXISTS {$table}";
+        return $this->adapter->query($sql);
+    }
+
+    private function generateCreateTableSQL(string $table, array $schema): string
+    {
+        // Generate CREATE TABLE SQL
+        return "CREATE TABLE {$table} (...)";
+    }
+}
+```
+
+### 6. **Logging System**
+
+#### Logger Manager
+```php
+class LoggerManager implements LoggerInterface
+{
+    private LoggerInterface $logger;
+    private array $config;
+
+    public function __construct(array $config = [])
+    {
+        $this->config = $config;
+        $this->initializeLogger();
+    }
+
+    public function log($level, string $message, array $context = []): void
+    {
+        $this->logger->log($level, $message, $context);
+    }
+
+    public function emergency(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::EMERGENCY, $message, $context);
+    }
+
+    public function alert(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::ALERT, $message, $context);
+    }
+
+    public function critical(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::CRITICAL, $message, $context);
+    }
+
+    public function error(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::ERROR, $message, $context);
+    }
+
+    public function warning(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::WARNING, $message, $context);
+    }
+
+    public function notice(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::NOTICE, $message, $context);
+    }
+
+    public function info(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::INFO, $message, $context);
+    }
+
+    public function debug(string $message, array $context = []): void
+    {
+        $this->log(LogLevel::DEBUG, $message, $context);
+    }
+}
 ```
 
 ---
 
 ## 📚 TÀI LIỆU KỸ THUẬT
 
-### Tài liệu chi tiết cho từng package:
-
-#### 1. **Rake Core Framework**
-📖 [`rake/docs/technical-documentation.md`](docs/technical-documentation.md)
+### Tài liệu chi tiết
+📖 [`docs/technical-documentation.md`](docs/technical-documentation.md)
 
 **Nội dung:**
 - Container (Dependency Injection)
@@ -275,109 +609,59 @@ CrawlFlow được xây dựng theo triết lý **"Flow-based Architecture"** - 
 - Facade Pattern
 - Development Guidelines
 
-#### 2. **Rake WordPress Adapter**
-📖 [`rake-wordpress-adapter/docs/technical-documentation.md`](../rake-wordpress-adapter/docs/technical-documentation.md)
+### Code Examples
 
-**Nội dung:**
-- WordPress Database Integration
-- WordPress Hooks Integration
-- WordPress Admin Integration
-- Security Layer
-- Cache Integration
-- Development Guidelines
-
-#### 3. **CrawlFlow Plugin**
-📖 [`wp-crawlflow/docs/technical-documentation.md`](../wp-crawlflow/docs/technical-documentation.md)
-
-**Nội dung:**
-- Dashboard System
-- Project Management
-- Migration Integration
-- Logging System
-- Frontend Assets (React + XYFlow)
-- Development Guidelines
-
----
-
-## 🚀 HƯỚNG DẪN SỬ DỤNG
-
-### Cài đặt và khởi tạo
-
-#### 1. Clone repositories
-```bash
-git clone https://github.com/crawlflow/rake.git
-git clone https://github.com/crawlflow/rake-wordpress-adapter.git
-git clone https://github.com/crawlflow/wp-crawlflow.git
-```
-
-#### 2. Cài đặt dependencies
-```bash
-# Rake Core
-cd rake
-composer install
-
-# Rake WordPress Adapter
-cd ../rake-wordpress-adapter
-composer install
-
-# CrawlFlow Plugin
-cd ../wp-crawlflow
-composer install
-```
-
-#### 3. Kích hoạt plugin trong WordPress
+#### Container Usage
 ```php
-// Trong WordPress admin
-// Plugins > CrawlFlow > Activate
+// Create container
+$container = new Container();
+
+// Register services
+$container->singleton(LoggerInterface::class, Logger::class);
+$container->bind(DatabaseInterface::class, MySQLDatabase::class);
+
+// Resolve services
+$logger = $container->make(LoggerInterface::class);
+$database = $container->make(DatabaseInterface::class);
+
+// Use services
+$logger->info('Service resolved successfully');
 ```
 
-### Sử dụng cơ bản
-
-#### Khởi tạo Rake Container
+#### Kernel Usage
 ```php
-use Rake\Rake;
+// Create kernel
+$container = new Container();
+$kernel = new ConsoleKernel($container);
 
-$app = new Rake();
-$kernel = new CrawlFlowDashboardKernel($app);
-$kernel->bootstrap();
+// Handle command
+$input = new ArgvInput();
+$output = new ConsoleOutput();
+$exitCode = $kernel->handle($input, $output);
 ```
 
-#### Chạy migrations
+#### Facade Usage
 ```php
-$migrationKernel = new CrawlFlowMigrationKernel($app);
-$migrationKernel->runMigrations();
-```
+// Set container
+Facade::setContainer($container);
 
-#### Sử dụng Logger
-```php
-use Rake\Facade\Logger;
-
+// Use facades
 Logger::info('Application started');
-Logger::error('An error occurred');
+Database::query('SELECT * FROM users');
 ```
 
-#### Tạo project mới
+#### Migration Usage
 ```php
-use CrawlFlow\Admin\ProjectService;
+// Create migration manager
+$adapter = new DatabaseAdapter();
+$manager = new MigrationManager($adapter);
 
-$projectService = new ProjectService();
-$projectId = $projectService->createProject([
-    'name' => 'My Project',
-    'description' => 'Project description',
-    'config' => json_encode($config),
-    'status' => 'active'
-]);
+// Run migrations
+$results = $manager->runMigrations();
+
+// Check status
+$status = $manager->getMigrationStatus();
 ```
-
-### Visual Flow Composer
-
-Truy cập vào WordPress Admin > CrawlFlow > Projects > "Add New Project" để sử dụng visual flow composer:
-
-- **React-based**: Sử dụng React 18
-- **XYFlow**: Visual flow editor
-- **Schema Definitions**: Pre-defined database schemas
-- **Real-time Preview**: Xem trước data structure
-- **Auto-save**: Tự động lưu khi thay đổi
 
 ---
 
@@ -391,43 +675,69 @@ Truy cập vào WordPress Admin > CrawlFlow > Projects > "Add New Project" để
 
 declare(strict_types=1);
 
-namespace CrawlFlow\Admin;
+namespace Rake\Container;
 
-use Rake\Rake;
-use Rake\Facade\Logger;
+use Rake\Contracts\ContainerInterface;
 
-class ProjectService
+class Container implements ContainerInterface
 {
-    private DatabaseAdapterInterface $db;
+    private array $services = [];
+    private array $singletons = [];
+    private array $resolved = [];
 
-    public function __construct()
+    public function bind(string $abstract, $concrete): void
     {
-        $this->db = new WordPressDatabaseAdapter();
+        $this->services[$abstract] = $concrete;
     }
 
-    public function createProject(array $data): int
+    public function singleton(string $abstract, $concrete): void
     {
-        Logger::info('Creating project', $data);
+        $this->singletons[$abstract] = $concrete;
+    }
 
-        $data['created_at'] = current_time('mysql');
-        $data['updated_at'] = current_time('mysql');
+    public function make(string $abstract): mixed
+    {
+        if ($this->has($abstract)) {
+            return $this->resolve($this->services[$abstract]);
+        }
 
-        return $this->db->insert('crawlflow_projects', $data);
+        throw new RuntimeException("Service {$abstract} not found.");
+    }
+
+    public function has(string $abstract): bool
+    {
+        return isset($this->services[$abstract]);
     }
 }
 ```
 
-#### WordPress Integration
+#### Interface Segregation
 ```php
-// Always use WordPress functions with backslash prefix
-$result = \wp_verify_nonce($nonce, $action);
+// Define specific interfaces
+interface LoggerInterface
+{
+    public function log($level, string $message, array $context = []): void;
+    public function emergency(string $message, array $context = []): void;
+    public function alert(string $message, array $context = []): void;
+    public function critical(string $message, array $context = []): void;
+    public function error(string $message, array $context = []): void;
+    public function warning(string $message, array $context = []): void;
+    public function notice(string $message, array $context = []): void;
+    public function info(string $message, array $context = []): void;
+    public function debug(string $message, array $context = []): void;
+}
 
-// Use WordPress security functions
-$sanitized = \sanitize_text_field($input);
-
-// Check capabilities before actions
-if (\current_user_can('manage_options')) {
-    // Perform admin action
+interface DatabaseAdapterInterface
+{
+    public function query(string $sql): bool;
+    public function getResults(string $sql): array;
+    public function getRow(string $sql): ?array;
+    public function getVar(string $sql): mixed;
+    public function insert(string $table, array $data): int;
+    public function update(string $table, array $data, array $where): int;
+    public function delete(string $table, array $where): int;
+    public function getPrefix(): string;
+    public function escape(string $value): string;
 }
 ```
 
@@ -435,212 +745,234 @@ if (\current_user_can('manage_options')) {
 
 #### Unit Testing
 ```php
-class ProjectServiceTest extends TestCase
+class ContainerTest extends TestCase
 {
-    private ProjectService $service;
-    private Rake $container;
+    private Container $container;
 
     protected function setUp(): void
     {
-        $this->container = new Rake();
-        $this->service = new ProjectService();
+        $this->container = new Container();
     }
 
-    public function testCreateProject(): void
+    public function testBindService(): void
     {
         // Arrange
-        $projectData = [
-            'name' => 'Test Project',
-            'description' => 'Test Description',
-        ];
+        $this->container->bind('test', TestService::class);
 
         // Act
-        $projectId = $this->service->createProject($projectData);
+        $service = $this->container->make('test');
 
         // Assert
-        $this->assertGreaterThan(0, $projectId);
+        $this->assertInstanceOf(TestService::class, $service);
+    }
+
+    public function testSingletonService(): void
+    {
+        // Arrange
+        $this->container->singleton('singleton', SingletonService::class);
+
+        // Act
+        $service1 = $this->container->make('singleton');
+        $service2 = $this->container->make('singleton');
+
+        // Assert
+        $this->assertSame($service1, $service2);
     }
 }
 ```
 
 #### Integration Testing
 ```php
-class WordPressIntegrationTest extends TestCase
+class KernelIntegrationTest extends TestCase
 {
-    public function testDatabaseAdapter(): void
+    public function testConsoleKernel(): void
     {
         // Arrange
-        $adapter = new WordPressDatabaseAdapter();
+        $container = new Container();
+        $kernel = new ConsoleKernel($container);
 
         // Act
-        $result = $adapter->query('SELECT 1');
+        $input = new ArgvInput(['command' => 'test']);
+        $output = new ConsoleOutput();
+        $exitCode = $kernel->handle($input, $output);
 
         // Assert
-        $this->assertTrue($result);
+        $this->assertEquals(0, $exitCode);
     }
 }
 ```
 
 ### Error Handling
 ```php
-class CrawlFlowException extends Exception
+class RakeException extends Exception
 {
     public function __construct(string $message, array $context = [], int $code = 0, ?Throwable $previous = null)
     {
-        parent::__construct("CrawlFlow error: {$message}", $code, $previous);
+        parent::__construct("Rake error: {$message}", $code, $previous);
     }
 }
 
 // Usage
 try {
-    $projectService = new ProjectService();
-    $result = $projectService->createProject($data);
-} catch (CrawlFlowException $e) {
-    Logger::error('Project creation failed: ' . $e->getMessage());
+    $container = new Container();
+    $service = $container->make('non-existent-service');
+} catch (RakeException $e) {
+    Logger::error('Service resolution failed: ' . $e->getMessage());
 }
 ```
 
 ---
 
-## 📊 DATABASE SCHEMA
+## 🔧 CONFIGURATION
 
-### Core Tables
+### Basic Configuration
+```php
+// Container configuration
+$container = new Container();
 
-#### rake_configs
-```sql
-CREATE TABLE `wp_rake_configs` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `config_key` varchar(255) NOT NULL,
-    `config_value` longtext,
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `idx_config_key` (`config_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+// Register core services
+$container->singleton(LoggerInterface::class, Logger::class);
+$container->bind(DatabaseAdapterInterface::class, DatabaseAdapter::class);
+
+// Register configuration
+$container->bind('config', function() {
+    return [
+        'debug' => true,
+        'log_level' => 'info',
+        'database' => [
+            'host' => 'localhost',
+            'database' => 'test',
+            'username' => 'root',
+            'password' => ''
+        ]
+    ];
+});
 ```
 
-#### rake_migrations
-```sql
-CREATE TABLE `wp_rake_migrations` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `migration_name` varchar(255) NOT NULL,
-    `executed_at` datetime DEFAULT CURRENT_TIMESTAMP,
-    `status` enum('success','failed') DEFAULT 'success',
-    `error_message` text,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `idx_migration_name` (`migration_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+### Advanced Configuration
+```php
+// Service provider pattern
+class AppServiceProvider implements ServiceProviderInterface
+{
+    public function register(Container $container): void
+    {
+        // Register services
+        $container->singleton(LoggerInterface::class, Logger::class);
+        $container->bind(DatabaseAdapterInterface::class, DatabaseAdapter::class);
+    }
 
-#### crawlflow_projects
-```sql
-CREATE TABLE `wp_crawlflow_projects` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `description` text,
-    `config` longtext,
-    `status` enum('active','inactive','archived') DEFAULT 'active',
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `idx_status` (`status`),
-    KEY `idx_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-```
+    public function boot(Container $container): void
+    {
+        // Boot services
+        $logger = $container->make(LoggerInterface::class);
+        $logger->info('Application services booted');
+    }
+}
 
-#### crawlflow_logs
-```sql
-CREATE TABLE `wp_crawlflow_logs` (
-    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `level` enum('debug','info','warning','error','critical') NOT NULL,
-    `message` text NOT NULL,
-    `context` longtext,
-    `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `idx_level` (`level`),
-    KEY `idx_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+// Register service provider
+$container = new Container();
+$container->register(new AppServiceProvider());
 ```
 
 ---
 
-## 🔗 PACKAGE DEPENDENCIES
+## 🚨 TROUBLESHOOTING
 
-### Dependency Graph
-```
-┌─────────────────┐    depends on    ┌─────────────────┐
-│   CRAWFLOW      │ ────────────────▶ │ RAKE WORDPRESS  │
-│   PLUGIN        │                  │    ADAPTER      │
-└─────────────────┘                  └─────────────────┘
-                                              │
-                                              │ depends on
-                                              ▼
-                                    ┌─────────────────┐
-                                    │   RAKE CORE     │
-                                    │   FRAMEWORK     │
-                                    └─────────────────┘
-```
+### Common Issues
 
-### Composer Dependencies
+#### Error: `Service not found`
+**Solution:**
+```php
+// Ensure service is registered
+$container->bind('service', ServiceClass::class);
 
-#### CrawlFlow Plugin
-```json
-{
-    "name": "crawlflow/wp-crawlflow",
-    "require": {
-        "php": ">=8.1",
-        "crawlflow/rake-wordpress-adapter": "^1.0",
-        "monolog/monolog": "^3.0"
-    }
+// Check if service exists
+if ($container->has('service')) {
+    $service = $container->make('service');
 }
 ```
 
-#### Rake WordPress Adapter
-```json
-{
-    "name": "crawlflow/rake-wordpress-adapter",
-    "require": {
-        "php": ">=8.1",
-        "crawlflow/rake-core": "^1.0"
-    }
-}
+#### Error: `Circular dependency detected`
+**Solution:**
+```php
+// Use lazy loading
+$container->bind('service', function() {
+    return new ServiceClass();
+});
+
+// Or use interface
+$container->bind(ServiceInterface::class, ServiceClass::class);
 ```
 
-#### Rake Core Framework
-```json
-{
-    "name": "crawlflow/rake-core",
-    "require": {
-        "php": ">=8.1",
-        "monolog/monolog": "^3.0"
-    }
-}
+#### Error: `Facade not initialized`
+**Solution:**
+```php
+// Set container for facades
+Facade::setContainer($container);
+
+// Then use facades
+Logger::info('Application started');
+```
+
+### Debug Mode
+```php
+// Enable debug mode
+$container->bind('debug', true);
+
+// Check container state
+$services = $container->getServices();
+$singletons = $container->getSingletons();
+```
+
+---
+
+## 📊 PERFORMANCE
+
+### Optimizations
+- **Lazy loading**: Services only instantiated when needed
+- **Singleton pattern**: Single instance for expensive services
+- **Caching**: Resolved services cached
+- **Memory management**: Efficient memory usage
+
+### Best Practices
+```php
+// Use singletons for expensive services
+$container->singleton(LoggerInterface::class, Logger::class);
+$container->singleton(DatabaseAdapterInterface::class, DatabaseAdapter::class);
+
+// Use interfaces for flexibility
+$container->bind(ServiceInterface::class, ServiceClass::class);
+
+// Use lazy loading for complex dependencies
+$container->bind('complex-service', function() {
+    return new ComplexService(new Dependency1(), new Dependency2());
+});
 ```
 
 ---
 
 ## 🎯 KẾT LUẬN
 
-CrawlFlow & Rake Framework Ecosystem cung cấp giải pháp toàn diện cho:
+Rake Core Framework cung cấp nền tảng tổng quát cho việc xây dựng ứng dụng với:
 
 ### Điểm nổi bật:
-1. **Modular Architecture**: 3 packages độc lập với trách nhiệm rõ ràng
-2. **Flow-based Design**: Mọi thứ có thể visualize và track
-3. **WordPress Integration**: Tích hợp hoàn chỉnh với WordPress
-4. **Visual Composer**: React-based visual flow editor
+1. **Platform Agnostic**: Không phụ thuộc vào platform cụ thể nào
+2. **Modular Architecture**: Kiến trúc module hóa với các thành phần độc lập
+3. **Flow-based Design**: Mọi thứ phải thấy được luồng xử lý
+4. **Dependency Injection**: Container pattern cho quản lý dependencies
 5. **Event-driven**: Hệ thống event-driven với logging toàn diện
-6. **Cross-platform**: Rake Core độc lập với platform
+6. **Extensible**: Dễ dàng mở rộng và tùy chỉnh
 
 ### Triết lý:
-**"Flow-based Architecture"** - mọi thứ phải thấy được luồng xử lý và có thể visualize, phù hợp với tên gọi "CrawlFlow".
+**"Platform Agnostic"** - framework tổng quát, không phụ thuộc vào platform cụ thể nào, chỉ tập trung vào lý thuyết, tư tưởng và triết lý thiết kế.
 
 ### Tương lai:
-- Mở rộng visual composer
-- Thêm nhiều data sources
-- Tích hợp với các platform khác
+- Mở rộng adapter system
+- Thêm nhiều platform adapters
 - Performance optimization
-- Advanced analytics
+- Advanced features
+- Community contributions
 
 ---
 
-**Tài liệu này sẽ được cập nhật thường xuyên khi có thay đổi trong hệ thống.**
+**Tài liệu này sẽ được cập nhật thường xuyên khi có thay đổi trong framework.**
