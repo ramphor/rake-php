@@ -95,7 +95,7 @@ rake/
 ### 2.2 Package Dependencies
 ```json
 {
-    "name": "crawlflow/rake-core",
+    "name": "ramphor/rake",
     "require": {
         "php": ">=8.1",
         "monolog/monolog": "^3.0"
