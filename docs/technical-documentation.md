@@ -281,7 +281,6 @@ class MigrationKernel extends AbstractKernel
     {
         return [
             'migration_schema_path' => __DIR__ . '/../schema_definitions/',
-            'migration_table' => 'rake_migrations',
         ];
     }
 
