@@ -5,6 +5,13 @@ namespace Rake;
 use Rake\Manager\DatabaseDriverManager;
 use Rake\Manager\LoggerManager;
 
+/**
+ * Bootstrapper (Legacy)
+ * Static bootstrapper for basic Rake initialization
+ * 
+ * This class handles core Rake framework initialization.
+ * For service provider pattern, use Rake\ApplicationBootstrapper instead.
+ */
 class Bootstrapper
 {
     /**
@@ -51,3 +58,4 @@ class Bootstrapper
         }
     }
 }
+

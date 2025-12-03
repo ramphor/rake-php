@@ -3,7 +3,7 @@
 namespace Rake;
 
 use Illuminate\Container\Container;
-use Rake\Manager\DatabaseDriverManager;
+use Rake\Manager\Database\DatabaseDriverManager;
 
 /**
  * Entrypoint cho core framework Rake 2.0
@@ -32,7 +32,7 @@ class Rake extends Container
     public static function getInstance()
     {
         if (static::$instance === null) {
-            static::$instance = (new static())->make(Rake::class);
+            static::$instance = new static();
         }
         return static::$instance;
     }
