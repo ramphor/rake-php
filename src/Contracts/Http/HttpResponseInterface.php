@@ -3,25 +3,43 @@
 namespace Rake\Contracts\Http;
 
 /**
- * Standard interface for HTTP responses (compatible with Symfony, Guzzle, ...)
+ * HTTP Response Interface
+ * Standard interface for HTTP responses
  */
 interface HttpResponseInterface
 {
     /**
-     * Get the response status code
+     * Get HTTP status code
+     *
      * @return int
      */
     public function getStatusCode(): int;
 
     /**
-     * Get the response body as string
+     * Get response body
+     *
      * @return string
      */
     public function getBody(): string;
 
     /**
-     * Get all response headers
+     * Get response headers
+     *
      * @return array
      */
     public function getHeaders(): array;
+
+    /**
+     * Check if response is successful (2xx status code)
+     *
+     * @return bool
+     */
+    public function isSuccessful(): bool;
+
+    /**
+     * Get response body as JSON array
+     *
+     * @return array
+     */
+    public function json(): array;
 }
