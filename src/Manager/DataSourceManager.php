@@ -125,6 +125,17 @@ class DataSourceManager
     }
 
     /**
+     * Get registered class name for a type
+     *
+     * @param string $type Source type
+     * @return string|null
+     */
+    public static function getRegisteredClass(string $type): ?string
+    {
+        return self::$dataSourceTypes[$type] ?? null;
+    }
+
+    /**
      * Get all instances
      *
      * @return array

@@ -74,6 +74,49 @@ class UrlDataSource extends AbstractDataSource
     }
 
     /**
+     * Get configuration fields for UI
+     * 
+     * @return array
+     */
+    public static function getDataSourceConfigFields(): array
+    {
+        return [
+            [
+                'name' => 'url',
+                'type' => 'url',
+                'label' => 'URL',
+                'description' => 'The URL to fetch data from',
+                'required' => true,
+                'default' => 'https://example.com',
+            ],
+            [
+                'name' => 'timeout',
+                'type' => 'number',
+                'label' => 'Timeout (seconds)',
+                'description' => 'Request timeout in seconds',
+                'required' => false,
+                'default' => 30,
+            ],
+            [
+                'name' => 'followRedirects',
+                'type' => 'checkbox',
+                'label' => 'Follow Redirects',
+                'description' => 'Automatically follow HTTP redirects',
+                'required' => false,
+                'default' => true,
+            ],
+            [
+                'name' => 'maxDepth',
+                'type' => 'number',
+                'label' => 'Max Crawl Depth',
+                'description' => 'Maximum depth for crawling links',
+                'required' => false,
+                'default' => 3,
+            ],
+        ];
+    }
+
+    /**
      * Validate configuration
      */
     public function validate(): bool
