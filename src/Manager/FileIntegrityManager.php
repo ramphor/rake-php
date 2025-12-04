@@ -3,6 +3,7 @@
 namespace Rake\Manager;
 
 use Rake\Adapter\Database\DatabaseAdapterInterface;
+use Rake\Contracts\File\FileDownloaderClientInterface;
 
 /**
  * File Integrity Manager
@@ -21,14 +22,23 @@ class FileIntegrityManager
     private $databaseAdapter;
 
     /**
+     * @var FileDownloaderClientInterface|null
+     */
+    private $downloaderClient;
+
+    /**
      * @var string
      */
     private $uploadDir;
 
-    public function __construct(DatabaseAdapterInterface $databaseAdapter, string $uploadDir = null)
-    {
+    public function __construct(
+        DatabaseAdapterInterface $databaseAdapter,
+        string $uploadDir = null,
+        FileDownloaderClientInterface $downloaderClient = null
+    ) {
         $this->databaseAdapter = $databaseAdapter;
         $this->checksumManager = new FileChecksumManager($databaseAdapter);
+        $this->downloaderClient = $downloaderClient;
         $this->uploadDir = $uploadDir ?: sys_get_temp_dir() . '/rake_uploads/';
 
         // Tạo upload directory nếu chưa tồn tại
@@ -105,6 +115,21 @@ class FileIntegrityManager
     {
         $tempFile = tempnam($this->uploadDir, 'rake_download_');
 
+        // Use injected client if available, fallback to file_get_contents
+        if ($this->downloaderClient) {
+            $result = $this->downloaderClient->downloadFile($url, $tempFile, [
+                'timeout' => 30
+            ]);
+
+            if (!$result['success']) {
+                unlink($tempFile);
+                throw new \RuntimeException("Cannot download file from {$url}: " . ($result['error'] ?? 'Unknown error'));
+            }
+
+            return $tempFile;
+        }
+
+        // Fallback: file_get_contents (for backward compatibility)
         $context = stream_context_create([
             'http' => [
                 'timeout' => 30,

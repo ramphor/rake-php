@@ -12,7 +12,7 @@ class ApiDataSource extends AbstractDataSource
 {
     /**
      * Fetch data from API
-     * 
+     * image.png
      * @return array
      */
     public function fetch(): array
