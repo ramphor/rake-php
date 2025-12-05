@@ -4,7 +4,7 @@ namespace Rake\CompletionAction;
 
 use Rake\Contracts\File\FileDownloaderClientInterface;
 use Rake\Manager\FileChecksumManager;
-use Rake\Adapter\Database\DatabaseAdapterInterface;
+use Rake\Contracts\Database\Adapter\DatabaseAdapterInterface;
 
 /**
  * Create Resource References Completion Action
