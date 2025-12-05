@@ -2,7 +2,7 @@
 
 namespace Rake\Manager;
 
-use Rake\Adapter\Database\DatabaseAdapterInterface;
+use Rake\Contracts\Database\Adapter\DatabaseAdapterInterface;
 
 /**
  * File Checksum Manager

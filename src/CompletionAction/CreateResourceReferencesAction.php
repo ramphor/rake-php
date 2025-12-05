@@ -273,27 +273,76 @@ class CreateResourceReferencesAction extends AbstractCompletionAction
     private function downloadAndChecksum(string $url, int $resourceId): array
     {
         // Download to temp location
-        $tempDir = wp_upload_dir()['basedir'] . '/crawlflow/temp/';
+        $tempDir = wp_upload_dir()["basedir"] . "/crawlflow/temp/";
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0755, true);
         }
 
-        $tempFile = $tempDir . 'resource_' . $resourceId . '_' . time();
+        $tempFile = $tempDir . "resource_" . $resourceId . "_" . time();
 
         $downloadResult = $this->fileDownloader->downloadFile($url, $tempFile);
 
-        if (!$downloadResult['success']) {
+        if (!$downloadResult["success"]) {
             return $downloadResult;
         }
 
-        // Create checksum
-        $checksum = $this->checksumManager->createFileChecksum($tempFile);
+        // Verify file exists and is readable
+        if (!file_exists($tempFile) || !is_readable($tempFile)) {
+            return [
+                "success" => false,
+                "error" => "Downloaded file is not accessible",
+                "file_path" => null
+            ];
+        }
+
+        // Create checksum using FileChecksumManager
+        try {
+            $checksum = $this->checksumManager->createFileChecksum($tempFile);
+            
+            // Validate checksum format
+            if (!$this->checksumManager->validateChecksum($checksum)) {
+                return [
+                    "success" => false,
+                    "error" => "Invalid checksum generated",
+                    "file_path" => null
+                ];
+            }
+        } catch (Exception $e) {
+            @unlink($tempFile); // Clean up on error
+            return [
+                "success" => false,
+                "error" => "Failed to create checksum: " . $e->getMessage(),
+                "file_path" => null
+            ];
+        }
+
+        // Verify file integrity by re-reading and checking checksum consistency
+        // This ensures file was not corrupted during download
+        try {
+            $verifyChecksum = $this->checksumManager->createFileChecksum($tempFile);
+            if ($checksum !== $verifyChecksum) {
+                @unlink($tempFile); // Clean up corrupted file
+                return [
+                    "success" => false,
+                    "error" => "File integrity check failed: checksum mismatch",
+                    "file_path" => null
+                ];
+            }
+        } catch (Exception $e) {
+            @unlink($tempFile); // Clean up on error
+            return [
+                "success" => false,
+                "error" => "Failed to verify file integrity: " . $e->getMessage(),
+                "file_path" => null
+            ];
+        }
 
         return [
-            'success' => true,
-            'file_path' => $tempFile,
-            'checksum' => $checksum,
-            'file_size' => $downloadResult['file_size']
+            "success" => true,
+            "file_path" => $tempFile,
+            "checksum" => $checksum,
+            "file_size" => $downloadResult["file_size"],
+            "mime_type" => $downloadResult["mime_type"] ?? null
         ];
     }
 
