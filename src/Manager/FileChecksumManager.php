@@ -194,6 +194,21 @@ class FileChecksumManager
      */
     private function getTableName(): string
     {
+        // Get prefix from database adapter if available
+        if (method_exists($this->databaseAdapter, 'getPrefix')) {
+            return $this->databaseAdapter->getPrefix() . 'rake_file_checksums';
+        }
+        
+        // Fallback: try to get from wpdb if adapter has driver
+        if (method_exists($this->databaseAdapter, 'getDriver')) {
+            $driver = $this->databaseAdapter->getDriver();
+            if (method_exists($driver, 'getWpdb')) {
+                global $wpdb;
+                return $wpdb->prefix . 'rake_file_checksums';
+            }
+        }
+        
+        // Last resort: return without prefix (will fail but at least won't crash)
         return 'rake_file_checksums';
     }
 
