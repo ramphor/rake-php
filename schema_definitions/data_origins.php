@@ -11,7 +11,8 @@ return [
         ],
         'source_id' => [
             'type' => 'bigint',
-            'comment' => 'Reference to rake_data_sources.id',
+            'nullable' => true,
+            'comment' => 'Reference to rake_data_sources.id (NULL for child origins extracted from HTML)',
         ],
         'guid' => [
             'type' => 'string',
@@ -24,16 +25,6 @@ return [
         'fetched_at' => [
             'type' => 'datetime',
             'default' => 'CURRENT_TIMESTAMP',
-        ],
-        'created_at' => [
-            'type' => 'datetime',
-            'default' => 'CURRENT_TIMESTAMP',
-            'comment' => 'Timestamp when origin was created',
-        ],
-        'updated_at' => [
-            'type' => 'datetime',
-            'nullable' => true,
-            'comment' => 'Timestamp when origin was last updated',
         ],
         'crawled' => [
             'type' => 'tinyint',
@@ -62,6 +53,16 @@ return [
             'type' => 'int',
             'default' => 100,
             'comment' => 'Priority level for processing order',
+        ],
+        'created_at' => [
+            'type' => 'datetime',
+            'default' => 'CURRENT_TIMESTAMP',
+            'comment' => 'Timestamp when origin was created',
+        ],
+        'updated_at' => [
+            'type' => 'datetime',
+            'nullable' => true,
+            'comment' => 'Timestamp when origin was last updated',
         ],
     ],
     'indexes' => [
