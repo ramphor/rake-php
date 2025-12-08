@@ -5,16 +5,16 @@ return [
     'collation' => 'utf8mb4_unicode_ci',
     'fields' => [
         'id' => [
-            'type' => 'int',
+            'type' => 'bigint',
             'auto_increment' => true,
             'primary' => true,
         ],
         'resource_id' => [
-            'type' => 'int',
+            'type' => 'bigint',
         ],
         'checksum' => [
             'type' => 'string',
-            'length' => 128,
+            'length' => 32,
         ],
         'app_new_type' => [
             'type' => 'string',
@@ -24,20 +24,24 @@ return [
         ],
         'app_new_guid' => [
             'type' => 'string',
-            'length' => 128,
+            'length' => 255,
             'nullable' => true,
             'comment' => 'Resource ID on target system (e.g., post_id, product_id)',
         ],
-
         'created_at' => [
             'type' => 'datetime',
             'default' => 'CURRENT_TIMESTAMP',
         ],
+        'updated_at' => [
+            'type' => 'datetime',
+            'default' => 'CURRENT_TIMESTAMP',
+            'on_update' => 'CURRENT_TIMESTAMP',
+        ],
     ],
     'indexes' => [
-        ['fields' => ['resource_id']],
+        ['fields' => ['resource_id', 'checksum'], 'unique' => true, 'name' => 'resource_checksum'],
         ['fields' => ['checksum']],
-        ['fields' => ['app_new_type']],
+        ['fields' => ['resource_id']],
         ['fields' => ['app_new_guid']],
     ],
     'version' => '2.0.0',

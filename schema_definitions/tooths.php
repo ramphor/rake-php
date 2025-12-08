@@ -21,7 +21,7 @@ return [
             'comment' => 'Tooth/project description',
         ],
         'config' => [
-            'type' => 'text',
+            'type' => 'longtext',
             'nullable' => true,
             'comment' => 'Tooth configuration (JSON)',
         ],

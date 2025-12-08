@@ -25,10 +25,47 @@ return [
             'type' => 'datetime',
             'default' => 'CURRENT_TIMESTAMP',
         ],
+        'created_at' => [
+            'type' => 'datetime',
+            'default' => 'CURRENT_TIMESTAMP',
+            'comment' => 'Timestamp when origin was created',
+        ],
+        'updated_at' => [
+            'type' => 'datetime',
+            'nullable' => true,
+            'comment' => 'Timestamp when origin was last updated',
+        ],
+        'crawled' => [
+            'type' => 'tinyint',
+            'length' => 1,
+            'default' => 0,
+            'comment' => 'Flag indicating if URL has been crawled (has raw_data)',
+        ],
+        'metadata' => [
+            'type' => 'text',
+            'nullable' => true,
+            'comment' => 'JSON metadata for extensibility',
+        ],
+        'source_type' => [
+            'type' => 'string',
+            'length' => 50,
+            'nullable' => true,
+            'comment' => 'data_source, processor, etc.',
+        ],
+        'processor_id' => [
+            'type' => 'string',
+            'length' => 255,
+            'nullable' => true,
+            'comment' => 'ID/name of processor that added this URL',
+        ],
     ],
     'indexes' => [
         ['fields' => ['source_id']],
         ['fields' => ['guid'], 'unique' => true],
+        ['fields' => ['fetched_at']],
+        ['fields' => ['created_at'], 'name' => 'idx_created_at'],
+        ['fields' => ['updated_at'], 'name' => 'idx_updated_at'],
+        ['fields' => ['crawled'], 'name' => 'idx_crawled'],
     ],
     'foreign_keys' => [
         [
@@ -38,5 +75,5 @@ return [
             'on_update' => 'CASCADE',
         ],
     ],
-    'version' => '2.0.0',
+    'version' => '2.1.0',
 ];
