@@ -58,6 +58,11 @@ return [
             'nullable' => true,
             'comment' => 'ID/name of processor that added this URL',
         ],
+        'priority' => [
+            'type' => 'int',
+            'default' => 100,
+            'comment' => 'Priority level for processing order',
+        ],
     ],
     'indexes' => [
         ['fields' => ['source_id']],
