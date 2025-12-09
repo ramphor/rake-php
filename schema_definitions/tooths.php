@@ -31,6 +31,11 @@ return [
             'default' => 'active',
             'comment' => 'Tooth status (active, inactive, archived, ...)',
         ],
+        'metadata' => [
+            'type' => 'longtext',
+            'nullable' => true,
+            'comment' => 'Tooth configuration (JSON)',
+        ],
         'created_at' => [
             'type' => 'datetime',
             'default' => 'CURRENT_TIMESTAMP',

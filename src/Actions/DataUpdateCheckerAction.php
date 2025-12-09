@@ -535,7 +535,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
             [
                 'guid' => $url,
                 'raw_data' => '', // Phase 1 does not fetch raw_data
-                'fetched_at' => null,
+                'fetched_at' => $now, // avoid NULL constraint errors
                 'crawled' => 0,
                 'ignored' => 0,
                 'is_archive' => 0,
