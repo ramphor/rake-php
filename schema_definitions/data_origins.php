@@ -14,6 +14,12 @@ return [
             'nullable' => true,
             'comment' => 'Reference to rake_data_sources.id (NULL for child origins extracted from HTML)',
         ],
+        'process_id' => [
+            'type' => 'bigint',
+            'nullable' => true,
+            'default' => 0,
+            'comment' => 'OS process id that claimed this origin',
+        ],
         'guid' => [
             'type' => 'string',
             'length' => 256,
@@ -86,6 +92,7 @@ return [
         ['fields' => ['crawled'], 'name' => 'idx_crawled'],
         ['fields' => ['ignored'], 'name' => 'idx_ignored'],
         ['fields' => ['is_archive'], 'name' => 'idx_is_archive'],
+        ['fields' => ['process_id'], 'name' => 'idx_process_id'],
     ],
     'foreign_keys' => [
         [
@@ -95,5 +102,5 @@ return [
             'on_update' => 'CASCADE',
         ],
     ],
-    'version' => '2.3.0',
+    'version' => '2.4.0',
 ];
