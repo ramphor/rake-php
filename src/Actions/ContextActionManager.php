@@ -12,10 +12,11 @@ class ContextActionManager
 {
     /**
      * @var array Registered actions by phase context
-     * Structure: ['phase1' => [actionId => action], 'phase2' => [...], 'phase3' => [...]]
+     * Structure: ['phase1' => [actionId => action], 'phase1_extra_actions' => [...], 'phase2' => [...], 'phase3' => [...]]
      */
     private static array $actions = [
         'phase1' => [],
+        'phase1_extra_actions' => [], // Data source scoped Phase 1 extra actions (bonus per data source)
         'phase2' => [],
         'phase3' => [],
     ];
@@ -34,7 +35,7 @@ class ContextActionManager
         $supportedContexts = $action->getSupportedContexts();
 
         foreach ($supportedContexts as $phase) {
-            if (!in_array($phase, ['phase1', 'phase2', 'phase3'])) {
+            if (!in_array($phase, ['phase1', 'phase1_extra_actions', 'phase2', 'phase3'])) {
                 error_log("Rake ContextActionManager: Invalid phase '{$phase}' in supported contexts for action '{$actionId}'");
                 continue;
             }
@@ -66,7 +67,7 @@ class ContextActionManager
             }
         } else {
             // Unregister from all phases
-            foreach (['phase1', 'phase2', 'phase3'] as $p) {
+            foreach (['phase1', 'phase1_extra_actions', 'phase2', 'phase3'] as $p) {
                 if (isset(self::$actions[$p][$actionId])) {
                     unset(self::$actions[$p][$actionId]);
                 }
@@ -84,7 +85,7 @@ class ContextActionManager
      */
     public static function execute(string $phase, ActionContext $context): array
     {
-        if (!in_array($phase, ['phase1', 'phase2', 'phase3'])) {
+        if (!in_array($phase, ['phase1', 'phase1_extra_actions', 'phase2', 'phase3'])) {
             error_log("Rake ContextActionManager: Invalid phase '{$phase}'");
             return [];
         }
@@ -212,6 +213,7 @@ class ContextActionManager
     {
         self::$actions = [
             'phase1' => [],
+            'phase1_extra_actions' => [],
             'phase2' => [],
             'phase3' => [],
         ];
