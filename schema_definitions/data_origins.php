@@ -32,6 +32,12 @@ return [
             'default' => 0,
             'comment' => 'Flag indicating if URL has been crawled (has raw_data)',
         ],
+        'ignored' => [
+            'type' => 'tinyint',
+            'length' => 1,
+            'default' => 0,
+            'comment' => 'Flag indicating if item should be ignored (no worker can handle it)',
+        ],
         'metadata' => [
             'type' => 'text',
             'nullable' => true,
@@ -72,6 +78,7 @@ return [
         ['fields' => ['created_at'], 'name' => 'idx_created_at'],
         ['fields' => ['updated_at'], 'name' => 'idx_updated_at'],
         ['fields' => ['crawled'], 'name' => 'idx_crawled'],
+        ['fields' => ['ignored'], 'name' => 'idx_ignored'],
     ],
     'foreign_keys' => [
         [
@@ -81,5 +88,5 @@ return [
             'on_update' => 'CASCADE',
         ],
     ],
-    'version' => '2.1.0',
+    'version' => '2.2.0',
 ];
