@@ -38,6 +38,12 @@ return [
             'default' => 0,
             'comment' => 'Flag indicating if item should be ignored (no worker can handle it)',
         ],
+        'is_archive' => [
+            'type' => 'tinyint',
+            'length' => 1,
+            'default' => 0,
+            'comment' => 'Flag indicating if this is an archive page (category pages, listing pages that contain multiple items)',
+        ],
         'metadata' => [
             'type' => 'text',
             'nullable' => true,
@@ -79,6 +85,7 @@ return [
         ['fields' => ['updated_at'], 'name' => 'idx_updated_at'],
         ['fields' => ['crawled'], 'name' => 'idx_crawled'],
         ['fields' => ['ignored'], 'name' => 'idx_ignored'],
+        ['fields' => ['is_archive'], 'name' => 'idx_is_archive'],
     ],
     'foreign_keys' => [
         [
@@ -88,5 +95,5 @@ return [
             'on_update' => 'CASCADE',
         ],
     ],
-    'version' => '2.2.0',
+    'version' => '2.3.0',
 ];
