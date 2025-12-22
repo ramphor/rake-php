@@ -50,6 +50,12 @@ return [
             'default' => 0,
             'comment' => 'Flag indicating if this is an archive page (category pages, listing pages that contain multiple items)',
         ],
+        'ignore_reason' => [
+            'type' => 'string',
+            'length' => 255,
+            'nullable' => true,
+            'comment' => 'Reason for ignoring this item',
+        ],
         'metadata' => [
             'type' => 'text',
             'nullable' => true,
