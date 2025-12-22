@@ -11,7 +11,7 @@ return [
         ],
         'source_id' => [
             'type' => 'bigint',
-            'nullable' => true,
+            'nullable' => false,
             'comment' => 'Reference to rake_data_sources.id (NULL for child origins extracted from HTML)',
         ],
         'process_id' => [
