@@ -55,7 +55,6 @@ class DataUpdateCheckerAction extends AbstractContextAction
 
             foreach ($dataSources as $source) {
                 $sourceType = $source['type'] ?? 'url';
-                
                 try {
                     if ($sourceType === 'sitemap') {
                         // Check sitemap for new URLs
@@ -218,280 +217,524 @@ class DataUpdateCheckerAction extends AbstractContextAction
         global $wpdb;
         $originsTable = $wpdb->prefix . 'rake_data_origins';
 
-        // Get all archive pages (is_archive = 1) for this project
-        // Since there's no project_id column, we'll get all archive pages
-        // and filter by checking if they're related to this project's data sources
-        $archivePages = $wpdb->get_results(
-            "SELECT id, guid, metadata FROM {$originsTable} 
-            WHERE is_archive = 1 
-            AND guid IS NOT NULL 
-            AND guid != ''
-            ORDER BY id ASC",
-            ARRAY_A
-        );
-        
-        // Filter archive pages by project (check metadata)
-        // Archive pages should have project_id in metadata (set when is_archive flag is set in Phase 2)
-        $filteredArchivePages = [];
-        foreach ($archivePages as $page) {
-            $metadata = json_decode($page['metadata'] ?? '{}', true);
-            // Check if page belongs to this project via metadata
-            if (isset($metadata['project_id']) && (int)$metadata['project_id'] === $projectId) {
-                $filteredArchivePages[] = $page;
-            }
-        }
-        
-        // If no filtered results, try to get archive pages by checking source_id
-        if (empty($filteredArchivePages)) {
-            $sourcesTable = $wpdb->prefix . 'rake_data_sources';
-            $projectSources = $wpdb->get_col($wpdb->prepare(
-                "SELECT id FROM {$sourcesTable} WHERE tooth_id = %d",
-                $projectId
-            ));
-            
-            if (!empty($projectSources)) {
-                $sourceIds = implode(',', array_map('intval', $projectSources));
-                $archivePages = $wpdb->get_results(
-                    "SELECT id, guid, metadata FROM {$originsTable} 
-                    WHERE is_archive = 1 
-                    AND guid IS NOT NULL 
-                    AND guid != ''
-                    AND source_id IN ({$sourceIds})
-                    ORDER BY id ASC",
-                    ARRAY_A
-                );
-            } else {
-                $archivePages = [];
-            }
-        } else {
-            $archivePages = $filteredArchivePages;
-        }
+        $sourcesTable = $wpdb->prefix . 'rake_data_sources';
+        $archivePages = $wpdb->get_results($wpdb->prepare(
+            "SELECT o.id, o.guid, o.metadata FROM {$originsTable} o
+             LEFT JOIN {$sourcesTable} s ON o.source_id = s.id
+             WHERE o.is_archive = 1
+             AND s.tooth_id = %d
+             AND o.guid IS NOT NULL
+             AND o.guid != ''
+             ORDER BY o.id ASC",
+            $projectId
+        ), ARRAY_A);
 
         if (empty($archivePages)) {
-            $this->log('No archive pages found', [
-                'project_id' => $projectId,
-            ]);
+            $this->log('No archive pages found for project', ['project_id' => $projectId]);
             return $result;
         }
 
-        $this->log('Found archive pages to check', [
-            'project_id' => $projectId,
-            'archive_pages_count' => count($archivePages),
-        ]);
+        // Get workers from flow config to detect URLs
+        $workers = $this->getWorkersFromFlowConfig($flowConfig);
+        if (empty($workers)) {
+            $this->log('No workers found in flow config', ['project_id' => $projectId]);
+            return $result;
+        }
 
-        $httpClient = new \CrawlFlow\DataSources\HttpDataSource();
+        $allDetectedUrls = [];
 
+        // Process each archive page and detect URLs based on worker rules
         foreach ($archivePages as $archivePage) {
+            $pageUrl = $archivePage['guid'];
+            $metadata = json_decode($archivePage['metadata'] ?? '{}', true);
+            
+            // Add page_url and project_id to metadata for logging
+            $metadata['page_url'] = $pageUrl;
+            $metadata['project_id'] = $projectId;
+            
+            $this->log('Processing archive page', [
+                'project_id' => $projectId,
+                'page_url' => $pageUrl
+            ]);
+
             try {
-                $archiveUrl = $archivePage['guid'];
+                // Fetch archive page content
+                $httpClient = new \Puleeno\Rake\WordPress\Http\WordPressHttpClient();
+                $response = $httpClient->get($pageUrl);
                 
-                // Fetch archive page HTML
-                $response = $httpClient->fetch($archiveUrl);
-                
-                if (isset($response['status_code']) && $response['status_code'] === 200) {
-                    $htmlContent = $response['body'] ?? '';
-                    
-                    // Use UrlDataSourceHandler to extract URLs with proper settings
-                    if (class_exists('\CrawlFlow\Cron\Phase1\UrlDataSourceHandler')) {
-                        $handler = new \CrawlFlow\Cron\Phase1\UrlDataSourceHandler();
-                        
-                        // Get URL settings from source config (if available)
-                        // Use default settings for archive pages
-                        $urlSettings = [
-                            'scope' => 'current-url',
-                            'excludeExtensions' => [],
-                            'excludePatterns' => [],
-                            'whitelistPatterns' => [],
-                            'domainPolicy' => 'all',
-                            'domainWhitelist' => [],
-                        ];
-                        
-                        // Use reflection to call protected extractUrls method
-                        $reflection = new \ReflectionClass($handler);
-                        $method = $reflection->getMethod('extractUrls');
-                        $method->setAccessible(true);
-                        $urls = $method->invoke($handler, $htmlContent, $archiveUrl, $urlSettings);
-                    } else {
-                        // Fallback: simple extraction
-                        $urls = $this->extractUrlsFromHtml($htmlContent, $archiveUrl);
-                    }
-                } else {
-                    $statusCode = $response['status_code'] ?? 'unknown';
-                    $result['errors'][] = "Failed to fetch archive page {$archiveUrl}: HTTP {$statusCode}";
+                if (!$response->isSuccessful()) {
+                    $result['errors'][] = "Failed to fetch archive page: {$pageUrl}";
                     continue;
                 }
 
-                $this->log('Extracted URLs from archive page', [
+                $htmlContent = $response->getBody();
+                
+                // Detect URLs based on worker rules
+                $detectedUrls = $this->detectUrlsFromArchivePage($htmlContent, $workers, $metadata);
+                $allDetectedUrls = array_merge($allDetectedUrls, $detectedUrls);
+                
+                $this->log('Detected URLs from archive page', [
                     'project_id' => $projectId,
-                    'archive_url' => $archiveUrl,
-                    'urls_count' => count($urls),
+                    'page_url' => $pageUrl,
+                    'urls_detected_count' => count($detectedUrls),
+                    'total_urls_so_far' => count($allDetectedUrls)
                 ]);
-
-                // Save only new URLs (not existing in database)
-                foreach ($urls as $url) {
-                    if ($this->saveNewUrl($projectId, $url, $flowConfig)) {
-                        $result['urls_saved']++;
-                    }
-                    $result['urls_found']++;
-                }
-
+                
             } catch (\Exception $e) {
-                $result['errors'][] = "Error checking archive page {$archivePage['guid']}: " . $e->getMessage();
+                $result['errors'][] = "Error processing archive page {$pageUrl}: " . $e->getMessage();
+                $this->logError('Error processing archive page', [
+                    'project_id' => $projectId,
+                    'page_url' => $pageUrl,
+                    'error' => $e->getMessage()
+                ]);
             }
         }
+
+        // Remove duplicates using array_unique
+        $uniqueUrls = array_unique($allDetectedUrls);
+        $result['urls_found'] = count($uniqueUrls);
+
+        $this->log('Detected URLs from archive pages', [
+            'project_id' => $projectId,
+            'total_detected' => count($allDetectedUrls),
+            'unique_urls' => count($uniqueUrls)
+        ]);
+
+        // Check each unique URL if it exists in database
+        $newUrlsCount = 0;
+        foreach ($uniqueUrls as $url) {
+            if ($this->saveNewUrl($projectId, $url, $flowConfig)) {
+                $newUrlsCount++;
+                $this->log('Inserted new URL', [
+                    'project_id' => $projectId,
+                    'url' => $url
+                ]);
+            }
+        }
+        
+        $this->log('URL processing completed', [
+            'project_id' => $projectId,
+            'unique_urls_checked' => count($uniqueUrls),
+            'new_urls_added' => $newUrlsCount,
+            'existing_urls_skipped' => count($uniqueUrls) - $newUrlsCount
+        ]);
 
         return $result;
     }
 
     /**
-     * Extract URLs from sitemap XML
-     * Handles both sitemap index and regular sitemap
-     * 
-     * @param string $xmlContent
-     * @param string $baseUrl
-     * @return array
+     * Get workers from flow config
      */
-    private function extractUrlsFromSitemap(string $xmlContent, string $baseUrl): array
+    private function getWorkersFromFlowConfig(array $flowConfig): array
     {
-        $urls = [];
+        $workers = [];
+        $nodes = $flowConfig['nodes'] ?? [];
         
-        libxml_use_internal_errors(true);
-        $xml = @simplexml_load_string($xmlContent);
+        foreach ($nodes as $node) {
+            if ($node['type'] === 'worker') {
+                $nodeData = $node['data'] ?? [];
+                if ($nodeData['enabled'] ?? true) {
+                    // Add worker ID for logging
+                    $nodeData['id'] = $node['id'] ?? 'unknown';
+                    $workers[] = $nodeData;
+                }
+            }
+        }
         
-        if ($xml === false) {
-            libxml_clear_errors();
-            return $urls;
-        }
-
-        // Get sitemap namespace
-        $namespaces = $xml->getNamespaces(true);
-        $sitemapNs = 'http://www.sitemaps.org/schemas/sitemap/0.9';
-        foreach ($namespaces as $prefix => $ns) {
-            if (strpos($ns, 'sitemap') !== false) {
-                $sitemapNs = $ns;
-                break;
-            }
-        }
-
-        // Handle sitemap index (contains <sitemap> elements)
-        if ($xml->getName() === 'sitemapindex' || isset($xml->sitemap)) {
-            foreach ($xml->sitemap as $sitemap) {
-                $loc = (string)($sitemap->loc ?? '');
-                if (!empty($loc)) {
-                    $urls[] = $this->normalizeUrl($loc, $baseUrl);
-                }
-            }
-            
-            // Also try with namespace
-            if (empty($urls) && isset($xml->children($sitemapNs)->sitemap)) {
-                foreach ($xml->children($sitemapNs)->sitemap as $sitemap) {
-                    $loc = (string)($sitemap->loc ?? '');
-                    if (!empty($loc)) {
-                        $urls[] = $this->normalizeUrl($loc, $baseUrl);
-                    }
-                }
-            }
-        }
-
-        // Handle regular sitemap (contains <url> elements)
-        if ($xml->getName() === 'urlset' || isset($xml->url)) {
-            foreach ($xml->url as $url) {
-                $loc = (string)($url->loc ?? '');
-                if (!empty($loc)) {
-                    $urls[] = $this->normalizeUrl($loc, $baseUrl);
-                }
-            }
-            
-            // Also try with namespace
-            if (empty($urls) && isset($xml->children($sitemapNs)->url)) {
-                foreach ($xml->children($sitemapNs)->url as $url) {
-                    $loc = (string)($url->loc ?? '');
-                    if (!empty($loc)) {
-                        $urls[] = $this->normalizeUrl($loc, $baseUrl);
-                    }
-                }
-            }
-        }
-
-        libxml_clear_errors();
-        return array_unique($urls);
+        $this->log('Loaded workers from flow config', [
+            'total_workers' => count($workers),
+            'worker_ids' => array_column($workers, 'id'),
+            'worker_details' => $workers
+        ]);
+        
+        return $workers;
     }
 
     /**
-     * Extract URLs from HTML
+     * Convert CSS selector to XPath
      * 
-     * @param string $htmlContent
-     * @param string $baseUrl
-     * @return array
-     */
-    private function extractUrlsFromHtml(string $htmlContent, string $baseUrl): array
-    {
-        $urls = [];
-        
-        // Use DOMDocument to extract URLs
-        libxml_use_internal_errors(true);
-        $dom = new \DOMDocument();
-        @$dom->loadHTML($htmlContent);
-        libxml_clear_errors();
-
-        $xpath = new \DOMXPath($dom);
-        
-        // Extract all href attributes from <a> tags
-        $links = $xpath->query('//a[@href]');
-        
-        foreach ($links as $link) {
-            $href = $link->getAttribute('href');
-            if (!empty($href)) {
-                $absoluteUrl = $this->normalizeUrl($href, $baseUrl);
-                if (!empty($absoluteUrl) && filter_var($absoluteUrl, FILTER_VALIDATE_URL)) {
-                    $urls[] = $absoluteUrl;
-                }
-            }
-        }
-
-        return array_unique($urls);
-    }
-
-    /**
-     * Normalize URL to absolute
-     * 
-     * @param string $url
-     * @param string $baseUrl
+     * @param string $cssSelector
      * @return string
      */
-    private function normalizeUrl(string $url, string $baseUrl): string
+    private function cssToXPath(string $cssSelector): string
     {
-        if (empty($url)) {
-            return '';
-        }
-
-        // If already absolute, return as is
-        if (preg_match('/^https?:\/\//', $url)) {
-            return $url;
-        }
-
-        // Parse base URL
-        $baseParts = parse_url($baseUrl);
-        if (!$baseParts) {
-            return '';
-        }
-
-        $scheme = $baseParts['scheme'] ?? 'http';
-        $host = $baseParts['host'] ?? '';
-        $basePath = $baseParts['path'] ?? '/';
-
-        // Handle relative URLs
-        if (strpos($url, '/') === 0) {
-            // Absolute path
-            return $scheme . '://' . $host . $url;
-        } else {
-            // Relative path
-            $baseDir = dirname($basePath);
-            if ($baseDir === '.') {
-                $baseDir = '/';
+        // Handle multiple classes in one selector like .con.fr.clean
+        if (preg_match('/^\.([a-zA-Z0-9_-]+)(\.[a-zA-Z0-9_-]+)+$/', $cssSelector, $matches)) {
+            // Extract all classes
+            $classes = explode('.', ltrim($cssSelector, '.'));
+            $classConditions = [];
+            foreach ($classes as $class) {
+                $classConditions[] = 'contains(concat(" ", normalize-space(@class), " "), " ' . $class . ' ")';
             }
-            return $scheme . '://' . $host . $baseDir . '/' . ltrim($url, '/');
+            return '//*[' . implode(' and ', $classConditions) . ']';
         }
+        
+        // Handle basic CSS selectors
+        $xpath = $cssSelector;
+        
+        // Convert class selectors (.class) to XPath
+        $xpath = preg_replace('/\.([a-zA-Z0-9_-]+)/', '[@class and contains(concat(" ", normalize-space(@class), " "), " $1 ")]', $xpath);
+        
+        // Convert ID selectors (#id) to XPath
+        $xpath = preg_replace('/#([a-zA-Z0-9_-]+)/', '[@id="$1"]', $xpath);
+        
+        // Convert element selectors (tag) to XPath
+        $xpath = preg_replace('/^([a-zA-Z][a-zA-Z0-9]*)/', '$1', $xpath);
+        
+        // Handle descendant selectors (space)
+        $xpath = preg_replace('/\s+/', '//', $xpath);
+        
+        // Handle child selectors (>)
+        $xpath = preg_replace('/\s*>\s*/', '/', $xpath);
+        
+        // If the selector doesn't start with // or ., add // for global search
+        if (!preg_match('/^\/\/|^\./', $xpath)) {
+            $xpath = '//' . $xpath;
+        }
+        
+        return $xpath;
+    }
+
+    /**
+     * Query DOM elements with both CSS and XPath support
+     * 
+     * @param DOMXPath $xpath
+     * @param string $selector
+     * @param DOMNode $context
+     * @return DOMNodeList|false
+     */
+    private function queryElements(\DOMXPath $xpath, string $selector, ?\DOMNode $context = null)
+    {
+        // Try as XPath first
+        $nodes = $xpath->query($selector, $context);
+        
+        // If XPath fails and it looks like CSS selector, try converting
+        if ($nodes === false && preg_match('/[.#]/', $selector)) {
+            $xpathSelector = $this->cssToXPath($selector);
+            $this->log('Converting CSS selector to XPath', [
+                'original_selector' => $selector,
+                'converted_xpath' => $xpathSelector
+            ]);
+            $nodes = $xpath->query($xpathSelector, $context);
+        }
+        
+        return $nodes;
+    }
+
+    /**
+     * Detect URLs from archive page based on worker rules
+     */
+    private function detectUrlsFromArchivePage(string $htmlContent, array $workers, array $archiveMetadata): array
+    {
+        $detectedUrls = [];
+        
+        // Create DOM document for parsing
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($htmlContent);
+        libxml_clear_errors();
+        
+        $xpath = new \DOMXPath($dom);
+        
+        foreach ($workers as $worker) {
+            if (!($worker['isArchive'] ?? false)) {
+                continue; // Skip workers that are not archive page handlers
+            }
+            
+            $wrapperSelector = $worker['archiveProductsWrapper'] ?? null;
+            $urlContains = $worker['archiveUrlContains'] ?? null;
+            
+            if (empty($wrapperSelector)) {
+                continue; // Skip if no wrapper selector defined
+            }
+            
+            // Find wrapper elements using both CSS and XPath support
+            $wrapperNodes = $this->queryElements($xpath, $wrapperSelector);
+            
+            if ($wrapperNodes === false) {
+                $this->log('XPath query failed completely', [
+                    'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                    'wrapper_selector' => $wrapperSelector,
+                    'page_url' => $archiveMetadata['page_url'] ?? 'unknown'
+                ]);
+                continue;
+            }
+            
+            if ($wrapperNodes->length === 0) {
+                // This is not necessarily an error - the selector might not match this page
+                $this->log('No wrapper elements found with selector', [
+                    'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                    'wrapper_selector' => $wrapperSelector,
+                    'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                    'elements_found' => $wrapperNodes->length
+                ]);
+                continue;
+            }
+            
+            $this->log('Found wrapper elements', [
+                'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                'wrapper_selector' => $wrapperSelector,
+                'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                'elements_found' => $wrapperNodes->length
+            ]);
+            
+            foreach ($wrapperNodes as $wrapperNode) {
+                // Find all links within wrapper
+                $links = $this->queryElements($xpath, './/a', $wrapperNode);
+                
+                if ($links === false || $links->length === 0) {
+                    // No links found in this wrapper element
+                    $this->log('No links found in wrapper element', [
+                        'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                        'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                        'wrapper_selector' => $wrapperSelector,
+                        'links_found' => 0
+                    ]);
+                    continue;
+                }
+                
+                $this->log('Found links in wrapper element', [
+                    'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                    'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                    'wrapper_selector' => $wrapperSelector,
+                    'links_found' => $links->length
+                ]);
+                
+                // Also try to find product containers directly
+                $productContainers = $this->queryElements($xpath, './/div[contains(concat(" ", normalize-space(@class), " "), " list ")]', $wrapperNode);
+                
+                if ($productContainers !== false && $productContainers->length > 0) {
+                    $this->log('Found product containers', [
+                        'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                        'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                        'product_containers_found' => $productContainers->length
+                    ]);
+                    
+                    // Extract links from product containers
+                    foreach ($productContainers as $container) {
+                        $containerLinks = $this->queryElements($xpath, './/a', $container);
+                        if ($containerLinks !== false && $containerLinks->length > 0) {
+                            foreach ($containerLinks as $link) {
+                                $href = $link->getAttribute('href');
+                                
+                                if (empty($href)) {
+                                    continue;
+                                }
+                                
+                                // Make URL absolute if needed
+                                $url = $this->makeAbsoluteUrl($href, $archiveMetadata['base_url'] ?? '', $archiveMetadata['page_url'] ?? '');
+                                
+                                $this->log('Processing URL from product container', [
+                                    'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                                    'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                                    'original_href' => $href,
+                                    'absolute_url' => $url,
+                                    'matches_worker_rules' => $this->urlMatchesWorkerRules($url, $worker)
+                                ]);
+                                
+                                if (!empty($url) && $this->urlMatchesWorkerRules($url, $worker)) {
+                                    $detectedUrls[] = $url;
+                                    $this->log('URL added to detected list', [
+                                        'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                                        'url' => $url
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                foreach ($links as $link) {
+                    $href = $link->getAttribute('href');
+                    
+                    if (empty($href)) {
+                        continue;
+                    }
+                    
+                    // Make URL absolute if needed
+                    $url = $this->makeAbsoluteUrl($href, $archiveMetadata['base_url'] ?? '', $archiveMetadata['page_url'] ?? '');
+                    
+                    $this->log('Processing URL from wrapper', [
+                        'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                        'page_url' => $archiveMetadata['page_url'] ?? 'unknown',
+                        'original_href' => $href,
+                        'absolute_url' => $url,
+                        'matches_worker_rules' => $this->urlMatchesWorkerRules($url, $worker)
+                    ]);
+                    
+                    if (!empty($url) && $this->urlMatchesWorkerRules($url, $worker)) {
+                        $detectedUrls[] = $url;
+                        $this->log('URL added to detected list', [
+                            'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
+                            'url' => $url
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        return $detectedUrls;
+    }
+
+    /**
+     * Check if URL matches worker rules
+     */
+    private function urlMatchesWorkerRules(string $url, array $worker): bool
+    {
+        $detectionRules = $worker['detectionRules'] ?? [];
+        $detectionLogic = $worker['detectionLogic'] ?? 'and';
+        
+        $this->log('Checking URL against worker rules', [
+            'url' => $url,
+            'worker_id' => $worker['id'] ?? 'unknown',
+            'detection_logic' => $detectionLogic,
+            'detection_rules' => $detectionRules
+        ]);
+        
+        if (empty($detectionRules)) {
+            $this->log('No detection rules found, accepting URL', ['url' => $url]);
+            return true; // No rules means accept all URLs
+        }
+        
+        $matchedRules = 0;
+        
+        foreach ($detectionRules as $rule) {
+            $ruleType = $rule['type'] ?? '';
+            $ruleValue = $rule['pattern'] ?? $rule['value'] ?? ''; // Use pattern first, then value as fallback
+            
+            $matches = false;
+            
+            switch ($ruleType) {
+                case 'url-format':
+                    $pattern = str_replace('*', '.*', preg_quote($ruleValue, '/'));
+                    $matches = preg_match("/^{$pattern}$/i", $url);
+                    $this->log('URL format rule check', [
+                        'url' => $url,
+                        'rule_value' => $ruleValue,
+                        'pattern' => $pattern,
+                        'matches' => (bool)$matches
+                    ]);
+                    break;
+                    
+                case 'html-contains':
+                    // This would require fetching the URL content, skip for now
+                    $matches = true; // Assume it matches for archive page detection
+                    $this->log('HTML contains rule check (assumed match)', [
+                        'url' => $url,
+                        'rule_value' => $ruleValue
+                    ]);
+                    break;
+                    
+                case 'dom-value':
+                case 'tag-attribute':
+                    // These are for content extraction, not URL detection
+                    $matches = true;
+                    $this->log('DOM rule check (assumed match)', [
+                        'url' => $url,
+                        'rule_type' => $ruleType,
+                        'rule_value' => $ruleValue
+                    ]);
+                    break;
+            }
+            
+            if ($matches) {
+                $matchedRules++;
+            }
+            
+            // For OR logic, if any rule matches, return true immediately
+            if ($detectionLogic === 'or' && $matches) {
+                $this->log('URL matches worker rules (OR logic)', [
+                    'url' => $url,
+                    'matched_rules' => $matchedRules,
+                    'total_rules' => count($detectionRules)
+                ]);
+                return true;
+            }
+        }
+        
+        // For AND logic, all rules must match
+        // For OR logic, at least one rule must match (handled above)
+        $result = $detectionLogic === 'and' && $matchedRules === count($detectionRules);
+        
+        $this->log('URL worker rules check result', [
+            'url' => $url,
+            'detection_logic' => $detectionLogic,
+            'matched_rules' => $matchedRules,
+            'total_rules' => count($detectionRules),
+            'final_result' => $result
+        ]);
+        
+        return $result;
+    }
+
+    /**
+     * Make URL absolute
+     */
+    private function makeAbsoluteUrl(string $url, string $baseUrl = '', string $pageUrl = ''): string
+    {
+        if (strpos($url, 'http') === 0) {
+            return $url; // Already absolute
+        }
+        
+        // Try to extract base URL from pageUrl if baseUrl is empty
+        if (empty($baseUrl) && !empty($pageUrl)) {
+            $parsedPageUrl = parse_url($pageUrl);
+            if (isset($parsedPageUrl['scheme']) && isset($parsedPageUrl['host'])) {
+                $baseUrl = $parsedPageUrl['scheme'] . '://' . $parsedPageUrl['host'];
+            }
+        }
+        
+        if (empty($baseUrl)) {
+            return $url; // Can't make absolute without base URL
+        }
+        
+        return rtrim($baseUrl, '/') . '/' . ltrim($url, '/');
+    }
+
+    /**
+     * Extract URLs from sitemap XML content
+     * 
+     * @param string $xmlContent
+     * @param string $sitemapUrl
+     * @return array
+     */
+    private function extractUrlsFromSitemap(string $xmlContent, string $sitemapUrl): array
+    {
+        $urls = [];
+        
+        try {
+            $xml = simplexml_load_string($xmlContent);
+            
+            if ($xml === false) {
+                $this->logError('Failed to parse sitemap XML', ['sitemap_url' => $sitemapUrl]);
+                return $urls;
+            }
+            
+            // Handle both sitemap index and urlset formats
+            if (isset($xml->url)) {
+                // Standard sitemap with URLs
+                foreach ($xml->url as $url) {
+                    if (isset($url->loc)) {
+                        $urls[] = (string)$url->loc;
+                    }
+                }
+            } elseif (isset($xml->sitemap)) {
+                // Sitemap index - this would need recursive fetching
+                foreach ($xml->sitemap as $sitemap) {
+                    if (isset($sitemap->loc)) {
+                        $urls[] = (string)$sitemap->loc;
+                    }
+                }
+            }
+            
+        } catch (\Exception $e) {
+            $this->logError('Error parsing sitemap XML', [
+                'sitemap_url' => $sitemapUrl,
+                'error' => $e->getMessage()
+            ]);
+        }
+        
+        return $urls;
     }
 
     /**
@@ -500,98 +743,149 @@ class DataUpdateCheckerAction extends AbstractContextAction
      * @param int $projectId
      * @param string $url
      * @param array $flowConfig
-     * @return bool True if saved, false if already exists
+     * @return bool
      */
     private function saveNewUrl(int $projectId, string $url, array $flowConfig): bool
     {
         global $wpdb;
         $originsTable = $wpdb->prefix . 'rake_data_origins';
-
-        // Check if URL already exists
-        $existing = $wpdb->get_var($wpdb->prepare(
-            "SELECT id FROM {$originsTable} WHERE guid = %s",
-            $url
-        ));
-
-        if ($existing) {
-            return false; // Already exists
-        }
-
-        // Detect worker priority
-        $priority = 100; // Default
-        if (!empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
-            $priority = $this->detectWorkerPriority($projectId, $flowConfig, $url);
-        }
-
-        // Insert new URL with metadata
-        $now = current_time('mysql');
-        $metadata = [
-            'project_id' => $projectId,
-            'source' => 'data_update_checker',
-        ];
         
-        $result = $wpdb->insert(
-            $originsTable,
-            [
+        try {
+            // Check if URL already exists
+            $existing = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$originsTable} WHERE guid = %s",
+                $url
+            ));
+            
+            $this->log('Checking if URL exists in database', [
+                'project_id' => $projectId,
+                'url' => $url,
+                'url_exists' => !empty($existing),
+                'existing_id' => $existing
+            ]);
+            
+            if ($existing) {
+                $this->log('URL already exists, skipping', [
+                    'project_id' => $projectId,
+                    'url' => $url,
+                    'existing_id' => $existing
+                ]);
+                return false; // URL already exists
+            }
+            
+            // Get or create source
+            $sourcesTable = $wpdb->prefix . 'rake_data_sources';
+            $sourceId = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$sourcesTable} WHERE tooth_id = %d LIMIT 1",
+                $projectId
+            ));
+            
+            if (empty($sourceId)) {
+                // Create source if not exists
+                $baseUrl = $flowConfig['projectSettings']['base_url'] ?? '';
+                $wpdb->insert($sourcesTable, [
+                    'tooth_id' => $projectId,
+                    'type' => 'url',
+                    'name' => 'Sitemap Source',
+                    'config' => json_encode(['url' => $baseUrl]),
+                    'created_at' => current_time('mysql'),
+                ]);
+                $sourceId = $wpdb->insert_id;
+            }
+            
+            // Insert new URL
+            $metadata = [
+                'project_id' => $projectId,
+                'detected_by' => 'data_update_checker',
+                'source_type' => 'sitemap',
+                'created_at' => current_time('mysql')
+            ];
+            
+            $wpdb->insert($originsTable, [
+                'source_id' => $sourceId,
                 'guid' => $url,
-                'raw_data' => '', // Phase 1 does not fetch raw_data
-                'fetched_at' => $now, // avoid NULL constraint errors
+                'source_type' => 'sitemap',
+                'priority' => 100,
                 'crawled' => 0,
                 'ignored' => 0,
                 'is_archive' => 0,
-                'metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
-                'source_type' => 'bonus_phase',
-                'priority' => $priority,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            ['%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s']
-        );
-
-        return $result !== false;
+                'metadata' => json_encode($metadata),
+                'created_at' => current_time('mysql')
+            ]);
+            
+            return $wpdb->insert_id > 0;
+            
+        } catch (\Exception $e) {
+            $this->logError('Error saving new URL', [
+                'project_id' => $projectId,
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
     }
 
     /**
-     * Detect worker priority for URL
-     * 
-     * @param int $projectId
-     * @param array $flowConfig
-     * @param string $url
-     * @return int
+     * Insert new URL into database with proper data
      */
-    private function detectWorkerPriority(int $projectId, array $flowConfig, string $url): int
+    private function insertNewUrl(int $projectId, string $url, array $flowConfig, array $workers): void
     {
-        try {
-            if (class_exists('\CrawlFlow\Cron\WorkerCacheService')) {
-                $workerCacheService = new \CrawlFlow\Cron\WorkerCacheService();
-                $reception = $workerCacheService->getReception($projectId, $flowConfig);
-                $workers = $reception->getWorkers();
-                
-                // Create a mock raw item for detection
-                $mockRawItem = [
-                    'id' => 0,
-                    'guid' => $url,
-                    'raw_data' => '',
-                ];
-                
-                // Check each worker (already sorted by priority)
-                foreach ($workers as $worker) {
-                    if ($worker->canHandle($mockRawItem)) {
-                        return $worker->getPriority();
-                    }
-                }
+        global $wpdb;
+        $originsTable = $wpdb->prefix . 'rake_data_origins';
+        
+        // Find the worker that detected this URL to get its priority
+        $workerPriority = 100; // Default priority
+        $sourceId = null;
+        
+        foreach ($workers as $worker) {
+            if ($this->urlMatchesWorkerRules($url, $worker)) {
+                $workerPriority = $worker['priority'] ?? 100;
+                break;
             }
-        } catch (\Exception $e) {
-            $this->log('Error detecting worker priority', [
-                'project_id' => $projectId,
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
         }
         
-        // Default priority if no worker matches
-        return 100;
+        $sourcesTable = $wpdb->prefix . 'rake_data_sources';
+        $sourceId = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$sourcesTable} WHERE tooth_id = %d LIMIT 1",
+            $projectId
+        ));
+        if (empty($sourceId)) {
+            $baseUrl = '';
+            if (isset($flowConfig['projectSettings']['base_url'])) {
+                $baseUrl = $flowConfig['projectSettings']['base_url'];
+            } else {
+                $parts = parse_url($url);
+                if (is_array($parts) && isset($parts['scheme'], $parts['host'])) {
+                    $baseUrl = $parts['scheme'] . '://' . $parts['host'];
+                }
+            }
+            $wpdb->insert($sourcesTable, [
+                'tooth_id' => $projectId,
+                'type' => 'url',
+                'name' => 'Auto Source',
+                'config' => json_encode(['url' => $baseUrl ?: $url]),
+                'created_at' => current_time('mysql'),
+            ]);
+            $sourceId = (int)$wpdb->insert_id;
+        }
+        
+        $metadata = [
+            'project_id' => $projectId,
+            'detected_by' => 'data_update_checker',
+            'worker_priority' => $workerPriority,
+            'created_at' => current_time('mysql')
+        ];
+        
+        $wpdb->insert($originsTable, [
+            'source_id' => $sourceId,
+            'guid' => $url,
+            'source_type' => 'data_source',
+            'priority' => $workerPriority,
+            'crawled' => 0,
+            'ignored' => 0,
+            'metadata' => json_encode($metadata),
+            'created_at' => current_time('mysql')
+        ]);
     }
 
 }
-
