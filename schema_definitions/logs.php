@@ -25,6 +25,10 @@ return [
             'type' => 'int',
             'nullable' => true,
         ],
+        'tooth_id' => [
+            'type' => 'bigint',
+            'nullable' => true,
+        ],
         'url_id' => [
             'type' => 'int',
             'nullable' => true,
@@ -39,5 +43,5 @@ return [
         ['fields' => ['resource_id']],
         ['fields' => ['url_id']],
     ],
-    'version' => '2.0.0',
+    'version' => '2.0.1',
 ];
