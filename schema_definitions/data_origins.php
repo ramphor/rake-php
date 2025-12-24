@@ -92,6 +92,7 @@ return [
     'indexes' => [
         ['fields' => ['source_id']],
         ['fields' => ['guid'], 'unique' => true],
+        ['fields' => ['source_id', 'guid'], 'unique' => true, 'name' => 'uk_source_guid'],
         ['fields' => ['fetched_at']],
         ['fields' => ['created_at'], 'name' => 'idx_created_at'],
         ['fields' => ['updated_at'], 'name' => 'idx_updated_at'],
