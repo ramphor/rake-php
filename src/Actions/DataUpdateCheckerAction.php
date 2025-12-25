@@ -918,7 +918,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
                     [
                         'parent_origin_id' => $originParentId,
                         'child_origin_id' => $originId,
-                        'relationship_type' => 'source',
+                        'relationship_type' => 'category_product',
                         'created_at' => current_time('mysql')
                     ]
                 );
