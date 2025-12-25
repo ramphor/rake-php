@@ -2,8 +2,7 @@
 
 namespace Rake\Actions;
 
-use Rake\Actions\ActionContext;
-use Rake\Actions\ActionResult;
+use Puleeno\Rake\WordPress\Http\WordPressHttpClient;
 
 /**
  * Data Update Checker Action
@@ -235,6 +234,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
             "SELECT o.id, o.guid, o.metadata FROM {$originsTable} o
              LEFT JOIN {$sourcesTable} s ON o.source_id = s.id
              WHERE o.is_archive = 1
+             AND o.crawled = 1
              AND s.tooth_id = %d
              AND o.guid IS NOT NULL
              AND o.guid != ''
@@ -331,6 +331,9 @@ class DataUpdateCheckerAction extends AbstractContextAction
             'new_urls_added' => $newUrlsCount,
             'existing_urls_skipped' => count($uniqueUrls) - $newUrlsCount
         ]);
+
+        // Update result with actual counts
+        $result['urls_saved'] = $newUrlsCount;
 
         return $result;
     }
@@ -452,10 +455,10 @@ class DataUpdateCheckerAction extends AbstractContextAction
     /**
      * Query DOM elements with both CSS and XPath support
      * 
-     * @param DOMXPath $xpath
+     * @param \DOMXPath $xpath
      * @param string $selector
-     * @param DOMNode $context
-     * @return DOMNodeList|false
+     * @param \DOMNode $context
+     * @return \DOMNodeList|false
      */
     private function queryElements(\DOMXPath $xpath, string $selector, ?\DOMNode $context = null)
     {
@@ -543,17 +546,24 @@ class DataUpdateCheckerAction extends AbstractContextAction
             
             // Find all links within wrapper elements
             foreach ($wrapperNodes as $wrapperNode) {
-                $links = $wrapperNode->getElementsByTagName('a');
-                foreach ($links as $link) {
-                    $href = $link->getAttribute('href');
-                    if (!empty($href)) {
-                        $url = $this->makeAbsoluteUrl($href, $archiveMetadata['base_url'] ?? '', $archiveMetadata['page_url'] ?? '');
-                        
-                        // Filter URLs based on archiveUrlContains rule
-                        if (!empty($url)) {
-                            $urlContains = $worker['archiveUrlContains'] ?? null;
-                            if (empty($urlContains) || strpos($url, $urlContains) !== false) {
-                                $extractedUrls[] = $url;
+                if ($wrapperNode instanceof \DOMElement) {
+                    $links = $wrapperNode->getElementsByTagName('a');
+                    foreach ($links as $link) {
+                        if ($link instanceof \DOMElement) {
+                            $href = $link->getAttribute('href');
+                            if (!empty($href)) {
+                                // Skip invalid URLs
+                                if ($this->isValidUrlForExtraction($href)) {
+                                    $url = $this->makeAbsoluteUrl($href, $archiveMetadata['base_url'] ?? '', $archiveMetadata['page_url'] ?? '');
+                                    
+                                    // Filter URLs based on archiveUrlContains rule
+                                    if (!empty($url)) {
+                                        $urlContains = $worker['archiveUrlContains'] ?? null;
+                                        if (empty($urlContains) || strpos($url, $urlContains) !== false) {
+                                            $extractedUrls[] = $url;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -567,49 +577,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
             'extracted_urls_count' => count($extractedUrls)
         ]);
         
-        // Phase 2: Validate extracted URLs against ALL workers
-        foreach ($extractedUrls as $url) {
-            $this->log('Validating extracted URL against all workers', [
-                'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
-                'url' => $url,
-                'total_workers_for_validation' => count($workers)
-            ]);
-            
-            $urlMatchesAnyWorker = false;
-            
-            foreach ($workers as $worker) {
-                $this->log('Checking URL against worker rules', [
-                    'url' => $url,
-                    'worker_id' => $worker['id'] ?? 'unknown',
-                    'detection_logic' => $worker['detectionLogic'] ?? 'and',
-                    'detection_rules' => $worker['detectionRules'] ?? []
-                ]);
-                
-                if ($this->urlMatchesWorkerRules($url, $worker)) {
-                    $urlMatchesAnyWorker = true;
-                    $this->log('URL matches worker rules', [
-                        'url' => $url,
-                        'worker_id' => $worker['id'] ?? 'unknown'
-                    ]);
-                    break; // URL matches at least one worker, no need to check others
-                }
-            }
-            
-            if ($urlMatchesAnyWorker) {
-                $detectedUrls[] = $url;
-                $this->log('URL added to detected list', [
-                    'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
-                    'url' => $url
-                ]);
-            } else {
-                $this->log('URL rejected - no worker matches', [
-                    'project_id' => $archiveMetadata['project_id'] ?? 'unknown',
-                    'url' => $url
-                ]);
-            }
-        }
-        
-        return $detectedUrls;
+        return $extractedUrls;
     }
 
     /**
@@ -702,6 +670,51 @@ class DataUpdateCheckerAction extends AbstractContextAction
         ]);
         
         return $result;
+    }
+
+    /**
+     * Validate if URL is suitable for extraction
+     * 
+     * @param string $url
+     * @return bool
+     */
+    private function isValidUrlForExtraction(string $url): bool
+    {
+        // Skip JavaScript URLs
+        if (strpos($url, 'javascript:') === 0) {
+            return false;
+        }
+        
+        // Skip empty or whitespace-only URLs
+        if (empty(trim($url))) {
+            return false;
+        }
+        
+        // Skip anchor-only URLs
+        if (strpos($url, '#') === 0) {
+            return false;
+        }
+        
+        // Skip mailto: and tel: URLs
+        if (strpos($url, 'mailto:') === 0 || strpos($url, 'tel:') === 0) {
+            return false;
+        }
+        
+        // Skip URLs with incomplete query parameters (ending with & or ?)
+        if (preg_match('/[?&]$/', $url)) {
+            return false;
+        }
+        
+        // Skip external domains that are clearly not product pages
+        $externalDomains = ['paypal.com', 'dhl.com', 'fedex.com', 'ems.com.cn', 'westernunion.com'];
+        foreach ($externalDomains as $domain) {
+            if (strpos($url, $domain) !== false) {
+                return false;
+            }
+        }
+        
+        // Accept relative URLs and same-domain URLs
+        return true;
     }
 
     /**
@@ -849,7 +862,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
             $metadata = [
                 'project_id' => $projectId,
                 'detected_by' => 'data_update_checker',
-                'source_type' => 'sitemap',
+                'source_type' => 'data_update_checker',
                 'worker_priority' => $workerPriority,
                 'created_at' => current_time('mysql')
             ];
