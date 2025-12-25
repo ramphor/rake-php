@@ -15,7 +15,7 @@ class ProcessorManager
     /**
      * @var array Registered processors
      */
-    private static array $processors = [];
+    public static array $processors = [];
 
     /**
      * @var array Processor aliases
