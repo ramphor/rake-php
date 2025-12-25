@@ -3,6 +3,7 @@
 namespace Rake\Actions;
 
 use Puleeno\Rake\WordPress\Http\WordPressHttpClient;
+use Rake\Facade\Request;
 
 /**
  * Data Update Checker Action
@@ -195,9 +196,10 @@ class DataUpdateCheckerAction extends AbstractContextAction
                 'urls_count' => count($urls),
             ]);
 
+                $originParentId = $this->findOriginParentId($sitemapUrl);
             // Save only new URLs (not existing in database)
             foreach ($urls as $url) {
-                if ($this->saveNewUrl($projectId, $url, $flowConfig, $workers)) {
+                if ($this->saveNewUrl($projectId, $url, $originParentId, $flowConfig, $workers)) {
                     $result['urls_saved']++;
                 }
                 $result['urls_found']++;
@@ -259,6 +261,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
         // Process each archive page and detect URLs based on worker rules
         foreach ($archivePages as $archivePage) {
             $pageUrl = $archivePage['guid'];
+            $originParentId = $archivePage['id'];
             $metadata = json_decode($archivePage['metadata'] ?? '{}', true);
             
             // Add page_url and project_id to metadata for logging
@@ -272,7 +275,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
 
             try {
                 // Fetch archive page content
-                $httpClient = new \Puleeno\Rake\WordPress\Http\WordPressHttpClient();
+                $httpClient = Request::client();
                 $response = $httpClient->get($pageUrl);
                 
                 if (!$response->isSuccessful()) {
@@ -316,7 +319,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
         // Check each unique URL if it exists in database
         $newUrlsCount = 0;
         foreach ($uniqueUrls as $url) {
-            if ($this->saveNewUrl($projectId, $url, $flowConfig, $workers)) {
+            if ($this->saveNewUrl($projectId, $url, $originParentId, $flowConfig, $workers)) {
                 $newUrlsCount++;
                 $this->log('Inserted new URL', [
                     'project_id' => $projectId,
@@ -788,6 +791,34 @@ class DataUpdateCheckerAction extends AbstractContextAction
     }
 
     /**
+     * Find origin parent ID for a given sitemap URL
+     * 
+     * @param string $sitemapUrl
+     * @return int|null
+     */
+    private function findOriginParentId(string $sitemapUrl): ?int
+    {
+        global $wpdb;
+        $originsTable = $wpdb->prefix . 'rake_data_origins';
+        
+        try {
+            $parentId = $wpdb->get_var($wpdb->prepare(
+                "SELECT id FROM {$originsTable} WHERE guid = %s LIMIT 1",
+                $sitemapUrl
+            ));
+            
+            return $parentId ? (int)$parentId : null;
+            
+        } catch (\Exception $e) {
+            $this->logError('Error finding origin parent ID', [
+                'sitemap_url' => $sitemapUrl,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
+    }
+
+    /**
      * Save new URL if it doesn't exist
      * 
      * @param int $projectId
@@ -795,7 +826,7 @@ class DataUpdateCheckerAction extends AbstractContextAction
      * @param array $flowConfig
      * @return bool
      */
-    private function saveNewUrl(int $projectId, string $url, array $flowConfig, array $workers): bool
+    private function saveNewUrl(int $projectId, string $url, int $originParentId, array $flowConfig, array $workers): bool
     {
         global $wpdb;
         $originsTable = $wpdb->prefix . 'rake_data_origins';
@@ -879,7 +910,21 @@ class DataUpdateCheckerAction extends AbstractContextAction
                 'created_at' => current_time('mysql')
             ]);
             
-            return $wpdb->insert_id > 0;
+            // Create reference in data_origins_references table
+            $originId = $wpdb->insert_id;
+            if ($originId) {
+                $wpdb->insert(
+                    $wpdb->prefix . 'rake_data_origins_references',
+                    [
+                        'parent_origin_id' => $originParentId,
+                        'child_origin_id' => $originId,
+                        'relationship_type' => 'source',
+                        'created_at' => current_time('mysql')
+                    ]
+                );
+            }
+            
+            return $originId > 0;
             
         } catch (\Exception $e) {
             $this->logError('Error saving new URL', [
