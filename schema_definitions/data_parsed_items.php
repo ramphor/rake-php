@@ -39,12 +39,6 @@ return [
             'type' => 'longtext',
             'comment' => 'JSON parsed data',
         ],
-        'status' => [
-            'type' => 'string',
-            'length' => 50,
-            'default' => 'pending',
-            'comment' => 'pending, processed, failed, skipped',
-        ],
         'has_change' => [
             'type' => 'tinyint',
             'length' => 1,
